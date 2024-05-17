@@ -58,14 +58,17 @@ class P_MPPI:
        pdf=(2*math.pi)**(-1)*(jnp.linalg.det(cov))**(-1/2)*jnp.exp(-1/2*jnp.matmul(jnp.matmul((x-mean).T,jnp.linalg.inv(cov)),(x-mean)))
        return pdf
         
-    def generate_session(self, args,epochs,key,state_train):
-
+    def generate_session(self, args,epochs,actions_d,state_train,D_demo,mpc_method=None,thetas=None):
+        
+        
+        demo_x_min,demo_x_max= jnp.min(D_demo[:,0]),jnp.max(D_demo[:,0])
+        demo_y_min,demo_y_max= jnp.min(D_demo[:,1]),jnp.max(D_demo[:,1])
         states, traj_probs, actions,FIMs = [], [], [],[]
         
         mpl.rcParams['path.simplify_threshold'] = 1.0
         mplstyle.use('fast')
         mplstyle.use(['ggplot', 'fast'])
-        #key = jax.random.PRNGKey(args.seed)
+        key = jax.random.PRNGKey(args.seed)
         np.random.seed(args.seed)
 
         # =========================== Experiment Choice ================== #
@@ -88,7 +91,7 @@ class P_MPPI:
         cov = jax.scipy.linalg.block_diag(*[cov_traj for _ in range(args.N_radar)])
         # cov = jnp.stack([cov_traj for n in range(N)])
 
-        mpc_method = "Single_FIM_3D_action_NN_MPPI"
+        #mpc_method = "Single_FIM_3D_action_features_MPPI"
 
         # ==================== AIS CONFIGURATION ================================= #
         key, subkey = jax.random.split(key)
@@ -105,6 +108,7 @@ class P_MPPI:
         #                 [30,30,z_elevation+20,-10,-10,0]])#,
 
         ps,key = place_sensors_restricted(key,target_state,args.R2R,args.R2T,-400,400,args.N_radar)
+        ps=D_demo[0,:3].reshape((1,3))
         chis = jax.random.uniform(key,shape=(ps.shape[0],1),minval=-jnp.pi,maxval=jnp.pi)
         vs = jnp.zeros((ps.shape[0],1))
         avs = jnp.zeros((ps.shape[0],1))
@@ -170,7 +174,7 @@ class P_MPPI:
             IM_fn_update = IM_fn
 
 
-        MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train)
+        MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train,thetas=thetas)
         #MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method)
         MPPI_scores = MPPI_scores_wrapper(MPC_obj)
 
@@ -269,6 +273,12 @@ class P_MPPI:
 
                     radar_states,radar_states_MPPI = MPPI(U_nominal=U_prime,
                                                                        U_MPPI=V,radar_state=radar_state)
+                    
+                    radar_states=radar_states.at[:,:,0].set(jnp.clip(radar_states[:,:,0],demo_x_min,demo_x_max))
+                    radar_states=radar_states.at[:,:,1].set(jnp.clip(radar_states[:,:,1],demo_y_min,demo_y_max))
+                    radar_states_MPPI=radar_states_MPPI.at[:,:,:,0].set(jnp.clip(radar_states_MPPI[:,:,:,0],demo_x_min,demo_x_max))
+                    radar_states_MPPI=radar_states_MPPI.at[:,:,:,1].set(jnp.clip(radar_states_MPPI[:,:,:,1],demo_y_min,demo_y_max))
+                    
 
                     mppi_rollout_end = time()
                     
@@ -325,12 +335,18 @@ class P_MPPI:
                 # radar_states = kinematic_model(U ,radar_state, dt_control)
 
                 # generate radar states at measurement frequency
+                #U=U.at[:,0,:].set(actions_d[step-1,:].reshape((1,2)))
+                #U[:,0,:]=actions_d[step,:].reshape((1,2))
                 radar_states = kinematic_model(U,
                                                radar_state, args.dt_control)
+                
 
                 #U += jnp.clip(jnp.sum(weights.reshape(args.num_traj,1,1,1) *  E.reshape(args.num_traj,N,horizon,2),axis=0),U_lower,U_upper)
 
                 radar_state = radar_states[:,1]
+                radar_state=radar_state.at[:,0].set(jnp.clip(radar_state[:,0],demo_x_min,demo_x_max))
+                radar_state=radar_state.at[:,1].set(jnp.clip(radar_state[:,1],demo_y_min,demo_y_max))
+                
                 U = jnp.roll(U, -1, axis=1)
 
                 mppi_end_time = time()

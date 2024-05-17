@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun May  5 13:38:21 2024
+Created on Thu May 16 16:59:39 2024
 
 @author: siliconsynapse
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 27 00:00:04 2024
-
-@author: siliconsynapse
-"""
 
 
 import jax
@@ -78,7 +72,7 @@ parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at 
 parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
 parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
 parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument("--N_steps",default=5,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
@@ -171,7 +165,7 @@ variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0])))
 params = variables['params']
 #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
 #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-3)
+tx = optax.adam(learning_rate=1e-2)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []
@@ -191,7 +185,9 @@ return_list, sum_of_cost_list = [], []
 
 #U,chis,radar_states,target_states
 thetas=jnp.ones((1,4))
-mpc_method = "Single_FIM_3D_action_NN_MPPI"
+
+alpha =1e-3
+mpc_method = "Single_FIM_3D_action_features_MPPI"
 
 for i in range(100):
     if (i== 0): 
@@ -207,11 +203,17 @@ for i in range(100):
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
         D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
     
-    trajs = [policy.generate_session(args,i,actions_d,state_train,D_demo,mpc_method,thetas)]
-    sample_trajs = trajs + sample_trajs
+    trajs = [policy.generate_session(args,i,actions_d,state_train,D_demo,thetas)]
+    sample_trajs = sample_trajs
     #sample_trajs = demo_trajs + sample_trajs
     D_samp = preprocess_traj(trajs, D_samp)
     #D_samp = D_demo
+    
+    states, probs, actions = D_samp[:,:-3], D_samp[:,-3], D_samp[:,-2:]
+    states_expert,probs_experts, actions_expert = D_demo[:,:-3], D_demo[:,-3], D_demo[:,-2:]
+    
+    
+    gradients=features(states_expert,is_Demo=True) - features_tilde(states,is_Demo=False)
 
     # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
     loss_rew = []

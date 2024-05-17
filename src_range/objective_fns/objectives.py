@@ -10,7 +10,7 @@ from jax import jit,vmap
 
 import jax
 from jax.tree_util import Partial as partial
-def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,method="action"):
+def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,method="action"):
 
     # the lower this value, the better!
 
@@ -86,7 +86,35 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,method="action
             for t in range(1,horizon+1):
                 # iterate through each FIM corresponding to a target
 
-                J = IM_fn(radar_state=radar_states[:,t,:3],target_state=target_state[:,t-1],J=J,method="NN", state_train=state_train)
+                J = IM_fn(radar_state=radar_states[:,t,:3],target_state=target_state[:,t-1],J=J,method="NN", state_train=state_train,thetas=thetas)
+                Js[t-1] = J
+
+            Js = jnp.stack(Js)
+            if N ==1 and M ==1 :
+                logdets = jnp.log(Js)
+            else :
+                _,logdets = jnp.linalg.slogdet(Js)
+            gammas = gamma**(jnp.arange(horizon))
+            multi_FIM_obj = jnp.sum(gammas*logdets)/jnp.sum(gammas)
+
+            return -multi_FIM_obj
+        
+    elif method=="Single_FIM_3D_action_features_MPPI":
+        @jit
+        def MPC_obj(U,radar_state,target_state,J,A):
+
+            # horizon = U.shape[1]
+            M,horizon,dm = target_state.shape
+            N,dn = radar_state.shape
+
+            radar_states = kinematic_model(U,radar_state,dt)
+            
+            # iterate through time step
+            Js = [None]*horizon
+            for t in range(1,horizon+1):
+                # iterate through each FIM corresponding to a target
+
+                J = IM_fn(radar_state=radar_states[:,t,:3],target_state=target_state[:,t-1],J=J,method="features", state_train=state_train,thetas=thetas)
                 Js[t-1] = J
 
             Js = jnp.stack(Js)

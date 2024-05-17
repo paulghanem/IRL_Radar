@@ -15,15 +15,40 @@ from copy import deepcopy
 
 from src_range.control.Sensor_Dynamics import UNI_SI_U_LIM,UNI_DI_U_LIM,unicycle_kinematics_single_integrator,unicycle_kinematics_double_integrator
 
+def features_f(radar_state,target_state): 
+    radar_positions = radar_state[:,:3]
 
-def Single_FIM_Radar(radar_state,target_state,C,J=None,method=None,state_train=None):
+    target_positions = target_state[:,:3]
+    
+    d=target_positions-radar_positions
+    distances = jnp.sqrt(jnp.sum(d**2,-1,keepdims=True))
+    
+    features=jnp.array([1/(distances), 1/(distances**2), 1/(distances**3), 1/(distances**4) ]).reshape((4,1))
+    return features
+    
+def Single_FIM_Radar(radar_state,target_state,C,J=None,method=None,state_train=None,thetas=None):
     
     if method=="NN":
        radar_positions = radar_state[:,:3]
    
        target_positions = target_state[:,:3]
        states=jnp.concatenate((radar_positions.reshape(1,-1),target_positions.reshape(1,-1)),axis=1)
-       J = state_train.apply_fn({'params': state_train.params}, states) +1e-6
+       J = state_train.apply_fn({'params': state_train.params}, states)+1e-2
+       
+       return J
+   
+    
+    if method=="features":
+       # radar_positions = radar_state[:,:3]
+   
+       # target_positions = target_state[:,:3]
+       
+       # #d = (target_positions[jnp.newaxis,:,:] - radar_positions[:,jnp.newaxis,:])
+       # d=target_positions-radar_positions
+       # distances = jnp.sqrt(jnp.sum(d**2,-1,keepdims=True))
+       
+       features=features_f(radar_state,target_state)
+       J=jnp.matmul(thetas,features)
        
        return J
    

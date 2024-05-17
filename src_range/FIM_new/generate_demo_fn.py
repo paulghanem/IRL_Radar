@@ -757,6 +757,7 @@ def generate_demo_MPPI_single(args,state_train):
 
                radar_state = radar_states[:,1]
                U = jnp.roll(U, -1, axis=1)
+               ps=radar_state[:,:3]
 
                mppi_end_time = time()
                print(f"MPPI Round Time {step} ",np.round(mppi_end_time-mppi_start_time,3))

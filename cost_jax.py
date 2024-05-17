@@ -50,21 +50,33 @@ class CostNN(nn.Module):
 
 
 @jax.jit
-def apply_model(state_train, states, actions,states_expert,actions_expert,probs):
+def apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
     """Computes gradients, loss and accuracy for a single batch."""
     
 
   
     def loss_fn(params):
-      costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert))
-      costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states))
+        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
+        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
       # LOSS CALCULATION FOR IOC (COST FUNCTION)
       #logits = state_train.apply_fn({'params': params}, jnp.concatenate((states,actions),axis=1))
-      loss = jnp.mean(costs_demo) + \
-              jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7)))
-      #loss=jnp.mean(optax.l2_loss(predictions=costs_samp,targets=jnp.ones((200,1))))
-        
-      return loss
+        # g_demo=jnp.zeros(costs_demo.shape)
+        # g_mono_demo=jnp.zeros(costs_demo.shape)
+        # g_samp=jnp.zeros(costs_samp.shape)
+        # g_mono_samp=jnp.zeros(costs_samp.shape)
+        # for i in range (2,costs_demo.shape[0]):
+        #     g_demo=g_demo.at[i].set(jnp.pow((costs_demo[i]-costs_demo[i-1])-(costs_demo[i-1]-costs_demo[i-2]),2))
+        #     g_mono_demo=g_mono_demo.at[i].set(jnp.pow(jnp.maximum(0,costs_demo[i]-costs_demo[i-1]-1),2))
+        # for i in range (costs_samp.shape[0]):
+        #     g_samp=g_samp.at[i].set(jnp.pow((costs_samp[i]-costs_samp[i-1])-(costs_samp[i-1]-costs_samp[i-2]),2))
+        #     g_mono_samp=g_mono_samp.at[i].set(jnp.pow(jnp.maximum(0,costs_samp[i]-costs_samp[i-1]-1),2))  
+         
+        loss = jnp.mean(costs_demo) + \
+               jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7))) #+ jnp.sum(g_demo) + jnp.sum(g_samp)+jnp.sum(g_mono_demo)+jnp.sum(g_mono_samp)
+               #jnp.mean((jnp.exp(-costs_demo))/(probs_experts))
+        #loss=jnp.mean(optax.l2_loss(predictions=costs_samp,targets=jnp.ones((200,1))))
+          
+        return loss
       
     grad_fn = jax.value_and_grad(loss_fn, has_aux=False)
     loss, grads = grad_fn(state_train.params)
