@@ -48,6 +48,13 @@ class CostNN(nn.Module):
     x = nn.relu(x)
     return x
 
+def cost_fn(state_train,params,states,N):
+    distances=states[:,:3]-states[:,3:]
+    #costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
+    #costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
+    costs = -jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6).flatten()/N
+    
+    return costs[0].astype(float)
 
 @jax.jit
 def apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
@@ -56,8 +63,12 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
 
   
     def loss_fn(params):
-        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
-        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
+        distances_expert=states_expert[:,:3]-states_expert[:,3:]
+        distances=states[:,:3]-states[:,3:]
+        #costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
+        #costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
+        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, distances_expert)+1e-6)
+        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6)
       # LOSS CALCULATION FOR IOC (COST FUNCTION)
       #logits = state_train.apply_fn({'params': params}, jnp.concatenate((states,actions),axis=1))
         # g_demo=jnp.zeros(costs_demo.shape)
@@ -71,11 +82,50 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
         #     g_samp=g_samp.at[i].set(jnp.pow((costs_samp[i]-costs_samp[i-1])-(costs_samp[i-1]-costs_samp[i-2]),2))
         #     g_mono_samp=g_mono_samp.at[i].set(jnp.pow(jnp.maximum(0,costs_samp[i]-costs_samp[i-1]-1),2))  
          
-        loss = jnp.mean(costs_demo) + \
-               jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7))) #+ jnp.sum(g_demo) + jnp.sum(g_samp)+jnp.sum(g_mono_demo)+jnp.sum(g_mono_samp)
+       # loss = jnp.mean(costs_demo) + \
+         #      jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7))) #+ jnp.sum(g_demo) + jnp.sum(g_samp)+jnp.sum(g_mono_demo)+jnp.sum(g_mono_samp)
                #jnp.mean((jnp.exp(-costs_demo))/(probs_experts))
         #loss=jnp.mean(optax.l2_loss(predictions=costs_samp,targets=jnp.ones((200,1))))
-          
+        loss = jnp.mean(costs_demo) + \
+               jnp.mean(jnp.log(jnp.exp(-costs_samp)/(probs+1e-7)))
+        # loss = jnp.mean(((costs_demo) + \
+        #        jnp.log(jnp.exp(-costs_samp)/(probs+1e-7)))**2)
+   
+        return loss
+      
+    grad_fn = jax.value_and_grad(loss_fn, has_aux=False)
+    loss, grads = grad_fn(state_train.params)
+    return grads, loss
+
+
+@jax.jit
+def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
+    """Computes gradients, loss and accuracy for a single batch."""
+    
+
+  
+    def loss_fn(params):
+        distances_expert=states_expert[:,:3]-states_expert[:,3:]
+        distances=states[:,:3]-states[:,3:]
+        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, distances_expert)+1e-6)
+        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6)
+        disc_demo = jnp.exp(costs_demo)/(jnp.exp(costs_demo)+1)
+        disc_samp =jnp.exp(costs_samp)/(jnp.exp(costs_samp)+1)
+      # LOSS CALCULATION FOR IOC (COST FUNCTION)
+      #logits = state_train.apply_fn({'params': params}, jnp.concatenate((states,actions),axis=1))
+        # g_demo=jnp.zeros(costs_demo.shape)
+        # g_mono_demo=jnp.zeros(costs_demo.shape)
+        # g_samp=jnp.zeros(costs_samp.shape)
+        # g_mono_samp=jnp.zeros(costs_samp.shape)
+        # for i in range (2,costs_demo.shape[0]):
+        #     g_demo=g_demo.at[i].set(jnp.pow((costs_demo[i]-costs_demo[i-1])-(costs_demo[i-1]-costs_demo[i-2]),2))
+        #     g_mono_demo=g_mono_demo.at[i].set(jnp.pow(jnp.maximum(0,costs_demo[i]-costs_demo[i-1]-1),2))
+        # for i in range (costs_samp.shape[0]):
+        #     g_samp=g_samp.at[i].set(jnp.pow((costs_samp[i]-costs_samp[i-1])-(costs_samp[i-1]-costs_samp[i-2]),2))
+        #     g_mono_samp=g_mono_samp.at[i].set(jnp.pow(jnp.maximum(0,costs_samp[i]-costs_samp[i-1]-1),2))  
+         
+        loss = -jnp.mean(jnp.log(disc_demo))-jnp.mean(jnp.log(1-disc_samp))
+              
         return loss
       
     grad_fn = jax.value_and_grad(loss_fn, has_aux=False)
@@ -115,8 +165,36 @@ def apply_model_multi(state_train, states, actions,states_expert,actions_expert,
     grad_fn = jax.value_and_grad(loss_fn, has_aux=False)
     loss, grads = grad_fn(state_train.params)
     return grads, loss
+
     
-      
+@jax.jit 
+def get_gradients(state_train,params,state,N_steps):
+    dc_d_theta=jax.grad(cost_fn,argnums=1)(state_train,params,state.reshape(1,-1),N_steps)
+    Dense_0_bias_g=dc_d_theta['Dense_0']['bias']
+    Dense_0_kernel_g=dc_d_theta['Dense_0']['kernel'].reshape((dc_d_theta['Dense_0']['kernel'].shape[0]*dc_d_theta['Dense_0']['kernel'].shape[1]))
+    Dense_1_bias_g=dc_d_theta['Dense_1']['bias']
+    Dense_1_kernel_g=dc_d_theta['Dense_1']['kernel'].reshape((dc_d_theta['Dense_1']['kernel'].shape[0]*dc_d_theta['Dense_1']['kernel'].shape[1]))
+    
+    gradients=jnp.concatenate((Dense_0_bias_g,Dense_0_kernel_g,Dense_1_bias_g,Dense_1_kernel_g))
+    return gradients
+
+@jax.jit 
+def get_hessian(state_train,params,state,N_steps):
+    d2c_d2_theta=jax.hessian(cost_fn,argnums=1)(state_train,params,state.reshape(1,-1),N_steps)
+    Dense_0_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['bias'])
+    Dense_0_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['kernel'])
+    Dense_1_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['bias'])
+    Dense_1_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['kernel'])
+    
+    for j in range(len(Dense_0_bias_h[0])):
+        Dense_0_bias_h[0][j]=Dense_0_bias_h[0][j].reshape((Dense_0_bias_h[0][j].shape[0],-1))
+        Dense_1_bias_h[0][j]=Dense_1_bias_h[0][j].reshape((Dense_1_bias_h[0][j].shape[0],-1))
+        Dense_0_kernel_h[0][j]=Dense_0_kernel_h[0][j].reshape((Dense_0_kernel_h[0][j].shape[0]*Dense_0_kernel_h[0][j].shape[1],-1))
+        Dense_1_kernel_h[0][j]=Dense_1_kernel_h[0][j].reshape((Dense_1_kernel_h[0][j].shape[0]*Dense_1_kernel_h[0][j].shape[1],-1))
+    
+    hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1)),axis=0) 
+    return hessian
+
 @jax.jit
 def update_model(state, grads):
     return state.apply_gradients(grads=grads)

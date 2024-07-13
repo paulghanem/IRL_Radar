@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun May  5 13:38:21 2024
+Created on Mon May 20 16:29:10 2024
 
 @author: siliconsynapse
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 27 00:00:04 2024
-
-@author: siliconsynapse
-"""
 
 
 import jax
@@ -26,6 +20,9 @@ from jax import config
 from flax.training import train_state,checkpoints
 import flax 
 import optax
+import argparse
+from time import time
+import os
 
 
 
@@ -36,11 +33,13 @@ from cost_jax import CostNN, apply_model, update_model
 from utils import to_one_hot, get_cumulative_rewards
 
 from torch.optim.lr_scheduler import StepLR
-from src_range.FIM_new.FIM_RADAR import Single_JU_FIM_Radar,Single_FIM_Radar,Multi_FIM_Logdet_decorator_MPC,FIM_Visualization
-from src_range.FIM_new.generate_demo_fn import generate_demo,generate_demo_MPC
-from src_range.utils import NoiseParams
-from src_range.control.MPPI import *
-
+from src_range.FIM_new.FIM_RADAR import Single_JU_FIM_Radar,JU_RANGE_SFIM,Single_FIM_Radar,FIM_Visualization
+from src_range.control.Sensor_Dynamics import UNI_SI_U_LIM,UNI_DI_U_LIM,unicycle_kinematics_single_integrator,unicycle_kinematics_double_integrator
+from src_range.utils import visualize_tracking,visualize_control,visualize_target_mse,place_sensors_restricted
+from src_range.control.MPPI import MPPI_scores_wrapper,weighting,MPPI_wrapper #,MPPI_adapt_distribution
+from src_range.objective_fns.objectives import *
+from src_range.tracking.cubatureTestMLP import generate_data_state
+from src_range.FIM_new.generate_demo_fn import generate_demo_MPPI_single,generate_demo_MPPI_NCIRL
 
 
 # CONVERTS TRAJ LIST TO STEP LIST
@@ -60,33 +59,105 @@ def preprocess_traj(traj_list, step_list, is_Demo = False):
 
 #torch.autograd.set_detect_anomaly(True)
 # SEEDS
-seed = 123
-key = jax.random.PRNGKey(seed)
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
+
 
 # ENV SETUP
+
+parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+
+# =========================== Experiment Choice ================== #
+parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
+parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at every nth frame (must be a multiple of the update on the control frequency, which is dt control / dt ckf)')
+parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
+parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
+parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
+parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
+parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
+parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
+parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
+parser.add_argument('--tail_length',default=10,type=int,help="The length of the tail of the radar trajectories in plottings")
+parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
+parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
+parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
+
+# ==================== RADAR CONFIGURATION ======================== #
+parser.add_argument('--fc', default=1e8,type=float, help='Radar Signal Carrier Frequency (Hz)')
+parser.add_argument('--Gt', default=200,type=float, help='Radar Transmit Gain')
+parser.add_argument('--Gr', default=200,type=float, help='Radar Receive Gain')
+parser.add_argument('--rcs', default=1,type=float, help='Radar Cross Section in m^2')
+parser.add_argument('--L', default=1,type=float, help='Radar Loss')
+parser.add_argument('--R', default=500,type=float, help='Radius for specific SNR (desired)')
+parser.add_argument('--Pt', default=1000,type=float, help='Radar Power Transmitted (W)')
+parser.add_argument('--SNR', default=-20,type=float, help='Signal-Noise Ratio for Experiment. Radar has SNR at range R')
+
+
+# ==================== MPPI CONFIGURATION ======================== #
+parser.add_argument('--acc_std', default=25,type=float, help='Radar Signal Carrier Frequency (Hz)')
+parser.add_argument('--ang_acc_std', default=45*jnp.pi/180,type=float, help='Radar Transmit Gain')
+parser.add_argument('--horizon', default=15,type=int, help='Radar Receive Gain')
+parser.add_argument('--acc_init', default=0,type=float, help='Radar Cross Section in m^2')
+parser.add_argument('--ang_acc_init', default= 0 * jnp.pi/180,type=float, help='Radar Loss')
+parser.add_argument('--num_traj', default=250,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--MPPI_iterations', default=25,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
+
+# ==================== AIS  CONFIGURATION ======================== #
+parser.add_argument('--temperature', default=0.1,type=float, help='Temperature on the objective function. Lower temperature accentuates the differences between scores in MPPI')
+parser.add_argument('--elite_threshold', default=0.9,type=float, help='Elite Threshold (between 0-1, where closer to 1 means reject most samaples)')
+parser.add_argument('--AIS_method', default="CE",type=str, help='Type of importance sampling. [CE,information]')
+
+# ============================ MPC Settings =====================================#
+parser.add_argument('--gamma', default=0.95,type=float, help="Discount Factor for MPC objective")
+parser.add_argument('--speed_minimum', default=5,type=float, help='Minimum speed Radars should move [m/s]')
+parser.add_argument('--R2T', default=125,type=float, help='Radius from Radar to Target to maintain [m]')
+parser.add_argument('--R2R', default=10,type=float, help='Radius from Radar to  Radar to maintain [m]')
+parser.add_argument('--x_min', default=-200,type=float, help='bounding box min limit x  [m]')
+parser.add_argument('--x_max', default=200,type=float, help='bounding box max limit x [m]')
+parser.add_argument('--y_min', default=-200,type=float, help='bounding box min limit y [m]')
+parser.add_argument('--y_max', default=200,type=float, help='bounding box max limit y  [m]')
+parser.add_argument('--alpha1', default=1,type=float, help='Cost weighting for FIM')
+parser.add_argument('--alpha2', default=1000,type=float, help='Cost weighting for maintaining distanace between Radar to Target')
+parser.add_argument('--alpha3', default=60,type=float, help='Cost weighting for maintaining distance between Radar to Radar')
+parser.add_argument('--alpha4', default=1,type=float, help='Cost weighting for smooth controls (between 0 to 1, where closer to 1 means no smoothness')
+parser.add_argument('--alpha5', default=0,type=float, help='Cost weighting to maintain minimum absolute speed')
+
+
+args = parser.parse_args()
+
+
+args.results_savepath = os.path.join(args.results_savepath,args.experiment_name) + f"_{args.seed}"
+args.tmp_img_savepath = os.path.join( args.results_savepath,"tmp_img") #('--tmp_img_savepath', default=os.path.join("results","tmp_images"),type=str, help='Folder to save temporary images to make GIFs')
+
+
+
+from datetime import datetime
+from pytz import timezone
+import json
+
+tz = timezone('EST')
+print("Experiment State @ ",datetime.now(tz))
+print("Experiment Saved @ ",args.results_savepath)
+print("Experiment Settings Saved @ ",args.results_savepath)
+
+
+os.makedirs(args.tmp_img_savepath,exist_ok=True)
+os.makedirs(args.results_savepath,exist_ok=True)
+
+# Convert and write JSON object to file
+with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as outfile:
+    json.dump(vars(args), outfile)
+
 
 n_actions = 2
 M,dm=1,6
 N,dn=1,2
-state_shape =((M*(dm//2) + N*(dn+1),))
+#state_shape =((M*(dm//2) + N*(dn+1),))
+state_shape =((M*(dm//2),))
 
-# LOADING EXPERT/DEMO SAMPLES
-demo_trajs_dict =sio.loadmat('expert_samples/Single_traj_follow.mat')
-demo_trajs=demo_trajs_dict['traj']
-input_shape=demo_trajs[0].flatten().shape[0]-2+1
 
-print(len(demo_trajs))
-states=demo_trajs[:,:-2]
-actions=demo_trajs[:,-2:]
 
-#states=states.reshape((states.shape[0],states.shape[1]*states.shape[2]))#watch out for the order
-#actions=actions.reshape((actions.shape[0],actions.shape[1]*actions.shape[2]))# watch out for the order
-    
 
-demo_trajs=[[states,actions,actions]]
 
 
 # INITILIZING POLICY AND REWARD FUNCTION
@@ -95,10 +166,12 @@ cost_f = CostNN(state_dims=state_shape[0])
 #cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
 init_rng = jax.random.key(0)
 
-variables = cost_f.init(init_rng, jnp.ones((1,input_shape))) 
+variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0]))) 
 
 params = variables['params']
-tx = optax.adam(learning_rate=1e-2)
+#params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
+#params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
+tx = optax.sgd(learning_rate=1e-3)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []
@@ -111,125 +184,37 @@ sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])
 
-c = 299792458
-fc = 1e9;
-Gt = 2000;
-Gr = 2000;
-lam = c / fc
-rcs = 1;
-L = 1;
-alpha = (jnp.pi)**2 / 3
-B = 0.05 * 10**5
-# calculate Pt such that I achieve SNR=x at distance R=y
-R = 1000
-
-Pt = 10000
-K = Pt * Gt * Gr * lam ** 2 * rcs / L / (4 * jnp.pi) ** 3
-Pr = K / (R ** 4)
-
-# get the power of the noise of the signalf
-SNR=0
-N = 1
-T = .05
-NT = 300
-
-ps = jax.random.uniform(key, shape=(N, 2), minval=-100, maxval=100)
-
-
-ps_init = deepcopy(ps)
-chis = jax.random.uniform(key,shape=(ps.shape[0],1),minval=-jnp.pi,maxval=jnp.pi) #jnp.tile(0., (ps.shape[0], 1, 1))
-z_elevation = 10
-qs = jnp.array([[0.0, -0.0,z_elevation, 25., 20,0]])
-m0=qs
-pt=qs[:,:2]
-chit = jax.random.uniform(key,shape=(pt.shape[0],1),minval=-jnp.pi,maxval=jnp.pi) #jnp.tile(0., (ps.shape[0], 1, 1))
-
-
-sigmaQ = jnp.sqrt(10 ** -1)
-sigmaV = jnp.sqrt(9)
-
-A_single = jnp.array([[1., 0, 0, T, 0, 0],
-               [0, 1., 0, 0, T, 0],
-               [0, 0, 1, 0, 0, T],
-               [0, 0, 0, 1, 0, 0],
-               [0, 0, 0, 0, 1., 0],
-               [0, 0, 0, 0, 0, 1]])
-
-Q_single = jnp.array([
-    [(T ** 4) / 4, 0, 0, (T ** 3) / 2, 0, 0],
-    [0, (T ** 4) / 4, 0, 0, (T ** 3) / 2, 0],
-    [0, 0, (T**4)/4, 0, 0, (T**3) / 2],
-    [(T ** 3) / 2, 0, 0, (T ** 2), 0, 0],
-    [0, (T ** 3) / 2, 0, 0, (T ** 2), 0],
-    [0, 0, (T**3) / 2, 0, 0, (T**2)]
-]) * sigmaQ ** 2
-
-A = jnp.kron(jnp.eye(M), A_single);
-Q = jnp.kron(jnp.eye(M), Q_single);
-G = jnp.eye(N)
-
-nx = Q.shape[0]
-
-J = jnp.eye(dm*M) #jnp.stack([jnp.eye(d) for m in range(M)])
-
-time_steps = 20
-time_step_size = T
-max_velocity = 50.
-min_velocity = 0
-max_angle_velocity = jnp.pi
-min_angle_velocity = -jnp.pi
-M, dm = qs.shape;
-N , dn = ps.shape;
-method = "Single_FIM_3D_action_MPPI_NN"
-method_t = "Single_FIM_3D_action_MPPI_NN_t"
-#MPPI_method = "single"
-MPPI_method = "NN"
-MPPI_method_t="NN_t"
-sigmaW = jnp.sqrt(M*Pr/ (10**(SNR/10)))
-v_init = 0
-av_init = 0
-U_V = jnp.ones((N,time_steps,1)) * v_init
-U_W = jnp.ones((N,time_steps,1)) * av_init
-U_Nom =jnp.concatenate((U_V,U_W),axis=-1)
-
-# ==================== MPPI CONFIGURATION ================================= #
-limits = jnp.array([[max_velocity, max_angle_velocity], [min_velocity, min_angle_velocity]])
-Qinv = jnp.linalg.inv(Q+jnp.eye(dm*M)*1e-8)
-
-IM_fn = partial(Single_JU_FIM_Radar,A=A,Qinv=Qinv,Pt=Pt,Gt=Gt,Gr=Gr,L=L,lam=lam,rcs=rcs,fc=fc,c=c,sigmaV=sigmaV,sigmaW=sigmaW,method=MPPI_method)
-IM_fn_t = partial(Single_JU_FIM_Radar,A=A,Qinv=Qinv,Pt=Pt,Gt=Gt,Gr=Gr,L=L,lam=lam,rcs=rcs,fc=fc,c=c,sigmaV=sigmaV,sigmaW=sigmaW,method=MPPI_method_t)
-#IM_fn(ps,qs,J=J,actions=U_Nom)
-IM_fn_GT = partial(Single_JU_FIM_Radar,A=A,Qinv=Qinv,Pt=Pt,Gt=Gt,Gr=Gr,L=L,lam=lam,rcs=rcs,fc=fc,c=c,sigmaV=sigmaV,sigmaW=sigmaW)
-
-Multi_FIM_Logdet = Multi_FIM_Logdet_decorator_MPC(IM_fn=IM_fn,method=method)
-Multi_FIM_Logdet_t = Multi_FIM_Logdet_decorator_MPC(IM_fn=IM_fn_t,method=method_t)
-MPPI_scores = MPPI_scores_wrapper(Multi_FIM_Logdet,method=MPPI_method)
-MPPI_scores_t = MPPI_scores_wrapper(Multi_FIM_Logdet_t,method=MPPI_method)
 
 #D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
 #D_demo=jnp.concatenate((D_demo[:,:2],jnp.zeros((D_demo.shape[0],1)),D_demo[:,2:]),axis=1)
 return_list, sum_of_cost_list = [], []
 
 #U,chis,radar_states,target_states
-
+thetas=jnp.ones((1,4))
+mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 for i in range(100):
-    if (i % 5 == 0): 
+    if (i%10 == 0): 
     
-        demo_trajs=generate_demo(state_train)
+        demo_trajs,demo_trajs_sindy= generate_demo_MPPI_NCIRL(args,state_train)
         demo_trajs=np.array(demo_trajs)
     
         states_d=demo_trajs[:,:-2]
         actions_d=demo_trajs[:,-2:]
-        D_demo=np.array([])
+        D_demo= np.array([])
+        #sample_trajs = []
+
     
         demo_trajs=[[states_d,actions_d,actions_d]]
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
-        D_demo=jnp.concatenate((D_demo[:,:2],jnp.zeros((D_demo.shape[0],1)),D_demo[:,2:]),axis=1)
-    
-    trajs = [policy.generate_session_N_CIRL(NT,ps,chis, pt,chit,m0,A,time_steps,time_step_size,limits,MPPI_scores,MPPI_scores_t,state_train,i,IM_fn_GT) for _ in range(EPISODES_TO_PLAY)]
+        D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
+    target_states=D_demo[:,3:6]
+    trajs = [policy.generate_session_N_CIRL(args,i,target_states,state_train,D_demo,mpc_method,thetas)]
+
     sample_trajs = trajs + sample_trajs
+    #sample_trajs = demo_trajs + sample_trajs
     D_samp = preprocess_traj(trajs, D_samp)
+    #D_samp = D_demo
 
     # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
     loss_rew = []
@@ -244,7 +229,7 @@ for i in range(100):
         D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
 
         states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
-        states_expert, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-2:]
+        states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
 
         # Reducing from float64 to float32 for making computaton faster
         #states = torch.tensor(states, dtype=torch.float32)
@@ -252,7 +237,7 @@ for i in range(100):
         #actions = torch.tensor(actions, dtype=torch.float32)
         #states_expert = torch.tensor(states_expert, dtype=torch.float32)
         #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs)
+        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
         state_train = update_model(state_train, grads)
         
        

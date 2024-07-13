@@ -23,6 +23,7 @@ import optax
 import argparse
 from time import time
 import os
+from jax import vmap
 
 
 
@@ -33,7 +34,7 @@ from cost_jax import CostNN, apply_model, update_model
 from utils import to_one_hot, get_cumulative_rewards
 
 from torch.optim.lr_scheduler import StepLR
-from src_range.FIM_new.FIM_RADAR import Single_JU_FIM_Radar,JU_RANGE_SFIM,Single_FIM_Radar,FIM_Visualization
+from src_range.FIM_new.FIM_RADAR import Single_JU_FIM_Radar,JU_RANGE_SFIM,Single_FIM_Radar,FIM_Visualization,features_f
 from src_range.control.Sensor_Dynamics import UNI_SI_U_LIM,UNI_DI_U_LIM,unicycle_kinematics_single_integrator,unicycle_kinematics_double_integrator
 from src_range.utils import visualize_tracking,visualize_control,visualize_target_mse,place_sensors_restricted
 from src_range.control.MPPI import MPPI_scores_wrapper,weighting,MPPI_wrapper #,MPPI_adapt_distribution
@@ -56,6 +57,14 @@ def preprocess_traj(traj_list, step_list, is_Demo = False):
         step_list.extend(x)
     return jnp.array(step_list)
 
+def features_f_tilde(radar_state,target_state,thetas,mean):
+    radar_state=radar_state.reshape((1,-1))
+    target_state=target_state.reshape((1,-1))
+    
+    features_tilde=jnp.exp(-jnp.matmul(thetas,features_f(radar_state,target_state)))*features_f(radar_state,target_state)
+   # features_tilde=jnp.exp(-jnp.matmul(thetas,features_f(radar_state,target_state)))
+    
+    return features_tilde/mean
 
 #torch.autograd.set_detect_anomaly(True)
 # SEEDS
@@ -72,14 +81,14 @@ parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at 
 parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
 parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
 parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-parser.add_argument("--N_steps",default=5,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
 parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
 parser.add_argument('--tail_length',default=10,type=int,help="The length of the tail of the radar trajectories in plottings")
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
-parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
+parser.add_argument('--fim_method_policy', default="SFIM_features",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
 
 # ==================== RADAR CONFIGURATION ======================== #
@@ -184,15 +193,18 @@ D_demo, D_samp = np.array([]), jnp.array([])
 return_list, sum_of_cost_list = [], []
 
 #U,chis,radar_states,target_states
-thetas=jnp.ones((1,4))
+thetas=1e-3*jnp.ones((1,6))
 
 alpha =1e-3
 mpc_method = "Single_FIM_3D_action_features_MPPI"
+features_func=vmap(features_f,in_axes=(0,0))
+features_tilde_func=vmap(features_f_tilde,in_axes=(0,0,None,None))
 
 for i in range(100):
+    #D_samp=jnp.array([])
     if (i== 0): 
     
-        demo_trajs,key=generate_demo_MPPI_single(args,state_train=None)
+        demo_trajs,demo_trajs_sindy=generate_demo_MPPI_single(args,state_train=None)
         demo_trajs=np.array(demo_trajs)
     
         states_d=demo_trajs[:,:-2]
@@ -203,8 +215,11 @@ for i in range(100):
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
         D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
     
-    trajs = [policy.generate_session(args,i,actions_d,state_train,D_demo,thetas)]
-    sample_trajs = sample_trajs
+    trajs= [policy.generate_session(args,i,actions_d,state_train,D_demo,mpc_method,thetas)]
+    trajs_sindy=trajs[0][3]
+    trajs=[trajs[0][:3]]
+    
+    #sample_trajs = sample_trajs
     #sample_trajs = demo_trajs + sample_trajs
     D_samp = preprocess_traj(trajs, D_samp)
     #D_samp = D_demo
@@ -212,112 +227,24 @@ for i in range(100):
     states, probs, actions = D_samp[:,:-3], D_samp[:,-3], D_samp[:,-2:]
     states_expert,probs_experts, actions_expert = D_demo[:,:-3], D_demo[:,-3], D_demo[:,-2:]
     
+    S_exp,ds=states_expert.shape
+    S,ds=states.shape
+    radar_experts=states_expert[:,:3].reshape((S_exp,3))
+    target_experts=states_expert[:,3:].reshape((S_exp,3))
+    radar_samples=states[:,:3].reshape((S,3))
+    target_samples=states[:,3:].reshape((S,3))
     
-    gradients=features(states_expert,is_Demo=True) - features_tilde(states,is_Demo=False)
-
+    
+    
+    
+    mean=jnp.mean(jnp.exp(-jnp.matmul(thetas,features_func(radar_samples,target_samples))),axis=0)
+    
+    gradients=-jnp.mean(features_func(radar_experts,target_experts),axis=0)+ jnp.mean(features_tilde_func(radar_samples,target_samples,thetas,mean),axis=0)
+    #gradients= - jnp.mean(features_tilde_func(radar_samples,target_samples,thetas,mean),axis=0)
+   
+    thetas= thetas -alpha*gradients.T
+    print(thetas)
     # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
-    loss_rew = []
-    for _ in range(REWARD_FUNCTION_UPDATE):
-        selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
-        selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
-
-        D_s_samp = D_samp[selected_samp]
-        D_s_demo = D_demo[selected_demo]
-
-        #D̂ samp ← D̂ demo ∪ D̂ samp
-        D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
-
-        states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
-        states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
-
-        # Reducing from float64 to float32 for making computaton faster
-        #states = torch.tensor(states, dtype=torch.float32)
-        #probs = torch.tensor(probs, dtype=torch.float32)
-        #actions = torch.tensor(actions, dtype=torch.float32)
-        #states_expert = torch.tensor(states_expert, dtype=torch.float32)
-        #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-        state_train = update_model(state_train, grads)
-        
-       
-     
-        # UPDATING THE COST FUNCTION
-       # cost_optimizer.zero_grad()
-        #loss_IOC.backward()
-        #cost_optimizer.step()
-
-        loss_rew.append(loss_IOC)
-
-    # for traj in trajs:
-    #     states, probs ,actions= traj
-        
-    #     states = torch.tensor(states, dtype=torch.float32)
-    #     actions = torch.tensor(actions, dtype=torch.float32)
-        
-            
-    #     costs = cost_f(torch.cat((states, actions), dim=-1))
-    #     cumulative_returns = torch.tensor(get_cumulative_rewards(-costs, 0.99))
-    #     #cumulative_returns = torch.tensor(cumulative_returns, dtype=torch.float32)
-        
-        
-    #     probs=policy(states)
-    #     log_probs = torch.log(probs)
-
-    
-    #     entropy = -torch.mean(torch.sum(probs*log_probs), dim = -1 )
-    #     loss = torch.mean(costs-1e-2*log_probs.reshape(-1,1))-entropy*1e-2 
-    #     #loss = -torch.mean(log_probs*cumulative_returns -entropy*1e-2)
-
-    #     # UPDATING THE POLICY NETWORK
-        
-        
-        
-
-    
-    # sum_of_cost = np.sum(costs.detach().numpy())
-    
-    # sum_of_cost_list.append(sum_of_cost)
-
-    
-    # mean_costs.append(np.mean(sum_of_cost_list))
-    mean_loss_rew.append(np.mean(loss_rew))
-    
     
 
-    # PLOTTING PERFORMANCE
-    if i % 10 == 0:
-        
-        costs_GT=0
-        # for j in range(M):
-        #     ps=states_expert[:,:3]
-        #     qs=states_expert[:,3+(j*dm):3+(j+1)*dm]
-            
-        #     costs_GT+= JU_FIM_radareqn_target_logdet(ps,qs,
-        #                                Pt,Gt,Gr,L,lam,rcs,c,B,alpha)
-        # # clear_output(True)
-        print(f"mean loss:{np.mean(loss_rew)} loss: {loss_IOC} epoch: {i}")
-        # print(f"learned cost:{np.sum(costs_demo.detach().numpy())} GT: {costs_GT} Loss_policy: {loss} loss_IOC: {loss_IOC}")
-        # plt.subplot(2, 2, 1)
-        # plt.title(f"Mean cost per {EPISODES_TO_PLAY} games")
-        # plt.plot(mean_costs)
-        # plt.grid()
-
-        plt.subplot(2, 2, 2)
-        plt.title(f"Mean loss per {REWARD_FUNCTION_UPDATE} batches")
-        plt.plot(mean_loss_rew)
-        plt.grid()
-
-        # plt.show()
-        plt.savefig('plots/GCL_learning_curve.png')
-        plt.close()
-
-    if np.mean(return_list) > 500:
-        break
     
-config = {'dimensions': np.array([5, 3])}
-ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}
-checkpoints.save_checkpoint(ckpt_dir='/tmp/flax_ckpt/flax-checkpointing',
-                            target=ckpt_single,
-                            step=0,
-                            overwrite=True,
-                            keep=2)

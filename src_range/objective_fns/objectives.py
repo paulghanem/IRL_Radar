@@ -119,7 +119,8 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,me
 
             Js = jnp.stack(Js)
             if N ==1 and M ==1 :
-                logdets = jnp.log(Js)
+                #logdets = jnp.log(Js)
+                logdets = Js
             else :
                 _,logdets = jnp.linalg.slogdet(Js)
             gammas = gamma**(jnp.arange(horizon))
@@ -155,6 +156,34 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,me
 
             return +multi_FIM_obj
 
+    elif method=="Single_FIM_3D_evasion_NN_MPPI":
+        @jit
+        def MPC_obj(U,radar_state,target_state,J,A):
+
+            # horizon = U.shape[1]
+            M,dm = target_state.shape
+            N,horizon,dn = radar_state.shape
+
+            target_states = kinematic_model(U,target_state,dt)
+
+            # iterate through time step
+            Js = [None]*horizon
+            for t in range(1,horizon+1):
+                # iterate through each FIM corresponding to a target
+
+                J = IM_fn(radar_state=radar_state[:,t,:3],target_state=target_states[:,t,:3],J=J,method="NN", state_train=state_train)
+                Js[t-1] = J
+
+            Js = jnp.stack(Js)
+            if N ==1 and M ==1 :
+                logdets = jnp.log(Js)
+            else :
+                _,logdets = jnp.linalg.slogdet(Js)
+            gammas = gamma**(jnp.arange(horizon))
+            multi_FIM_obj = jnp.sum(gammas*logdets)/jnp.sum(gammas)
+
+            return +multi_FIM_obj
+
 
     elif method=="Single_FIM_2D_noaction":
         @jit
@@ -172,7 +201,7 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,me
     return MPC_obj
 
 @jit
-def collision_penalty(radar_states,target_states,radius):
+def collision_penalty(radar_states,target_states,x_min,x_max,y_min,y_max):
 
     # N,horizon,dn= radar_states.shape
     # M,horizon,dm = target_states.shape
@@ -181,13 +210,20 @@ def collision_penalty(radar_states,target_states,radius):
 
     target_positions = target_states[...,:3]
 
-    d = (radar_positions[:,jnp.newaxis]-target_positions[jnp.newaxis])
+    #d = (radar_positions[:,jnp.newaxis]-target_positions[jnp.newaxis])
 
-    distances = jnp.sqrt(jnp.sum(d**2,-1))
+    #distances = jnp.sqrt(jnp.sum(d**2,-1))
+    coll_obj = (radar_positions[:,:,0] < x_min)
+    coll_obj += (radar_positions[:,:,0] > x_max)
+    coll_obj += (radar_positions[:,:,1] < y_min)
+    coll_obj += (radar_positions[:,:,1] > y_max)
+    
+    
 
-    coll_obj = (distances < radius)
+    #coll_obj = (distances < radius)
     # coll_obj = jnp.heaviside(-(distances - radius), 1.0) * jnp.exp(-distances / spread)
-    return jnp.sum(coll_obj,axis=[0,1])
+    return jnp.sum(coll_obj,axis=0)
+   
 
 @jit
 def self_collision_penalty(radar_states,radius):

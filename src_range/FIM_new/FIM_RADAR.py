@@ -15,15 +15,22 @@ from copy import deepcopy
 
 from src_range.control.Sensor_Dynamics import UNI_SI_U_LIM,UNI_DI_U_LIM,unicycle_kinematics_single_integrator,unicycle_kinematics_double_integrator
 
-def features_f(radar_state,target_state): 
+def features_f(radar_state,target_state, is_demo=True):
+
+    radar_state=radar_state.reshape((1,-1))
+    target_state=target_state.reshape((1,-1))
+    
     radar_positions = radar_state[:,:3]
 
     target_positions = target_state[:,:3]
     
     d=target_positions-radar_positions
     distances = jnp.sqrt(jnp.sum(d**2,-1,keepdims=True))
+  
     
-    features=jnp.array([1/(distances), 1/(distances**2), 1/(distances**3), 1/(distances**4) ]).reshape((4,1))
+    features=jnp.array([distances,jnp.array([1]).reshape(1,-1),1/(distances), 1/(distances**2), 1/(distances**3), 1/(distances**4) ]).reshape((6,1))
+        
+        
     return features
     
 def Single_FIM_Radar(radar_state,target_state,C,J=None,method=None,state_train=None,thetas=None):
@@ -32,8 +39,10 @@ def Single_FIM_Radar(radar_state,target_state,C,J=None,method=None,state_train=N
        radar_positions = radar_state[:,:3]
    
        target_positions = target_state[:,:3]
-       states=jnp.concatenate((radar_positions.reshape(1,-1),target_positions.reshape(1,-1)),axis=1)
-       J = state_train.apply_fn({'params': state_train.params}, states)+1e-2
+       d=radar_positions-target_positions 
+       #states=jnp.concatenate((radar_positions.reshape(1,-1),target_positions.reshape(1,-1)),axis=1)
+       states=d.reshape(1,-1)
+       J = state_train.apply_fn({'params': state_train.params}, states)+1e-6
        
        return J
    
@@ -263,7 +272,9 @@ def FIM_Visualization_NN(ps,qs,C,N,state_train=None):
     radar_positions=jnp.tile(radar_positions,(N**2,1))
     
     
-    states=jnp.concatenate((radar_positions,target_positions),axis=1)
+    #states=jnp.concatenate((radar_positions,target_positions),axis=1)
+    states=radar_positions-target_positions
+   
 
     J = state_train.apply_fn({'params': state_train.params}, states) +1e-6
     J= jnp.log(J)

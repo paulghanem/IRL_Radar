@@ -73,7 +73,7 @@ def main(args):
     #                 [-100.4,-30.32,z_elevation-15,20,-10,0], #,
     #                 [30,30,z_elevation+20,-10,-10,0]])#,
 
-    ps,key = place_sensors_restricted(key,target_state_v,args.R2R,args.R2T,-400,400,args.N_radar)
+    ps,key = place_sensors_restricted(key,target_state_v,args.R2R,args.R2T,-100,100,args.N_radar)
     chis = jax.random.uniform(key,shape=(ps.shape[0],1),minval=-jnp.pi,maxval=jnp.pi)
     vs = jnp.zeros((ps.shape[0],1))
     avs = jnp.zeros((ps.shape[0],1))
@@ -204,6 +204,10 @@ def main(args):
     P=np.eye(M_target*dm) * 50
     
     J = jnp.linalg.inv(P)
+    demo_x_min=-100
+    demo_x_max=100
+    demo_y_min=-100
+    demo_y_max=100
 
     for step in range(1,args.N_steps+1):
         #target_state_true = target_states_true[:, step-1].reshape(M_target,dm)
@@ -248,6 +252,10 @@ def main(args):
 
                 radar_states,radar_states_MPPI = MPPI(U_nominal=U_prime,
                                                                    U_MPPI=V,radar_state=radar_state)
+                # radar_states=radar_states.at[:,:,0].set(jnp.clip(radar_states[:,:,0],demo_x_min,demo_x_max))
+                # radar_states=radar_states.at[:,:,1].set(jnp.clip(radar_states[:,:,1],demo_y_min,demo_y_max))
+                # radar_states_MPPI=radar_states_MPPI.at[:,:,:,0].set(jnp.clip(radar_states_MPPI[:,:,:,0],demo_x_min,demo_x_max))
+                # radar_states_MPPI=radar_states_MPPI.at[:,:,:,1].set(jnp.clip(radar_states_MPPI[:,:,:,1],demo_y_min,demo_y_max))
 
                 mppi_rollout_end = time()
                 
@@ -255,7 +263,11 @@ def main(args):
                 # GET MPC OBJECTIVE
                 mppi_score_start = time()
                 # Score all the rollouts
-                cost_trajectory = MPPI_scores(radar_state, target_states_rollout, V,
+                if (radar_state[:,0]>demo_x_max or radar_state[:,0]<demo_x_min or radar_state[:,1]>demo_y_max or radar_state[:,1]<demo_y_min ):
+                    cost_trajectory = MPPI_scores(radar_state, target_states_rollout, V,
+                                          A=A,J=J)+1000
+                else :
+                    cost_trajectory = MPPI_scores(radar_state, target_states_rollout, V,
                                           A=A,J=J)
                 
 
@@ -310,6 +322,8 @@ def main(args):
             #U += jnp.clip(jnp.sum(weights.reshape(args.num_traj,1,1,1) *  E.reshape(args.num_traj,N,horizon,2),axis=0),U_lower,U_upper)
 
             radar_state = radar_states[:,1]
+            # radar_state=radar_state.at[:,0].set(jnp.clip(radar_state[:,0],demo_x_min,demo_x_max))
+            # radar_state=radar_state.at[:,1].set(jnp.clip(radar_state[:,1],demo_y_min,demo_y_max))            
             U = jnp.roll(U, -1, axis=1)
 
             mppi_end_time = time()
@@ -336,6 +350,11 @@ def main(args):
     
                 target_states,target_states_MPPI = MPPI(U_nominal=U_prime_t,
                                                                    U_MPPI=V_t,radar_state=target_state)
+                # target_states=target_states.at[:,:,0].set(jnp.clip(target_states[:,:,0],demo_x_min,demo_x_max))
+                # target_states=target_states.at[:,:,1].set(jnp.clip(target_states[:,:,1],demo_y_min,demo_y_max))
+                # target_states_MPPI=target_states_MPPI.at[:,:,:,0].set(jnp.clip(target_states_MPPI[:,:,:,0],demo_x_min,demo_x_max))
+                # target_states_MPPI=target_states_MPPI.at[:,:,:,1].set(jnp.clip(target_states_MPPI[:,:,:,1],demo_y_min,demo_y_max))
+                
     
                 mppi_rollout_end = time()
     
@@ -343,9 +362,14 @@ def main(args):
                 # GET MPC OBJECTIVE
                 mppi_score_start = time()
                 # Score all the rollouts
-                cost_trajectory_t = MPPI_scores_t(radar_states, target_state, V_t,
-                                          A=A,J=J)
-    
+                
+                if (target_state[:,0]>demo_x_max or target_state[:,0]<demo_x_min or target_state[:,1]>demo_y_max or target_state[:,1]<demo_y_min ):
+                    cost_trajectory_t = MPPI_scores_t(radar_states, target_state, V_t,
+                                              A=A,J=J) + 1000
+                else :
+                    cost_trajectory_t = MPPI_scores_t(radar_states, target_state, V_t,
+                                              A=A,J=J)
+                
                 mppi_score_end = time()
     
     
@@ -399,6 +423,8 @@ def main(args):
             # U += jnp.clip(jnp.sum(weights.reshape(args.num_traj,1,1,1) *  E.reshape(args.num_traj,N,horizon,2),axis=0),U_lower,U_upper)
     
             target_state = target_states[:,1]
+            # target_state=target_state.at[:,0].set(jnp.clip(target_state[:,0],demo_x_min,demo_x_max))
+            # target_state=target_state.at[:,1].set(jnp.clip(target_state[:,1],demo_y_min,demo_y_max))
             pt=target_state[:,:3]
             U_t = jnp.roll(U_t, -1, axis=1)
     
@@ -491,7 +517,7 @@ if __name__ == "__main__":
     parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
     parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
     parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-    parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+    parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
     parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
     parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
     parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')

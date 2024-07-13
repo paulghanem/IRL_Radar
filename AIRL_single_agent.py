@@ -35,7 +35,7 @@ import os
 
 
 from experts.P_MPPI import *
-from cost_jax import CostNN, apply_model, update_model
+from cost_jax import CostNN, apply_model,apply_model_AIRL, update_model
 from utils import to_one_hot, get_cumulative_rewards
 
 from torch.optim.lr_scheduler import StepLR
@@ -78,7 +78,7 @@ parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at 
 parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
 parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
 parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
@@ -180,7 +180,7 @@ mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
 REWARD_FUNCTION_UPDATE = 10
-DEMO_BATCH = 500
+DEMO_BATCH = 100
 sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])
@@ -211,11 +211,9 @@ for i in range(100):
     trajs = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
 
    
-    sample_trajs = trajs #+ sample_trajs
+    sample_trajs = trajs + sample_trajs
     #sample_trajs = demo_trajs + sample_trajs
-    D_samp=np.array([])
     D_samp = preprocess_traj(trajs, D_samp)
-    
     #D_samp = D_demo
 
     # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
@@ -224,12 +222,11 @@ for i in range(100):
         selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
         selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
 
-        #D_s_samp = D_samp[selected_samp]
-        #D_s_demo = D_demo[selected_demo]
-        D_s_samp = D_samp
-        D_s_demo = D_demo
+        D_s_samp = D_samp[selected_samp]
+        D_s_demo = D_demo[selected_demo]
+
         #D̂ samp ← D̂ demo ∪ D̂ samp
-        #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
+        D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
 
         states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
         states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
@@ -240,7 +237,7 @@ for i in range(100):
         #actions = torch.tensor(actions, dtype=torch.float32)
         #states_expert = torch.tensor(states_expert, dtype=torch.float32)
         #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+        grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
         state_train = update_model(state_train, grads)
         
        
