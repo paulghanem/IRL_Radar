@@ -87,6 +87,7 @@ parser.add_argument('--tail_length',default=10,type=int,help="The length of the 
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
+parser.add_argument('--gail', default=False,type=bool, help='gail metod flag')
 
 # ==================== RADAR CONFIGURATION ======================== #
 parser.add_argument('--fc', default=1e8,type=float, help='Radar Signal Carrier Frequency (Hz)')

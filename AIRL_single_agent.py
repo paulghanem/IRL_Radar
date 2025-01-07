@@ -78,7 +78,7 @@ parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at 
 parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
 parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
 parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
@@ -87,6 +87,7 @@ parser.add_argument('--tail_length',default=10,type=int,help="The length of the 
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
+parser.add_argument('--gail', default=True,type=bool, help='gail metod flag')
 
 # ==================== RADAR CONFIGURATION ======================== #
 parser.add_argument('--fc', default=1e8,type=float, help='Radar Signal Carrier Frequency (Hz)')
@@ -172,7 +173,7 @@ variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0])))
 params = variables['params']
 #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
 #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-3)
+tx = optax.adam(learning_rate=1e-4)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []

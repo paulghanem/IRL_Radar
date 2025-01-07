@@ -109,8 +109,11 @@ def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,p
         distances=states[:,:3]-states[:,3:]
         costs_demo = -jnp.log(state_train.apply_fn({'params': params}, distances_expert)+1e-6)
         costs_samp =-jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6)
-        disc_demo = jnp.exp(costs_demo)/(jnp.exp(costs_demo)+1)
-        disc_samp =jnp.exp(costs_samp)/(jnp.exp(costs_samp)+1)
+        
+        disc_demo = jnp.divide(jnp.exp(-costs_demo),(jnp.exp(-costs_demo)+1))
+        disc_samp = jnp.divide(jnp.exp(-costs_samp),(jnp.exp(-costs_samp)+1))
+        
+
       # LOSS CALCULATION FOR IOC (COST FUNCTION)
       #logits = state_train.apply_fn({'params': params}, jnp.concatenate((states,actions),axis=1))
         # g_demo=jnp.zeros(costs_demo.shape)
@@ -124,7 +127,7 @@ def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,p
         #     g_samp=g_samp.at[i].set(jnp.pow((costs_samp[i]-costs_samp[i-1])-(costs_samp[i-1]-costs_samp[i-2]),2))
         #     g_mono_samp=g_mono_samp.at[i].set(jnp.pow(jnp.maximum(0,costs_samp[i]-costs_samp[i-1]-1),2))  
          
-        loss = -jnp.mean(jnp.log(disc_demo))-jnp.mean(jnp.log(1-disc_samp))
+        loss = -jnp.mean(jnp.log(disc_demo+1e-6))-jnp.mean(jnp.log(1-disc_samp+1e-6))
               
         return loss
       

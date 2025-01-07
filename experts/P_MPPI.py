@@ -175,7 +175,7 @@ class P_MPPI:
             IM_fn_update = IM_fn
 
 
-        MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train,thetas=thetas)
+        MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train,thetas=thetas,gail=args.gail)
         #MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method)
         MPPI_scores = MPPI_scores_wrapper(MPC_obj)
 
@@ -191,7 +191,7 @@ class P_MPPI:
         chis = jax.random.uniform(key,shape=(ps.shape[0],1),minval=-jnp.pi,maxval=jnp.pi) #jnp.tile(0., (ps.shape[0], 1, 1))
         # dt_controls = jnp.tile(dt_control, (N, 1))
 
-        collision_penalty_vmap = jit( vmap(collision_penalty, in_axes=(0, None, None)))
+        collision_penalty_vmap = jit( vmap(collision_penalty, in_axes=(0, None, None,None,None,None)))
         self_collision_penalty_vmap = jit(vmap(self_collision_penalty, in_axes=(0, None)))
         speed_penalty_vmap = jit(vmap(speed_penalty, in_axes=(0, None)))
 
@@ -292,9 +292,14 @@ class P_MPPI:
                     
 
                     mppi_score_end = time()
+                    cost_collision_r2t = collision_penalty_vmap(radar_states_MPPI[...,1:args.horizon+1,:], target_states_rollout,
+                                           demo_x_min,demo_x_max,demo_y_min,demo_y_max)
+
+                    cost_collision_r2t = jnp.sum((cost_collision_r2t * args.gamma**(jnp.arange(args.horizon))) / jnp.sum(args.gamma**jnp.arange(args.horizon)),axis=-1)
+
                     
                     #cost_MPPI = args.alpha1*cost_trajectory + args.alpha2*cost_collision_r2t + args.alpha3 * cost_collision_r2r * args.temperature * (1-args.alpha4) * cost_control + args.alpha5*cost_speed
-                    cost_MPPI = args.alpha1*cost_trajectory
+                    cost_MPPI = args.alpha1*cost_trajectory + args.alpha2*cost_collision_r2t
 
                     weights = weight_fn(cost_MPPI)
 

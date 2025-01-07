@@ -825,18 +825,18 @@ def generate_demo_MPPI_single(args,state_train):
 
        np.savetxt(os.path.join(args.results_savepath,f'rmse_{args.seed}.csv'), np.c_[np.arange(1,args.N_steps+1),target_state_mse], delimiter=',',header="k,rmse",comments='')
 
-       if args.save_images:
-           visualize_target_mse(target_state_mse,fig_mse,axes_mse,args.results_savepath,filename="target_mse")
+       # if args.save_images:
+       #     visualize_target_mse(target_state_mse,fig_mse,axes_mse,args.results_savepath,filename="target_mse")
 
-           images = [imageio.imread(file) for file in imgs_main]
-           imageio.mimsave(os.path.join(args.results_savepath, f'MPPI_MPC_AIS={args.AIS_method}_FIM={args.fim_method_demo}.gif'), images, duration=0.1)
+       #     images = [imageio.imread(file) for file in imgs_main]
+       #     imageio.mimsave(os.path.join(args.results_savepath, f'MPPI_MPC_AIS={args.AIS_method}_FIM={args.fim_method_demo}.gif'), images, duration=0.1)
 
-           images = [imageio.imread(file) for file in imgs_control]
-           imageio.mimsave(os.path.join(args.results_savepath, f'MPPI_Control_AIS={args.AIS_method}.gif'), images, duration=0.1)
+       #     images = [imageio.imread(file) for file in imgs_control]
+       #     imageio.mimsave(os.path.join(args.results_savepath, f'MPPI_Control_AIS={args.AIS_method}.gif'), images, duration=0.1)
 
 
-           if args.remove_tmp_images:
-               shutil.rmtree(args.tmp_img_savepath)
+       #     if args.remove_tmp_images:
+       #         shutil.rmtree(args.tmp_img_savepath)
     
        return traj_list , traj_sindy_list
    

@@ -10,7 +10,7 @@ from jax import jit,vmap
 
 import jax
 from jax.tree_util import Partial as partial
-def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,method="action"):
+def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,method="action",gail=False):
 
     # the lower this value, the better!
 
@@ -94,10 +94,15 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,me
                 logdets = jnp.log(Js)
             else :
                 _,logdets = jnp.linalg.slogdet(Js)
+            
             gammas = gamma**(jnp.arange(horizon))
             multi_FIM_obj = jnp.sum(gammas*logdets)/jnp.sum(gammas)
-
-            return -multi_FIM_obj
+            cost=-multi_FIM_obj
+            if gail==True:
+                D=jnp.divide(jnp.exp(-cost),(jnp.exp(-cost)+1))
+                cost = jnp.log(D)
+            
+            return cost
         
     elif method=="Single_FIM_3D_action_features_MPPI":
         @jit

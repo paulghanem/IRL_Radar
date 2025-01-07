@@ -43,10 +43,12 @@ def Single_FIM_Radar(radar_state,target_state,C,J=None,method=None,state_train=N
        #states=jnp.concatenate((radar_positions.reshape(1,-1),target_positions.reshape(1,-1)),axis=1)
        states=d.reshape(1,-1)
        J = state_train.apply_fn({'params': state_train.params}, states)+1e-6
+      
        
        return J
    
-    
+
+   
     if method=="features":
        # radar_positions = radar_state[:,:3]
    
