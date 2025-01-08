@@ -30,7 +30,7 @@ import shutil
 from tqdm import tqdm
 
 class P_MPPI:
-    def __init__(self, state_shape, n_actions):
+    def __init__(self, state_shape, n_actions,args):
         
 
         self.state_shape = state_shape
@@ -42,7 +42,8 @@ class P_MPPI:
         self.seed = 123
         self.v_init = 0
         self.av_init = 0
-        
+        self.args = args
+
     def predict_probs(self,mean,cov,x):
        x=x.T
        mean=mean.T
@@ -63,7 +64,7 @@ class P_MPPI:
 
         mppi = MPPI_wrapper(dynamic_rollout)
 
-        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI")
+        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
 
         mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
 

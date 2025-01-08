@@ -78,7 +78,7 @@ parser.add_argument('--tail_length',default=10,type=int,help="The length of the 
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
-parser.add_argument('--gail', default=False,type=bool, help='gail metod flag')
+parser.add_argument('--gail', default=True,type=bool, help='gail metod flag')
 
 
 # ==================== MPPI CONFIGURATION ======================== #
@@ -122,7 +122,7 @@ state_shape =((4,))
 
 
 # INITILIZING POLICY AND REWARD FUNCTION
-policy = P_MPPI(state_shape, n_actions)
+policy = P_MPPI(state_shape, n_actions,args)
 cost_f = CostNN(state_dims=state_shape[0])
 
 #cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)

@@ -10,7 +10,7 @@ from jax import jit,vmap
 
 import jax
 from jax.tree_util import Partial as partial
-def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,method="gymenv"):
+def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,method="gymenv",args=None):
 
     # lower value is better
     if method=="gymenv":
@@ -63,6 +63,10 @@ def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,
             gammas = gamma**(jnp.arange(horizon))
 
             total_cost = jnp.sum(gammas*Js,axis=-1)/jnp.sum(gammas)
+
+            if args.gail == True:
+                D = jnp.divide(jnp.exp(-total_cost), (jnp.exp(-total_cost) + 1))
+                total_cost = -jnp.log(D)
 
             return total_cost
 
