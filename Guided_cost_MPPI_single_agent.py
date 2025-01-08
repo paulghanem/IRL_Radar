@@ -124,7 +124,7 @@ variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0])))
 params = variables['params']
 #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
 #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-2)
+tx = optax.adam(learning_rate=1e-3)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []

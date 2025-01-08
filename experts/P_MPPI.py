@@ -81,7 +81,6 @@ class P_MPPI:
         U_MPPI_init= jnp.array(np.random.randn(15, args.horizon, args.a_dim) * 0.2)
         U_nominal = U_MPPI_init.mean(axis=0)
 
-        states.append(state)
         rewards = [cart_pole_cost(state)]
 
         pbar = tqdm(total=args.N_steps, desc="Starting")
@@ -110,10 +109,10 @@ class P_MPPI:
             traj_probs.append(prob.flatten())
             actions.append(U_nominal[0,:].flatten())
 
-            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {cart_pole_cost(state):.4f}")
+            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {cart_pole_cost(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel().item():.4f}")
             pbar.update(1)
 
 
         rewards = np.array(rewards)
         pbar.close()
-        return states[:-1],traj_probs,actions
+        return states,traj_probs,actions
