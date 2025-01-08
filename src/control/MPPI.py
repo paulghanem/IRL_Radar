@@ -32,18 +32,6 @@ def MPPI_wrapper(kinematic_model):
 
     return MPPI
 
-
-
-def MPPI_ptb(stds,N, time_steps, num_traj, key,method="CartPole-Normal"):
-
-    if method=='CartPole-Normal':
-        f_min, f_max = stds[0]
-
-        U_force = jax.random.normal(key,shape=(num_traj, N, time_steps,1)) * f_max
-        U_ptb = U_force
-
-    return U_ptb
-
 def weighting(method="CE"):
 
     if method == "CE":
@@ -84,39 +72,24 @@ def MPPI_scores_wrapper(score_fn,method="gymenv"):
         
     if method == "NN":
         @jit
-        def MPPI_scores(radar_states,target_states,U_MPPI,chis,time_step_size,A,J,gamma,state_train):
+        def MPPI_scores(U_MPPI,state,state_train):
             # the lower the value, the better
-            score_fn_partial = partial(score_fn,chis=chis, radar_states=radar_states, target_states=target_states, time_step_size=time_step_size,
-                                                    A=A,J=J,
-                                                    gamma=gamma,state_train=state_train)
+            score_fn_partial = partial(score_fn,state=state,state_train=state_train)
+
             MPPI_score_fn = vmap(score_fn_partial)
             scores = MPPI_score_fn(U_MPPI)
 
             return scores
-        
-    if method == "NN_t":
-        @jit
-        def MPPI_scores(radar_states,target_states,U_MPPI,chis,time_step_size,A,J,gamma,state_train):
-            # the lower the value, the better
-            score_fn_partial = partial(score_fn,chis=chis, radar_states=radar_states, target_states=target_states, time_step_size=time_step_size,
-                                                    A=A,J=J,
-                                                    gamma=gamma,state_train=state_train)
-            MPPI_score_fn = vmap(score_fn_partial)
-            scores = MPPI_score_fn(U_MPPI)
-
-            return scores
-        
-  
-
 
     return MPPI_scores
 
 from copy import deepcopy
 
 def MPPI_control(
-                 state,U,cov,key, # radar state
-                 kinematic_model, control_constraints,# kinematic model and cubature kalman filter
-                 MPPI_kinematics,MPPI_scores,weight_fn, # MPPI need parameters
+                 state,U,cov,key,
+                 kinematic_model, control_constraints,# kinematic model
+                 MPPI_kinematics,MPPI_scores,weight_fn,
+                 method,state_train, # MPPI need parameters
                  args):
 
     # horizon x 2
@@ -151,9 +124,12 @@ def MPPI_control(
         # GET MPC OBJECTIVE
         # mppi_score_start = time()
         # Score all the rollouts
-        cost_MPPI = MPPI_scores(V,state)
+        if method == "NN":
+            cost_MPPI = MPPI_scores(V,state,state_train)
+        else:
+            cost_MPPI = MPPI_scores(V,state)
 
-        weights = weight_fn(cost_MPPI)
+        weights = weight_fn(cost_MPPI.ravel())
 
 
         if jnp.isnan(cost_MPPI).any():
@@ -196,8 +172,7 @@ def MPPI_control(
 
     U = jnp.roll(U, -1, axis=1)
 
-    return U,(states,states_MPPI),cost_MPPI,key
-
+    return (U,cov_prime),(states,states_MPPI),cost_MPPI,key
 
 def MPPI_visualize(MPPI_trajectories,nominal_trajectory):
     # J_eval = Multi_FIM_Logdet(U, chis, ps, qs, dts=dts, J=J, A=A, Q=Q, W=W, **key_args)
