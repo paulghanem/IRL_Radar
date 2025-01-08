@@ -33,7 +33,7 @@ from gymnax.environments import EnvState
 
 
 from experts.P_MPPI import P_MPPI
-from cost_jax import CostNN, apply_model, update_model
+from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
 
 from src.objective_fns.objectives import *
 from src.objective_fns.cost_to_go_fns import cart_pole_cost
@@ -70,7 +70,7 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps",default=250,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
@@ -141,7 +141,7 @@ mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
 REWARD_FUNCTION_UPDATE = 10
-DEMO_BATCH = 250
+DEMO_BATCH = 150
 sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])
