@@ -26,13 +26,22 @@ import numpy as np
 import jax.numpy as jnp
 import jax
 
+import gymnax
+from gymnax.visualize import Visualizer
+from flax import struct
+from gymnax.environments import EnvState
+
 
 from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, update_model
 
 from src.objective_fns.objectives import *
+from src.objective_fns.cost_to_go_fns import cart_pole_cost
+
 from utils.helpers import generate_demo,load_config
 from utils.models import load_neural_network
+
+
 
 import gymnax
 # CONVERTS TRAJ LIST TO STEP LIST
@@ -146,7 +155,7 @@ return_list, sum_of_cost_list = [], []
 thetas=jnp.ones((1,4))
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
-for i in range(100):
+for i in range(15):
     if (i== 0):
         base = osp.join("expert_agents", "CartPole-v1", "ppo")
         configs = load_config(base + ".yaml")
@@ -216,8 +225,23 @@ for i in range(100):
     
     # mean_costs.append(np.mean(sum_of_cost_list))
     mean_loss_rew.append(np.mean(loss_rew))
-    
-    
+
+# just for cartpole...
+@struct.dataclass
+class EnvState(EnvState):
+    x: jnp.ndarray
+    x_dot: jnp.ndarray
+    theta: jnp.ndarray
+    theta_dot: jnp.ndarray
+    time: int
+
+visualization_irl = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
+states_mppi_irl = [EnvState(x=state[0],x_dot=state[1],theta=state[2],theta_dot=state[3],time=i) for i,state in enumerate(visualization_irl[0][0])]
+costs_mppi_irl = [cart_pole_cost(state) for state in visualization_irl[0][0]]
+
+vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
+vis.animate(osp.join("results","CartPole-v1-mppi-irl.gif"))
+
 
 config = {'dimensions': np.array([5, 3])}
 ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}

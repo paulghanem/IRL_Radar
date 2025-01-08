@@ -87,7 +87,7 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
                #jnp.mean((jnp.exp(-costs_demo))/(probs_experts))
         #loss=jnp.mean(optax.l2_loss(predictions=costs_samp,targets=jnp.ones((200,1))))
         loss = jnp.mean(costs_demo) + \
-               jnp.mean(jnp.log(jnp.exp(-costs_samp)/(probs+1e-7)))
+               jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7)))
         # loss = jnp.mean(((costs_demo) + \
         #        jnp.log(jnp.exp(-costs_samp)/(probs+1e-7)))**2)
    
