@@ -105,10 +105,9 @@ def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,p
 
   
     def loss_fn(params):
-        distances_expert=states_expert[:,:3]-states_expert[:,3:]
-        distances=states[:,:3]-states[:,3:]
-        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, distances_expert)+1e-6)
-        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6)
+ 
+        costs_demo = state_train.apply_fn({'params': params}, states_expert)+1e-6
+        costs_samp = state_train.apply_fn({'params': params}, states)+1e-6
         
         disc_demo = jnp.divide(jnp.exp(-costs_demo),(jnp.exp(-costs_demo)+1))
         disc_samp = jnp.divide(jnp.exp(-costs_samp),(jnp.exp(-costs_samp)+1))

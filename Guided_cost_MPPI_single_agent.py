@@ -155,6 +155,8 @@ return_list, sum_of_cost_list = [], []
 thetas=jnp.ones((1,4))
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
+AIRL=True
+
 for i in range(30):
     if (i== 0):
         base = osp.join("expert_agents", "CartPole-v1", "ppo")
@@ -216,7 +218,12 @@ for i in range(30):
         #actions = torch.tensor(actions, dtype=torch.float32)
         #states_expert = torch.tensor(states_expert, dtype=torch.float32)
         #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+        if AIRL:
+            grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+        else :
+            
+            grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+       
         state_train = update_model(state_train, grads)
         
 
