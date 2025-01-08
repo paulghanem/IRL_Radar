@@ -17,11 +17,12 @@ class CartPoleEnvState(object):
     x_dot: jnp.ndarray
     theta: jnp.ndarray
     theta_dot: jnp.ndarray
+    t: int
 
 def cartpole_step(
-        x,x_dot,theta,theta_dot,
-        action: Union[int, float, chex.Array],
-) -> Tuple[chex.Array, CartPoleEnvState, jnp.ndarray, jnp.ndarray, Dict[Any, Any]]:
+        action,
+        state):
+
     gravity = 9.8
     masscart = 1.0
     masspole= 0.1
@@ -31,8 +32,12 @@ def cartpole_step(
     force_mag = 10.0
     tau = 0.02
 
+    x, x_dot, theta, theta_dot = state[...,0],state[...,1],state[...,2],state[...,3]
+
+    force = action[...,0]
+
     """Performs step transitions in the environment."""
-    force = force_mag * action - force_mag * (1 - action)
+    force = jnp.clip(force,-force_mag,force_mag) #force_mag * action - force_mag * (1 - action) turn to continuous :)
     costheta = jnp.cos(theta)
     sintheta = jnp.sin(theta)
 
@@ -55,26 +60,25 @@ def cartpole_step(
     return lax.stop_gradient(jnp.array([x, x_dot, theta, theta_dot]))
 
 
-def cartpole_kinematics(x, x_dot, theta, theta_dot, action, cartpole_step):
+def kinematics(action, state, step_fn):
     """Rollout a jitted gymnax episode with lax.scan."""
 
     def policy_step(state_input, tmp):
         """lax.scan compatible step transition in jax env."""
-        x, x_dot, theta, theta_dot = state_input
-        a = tmp
 
-        next_x, next_x_dot, next_theta, next_theta_dot = cartpole_step(x, x_dot, theta, theta_dot, a)
+        action = tmp
+        next_state = step_fn(action,state_input)
 
-        carry = [next_x, next_x_dot, next_theta, next_theta_dot]
+        carry = next_state
         return carry, carry
 
     # Scan over episode step loop
     _, scan_out = jax.lax.scan(
         policy_step,
-        [x, x_dot, theta, theta_dot],
+        state,
         action,
     )
     # Return masked sum of rewards accumulated by agent in episode
-    x, x_dot, theta, theta_dot = scan_out
-    return x, x_dot, theta, theta_dot
+    states = scan_out
+    return states
 
