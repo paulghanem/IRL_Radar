@@ -61,8 +61,7 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at every nth frame (must be a multiple of the update on the control frequency, which is dt control / dt ckf)')
-parser.add_argument("--N_steps",default=250,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
@@ -125,7 +124,7 @@ variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0])))
 params = variables['params']
 #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
 #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-3)
+tx = optax.adam(learning_rate=1e-2)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []
@@ -133,7 +132,7 @@ mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
 REWARD_FUNCTION_UPDATE = 10
-DEMO_BATCH = 250
+DEMO_BATCH = 150
 sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])

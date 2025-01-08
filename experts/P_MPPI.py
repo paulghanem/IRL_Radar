@@ -36,7 +36,7 @@ class P_MPPI:
         self.state_shape = state_shape
         self.n_actions = n_actions
         self.MPPI_iterations=10
-        self.gamma=0.95
+        self.gamma=0.99
         self.temperature=0.1
         self.num_traj=500
         self.seed = 123
@@ -63,7 +63,7 @@ class P_MPPI:
 
         mppi = MPPI_wrapper(dynamic_rollout)
 
-        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout, 0.99,method="Single_FIM_3D_action_NN_MPPI")
+        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI")
 
         mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
 
@@ -110,7 +110,7 @@ class P_MPPI:
             traj_probs.append(prob.flatten())
             actions.append(U_nominal[0,:].flatten())
 
-            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]}")
+            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {cart_pole_cost(state):.4f}")
             pbar.update(1)
 
 

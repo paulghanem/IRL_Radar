@@ -35,7 +35,7 @@ def MPPI_wrapper(kinematic_model):
 def weighting(method="CE"):
 
     if method == "CE":
-        def weight_fn(costs,elite_threshold=0.8):
+        def weight_fn(costs,elite_threshold=0.9):
             num_traj = costs.shape[0]
 
             zeta = jnp.round(num_traj * (1-elite_threshold))

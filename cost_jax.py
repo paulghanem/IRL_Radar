@@ -67,8 +67,8 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
 
         #costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
         #costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
-        costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-6)
-        costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-6)
+        costs_demo = state_train.apply_fn({'params': params}, states_expert)+1e-6
+        costs_samp = state_train.apply_fn({'params': params}, states)+1e-6
       # LOSS CALCULATION FOR IOC (COST FUNCTION)
       #logits = state_train.apply_fn({'params': params}, jnp.concatenate((states,actions),axis=1))
         # g_demo=jnp.zeros(costs_demo.shape)
