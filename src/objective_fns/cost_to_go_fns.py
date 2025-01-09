@@ -15,10 +15,10 @@ def cart_pole_cost(state,goal_x = 0.0,goal_theta = 0.0):
     return 2.5*pos_cost + 5*theta_cost
 
 def pendudulum_cost(state):
-    theta,theta_vel = state[0],state[1]
-    theta_normalize = ((theta + jnp.pi) % (2 * jnp.pi)) - jnp.pi
+    x,y,theta_vel = state[...,0],state[...,1],state[...,2]
+
     # see gymlibrary dev https://www.gymlibrary.dev/environments/classic_control/pendulum/
-    return (theta_normalize**2 + 0.1 * theta_vel**2)
+    return ((x-1)**2 + y**2 + 0.1 * theta_vel**2)
 
 
 

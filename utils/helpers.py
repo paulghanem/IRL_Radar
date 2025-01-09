@@ -100,10 +100,8 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
     t_counter = 0
     reward_seq = []
     while True:
-        if env.name=="Pendulum-v1":
-            state_seq.append(jnp.array([env_state.theta,env_state.theta_dot]).ravel())
-        else:
-            state_seq.append(obs)
+
+        state_seq.append(obs)
 
         rng, rng_act, rng_step = jax.random.split(rng, 3)
 
@@ -136,7 +134,7 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
         else:
             env_state = next_env_state
             obs = next_obs
-    print(f"{env.name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}")
+    print(f"{env.name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, SObs")
 
     if len(action.shape) == 0:
         return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq)

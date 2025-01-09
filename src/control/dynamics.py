@@ -23,7 +23,8 @@ class CartPoleEnvState(environment.EnvState):
 
 @struct.dataclass
 class PendulumEnvState(environment.EnvState):
-    theta: jnp.ndarray
+    x: jnp.ndarray
+    y: jnp.ndarray
     theta_dot: jnp.ndarray
     last_u: jnp.ndarray  # Only needed for rendering
     time: int
@@ -89,7 +90,9 @@ def pendulum_step(
     """Integrate pendulum ODE and return transition."""
     u = jnp.clip(action, -max_torque, max_torque)
 
-    theta,theta_dot = state[...,0],state[...,1]
+    x,y,theta_dot = state[...,0],state[...,1],state[...,2]
+
+    theta = jnp.atan2(y,x)
 
     newthdot = theta_dot + (
         (
@@ -105,8 +108,10 @@ def pendulum_step(
 
     theta = newth.squeeze()
     theta_dot = newthdot.squeeze()
+    x = jnp.cos(theta)
+    y = jnp.sin(theta)
 
-    return lax.stop_gradient(jnp.array([theta, theta_dot]))
+    return lax.stop_gradient(jnp.array([x,y, theta_dot]))
 
 
 
@@ -122,7 +127,7 @@ def get_state(state,action=None,time=None,env_name="CartPole-v1"):
         return CartPoleEnvState(x=state[0],x_dot=state[1],theta=state[2],theta_dot=state[3],time=time)
 
     if env_name == "Pendulum-v1":
-        return PendulumEnvState(theta=state[0],theta_dot=state[1],last_u=action,time=time)
+        return PendulumEnvState(x=state[0],y=state[1],theta_dot=state[2],last_u=action,time=time)
 
 
 def get_step_model(env_name):
