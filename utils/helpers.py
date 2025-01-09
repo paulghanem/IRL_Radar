@@ -100,7 +100,11 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
     t_counter = 0
     reward_seq = []
     while True:
-        state_seq.append(obs)
+        if env.name=="Pendulum-v1":
+            state_seq.append(jnp.array([env_state.theta,env_state.theta_dot]).ravel())
+        else:
+            state_seq.append(obs)
+
         rng, rng_act, rng_step = jax.random.split(rng, 3)
 
         v, pi = model.apply(model_params, obs, rng_act)
@@ -111,8 +115,15 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
             rng_step, env_state, action, env_params
         )
 
-        if env.name == "CartPole-v1":
-            action = action*env_params.force_mag + (1-action)*(-env_params.force_mag)
+        if model.model_name.startswith("separate"):
+            v, pi = model.apply(model_params, obs, rng_act)
+            action = pi.sample(seed=rng_act)
+            if env.name == "CartPole-v1":
+                action = action*env_params.force_mag + (1-action)*(-env_params.force_mag)
+
+        else:
+            action = model.apply(model_params, obs, rng_act)
+
 
         action_seq.append(action)
         reward_seq.append(reward)
@@ -120,7 +131,7 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
         print(t_counter, reward, action, done)
         print(10 * "=")
         t_counter += 1
-        if done or t_counter == max_frames:
+        if t_counter == max_frames:
             break
         else:
             env_state = next_env_state

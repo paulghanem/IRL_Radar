@@ -64,7 +64,7 @@ def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,
 
             total_cost = jnp.sum(gammas*Js,axis=-1)/jnp.sum(gammas)
 
-            if args.gail == True:
+            if args.gail:
                 D = jnp.divide(jnp.exp(-total_cost), (jnp.exp(-total_cost) + 1))
                 total_cost = -jnp.log(D)
 

@@ -65,18 +65,19 @@ parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstar
 parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
-parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
-parser.add_argument('--tail_length',default=10,type=int,help="The length of the tail of the radar trajectories in plottings")
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
-parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
-parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
-parser.add_argument('--gail', default=True,type=bool, help='gail metod flag')
+parser.add_argument('--lr', default=1e-3,type=float, help='learning rate')
+
+parser.add_argument('--gail', default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
+parser.add_argument('--airl', default=False,type=bool, help='airl method flag')
+parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
 parser.add_argument('--num_traj', default=250,type=int, help='Number of MPPI control sequences samples to generate')
 parser.add_argument('--MPPI_iterations', default=75,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
+parser.add_argument('--gamma',default=0.99,type=float,help='The discount factor in the MPC objective')
 
 
 
@@ -108,25 +109,7 @@ with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as ou
     json.dump(vars(args), outfile)
 
 
-n_actions = 1
 
-state_shape =((4,))
-
-
-# INITILIZING POLICY AND REWARD FUNCTION
-policy = P_MPPI(state_shape, n_actions,args)
-cost_f = CostNN(state_dims=state_shape[0])
-
-#cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
-init_rng = jax.random.key(0)
-
-variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0]))) 
-
-params = variables['params']
-#params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
-#params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-3)
-state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []
 mean_costs = []
@@ -151,7 +134,7 @@ AIRL=True
 
 for i in range(30):
     if (i== 0):
-        base = osp.join("expert_agents", "CartPole-v1", "ppo")
+        base = osp.join("expert_agents",args.gym_env, "ppo")
         configs = load_config(base + ".yaml")
         model, model_params = load_neural_network(
             configs.train_config, base + ".pkl"
@@ -171,10 +154,31 @@ for i in range(30):
         args.s_dim = states_d.shape[-1]
 
         D_demo=np.array([])
+
+        # initalize Neural Network...
+        args.a_dim = actions_d.shape[-1]
+        args.s_dim = states_d.shape[-1]
+        thetas = jnp.ones((1, args.s_dim))
+
+        # INITILIZING POLICY AND REWARD FUNCTION
+        policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
+        cost_f = CostNN(state_dims=args.s_dim)
+
+        # cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
+        init_rng = jax.random.key(0)
+
+        variables = cost_f.init(init_rng, jnp.ones((1, args.s_dim)))
+
+        params = variables['params']
+        # params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
+        # params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
+        tx = optax.adam(learning_rate=args.lr)
+        state_train = train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
+
     
         demo_trajs=[[states_d,actions_d,actions_d]]
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
-        D_demo=jnp.concatenate((D_demo[:,:state_shape[0]],D_demo[:,state_shape[0]:]),axis=1)
+        D_demo=jnp.concatenate((D_demo[:,:args.s_dim],D_demo[:,args.s_dim:]),axis=1)
 
 
 
@@ -239,7 +243,7 @@ states_mppi_irl = [EnvState(x=state[0],x_dot=state[1],theta=state[2],theta_dot=s
 costs_mppi_irl = [cart_pole_cost(state) for state in visualization_irl[0][0]]
 
 vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
-vis.animate(osp.join("results","CartPole-v1-mppi-irl.gif"))
+vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
 
 
 config = {'dimensions': np.array([5, 3])}

@@ -16,9 +16,9 @@ config.update("jax_enable_x64", True)
 
 from functools import partial
 
-from src.control.dynamics import cartpole_step,CartPoleEnvState,kinematics
+from src.control.dynamics import cartpole_step,get_step_model,get_action_space,kinematics
 from src.control.MPPI import MPPI_wrapper,weighting,MPPI_scores_wrapper,MPPI_control
-from src.objective_fns.cost_to_go_fns import cart_pole_cost
+from src.objective_fns.cost_to_go_fns import get_cost
 from src.objective_fns.objectives import MPC_decorator
 
 from cost_jax import get_gradients,get_hessian
@@ -38,12 +38,10 @@ class P_MPPI:
         self.state_shape = state_shape
         self.n_actions = n_actions
         self.MPPI_iterations=10
-        self.gamma=0.99
+        self.gamma=args.gamma
         self.temperature=0.1
         self.num_traj=500
         self.seed = 123
-        self.v_init = 0
-        self.av_init = 0
         self.args = args
 
     def predict_probs(self,mean,cov,x):
@@ -62,33 +60,41 @@ class P_MPPI:
 
 
         # ==================== MPPI CONFIGURATION ================================= #
-        dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
+        dynamic_rollout = jax.jit(partial(kinematics, step_fn=get_step_model(args.gym_env)))
 
         mppi = MPPI_wrapper(dynamic_rollout)
 
-        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
+        mpc_obj = MPC_decorator(None, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
 
         mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
 
         weight_fn = weighting()
 
-        action_space = jnp.array([[-10,10]])
+        action_space = get_action_space(args.gym_env)
 
-        cov_timestep = jnp.eye(args.a_dim)*10
+        def cov_coef(env_name):
+            if env_name == "CartPole-v1":
+                return 10.
+            if env_name == "Pendulum-v1":
+                return 1.0
+
+        cov_timestep = jnp.eye(args.a_dim)*cov_coef(args.gym_env)
         cov = jax.scipy.linalg.block_diag(*[cov_timestep for _ in range(args.horizon)])
 
 
         state = D_demo[0,:args.s_dim]
 
-
         U_MPPI_init= jnp.array(np.random.randn(15, args.horizon, args.a_dim) * 0.2)
         U_nominal = U_MPPI_init.mean(axis=0)
+        true_cost_fn = get_cost(args.gym_env)
 
-        rewards = [cart_pole_cost(state)]
+        rewards = [true_cost_fn(state)]
 
         pbar = tqdm(total=args.N_steps, desc="Starting")
 
         for step in range(1,args.N_steps+1):
+            states.append(state)
+
             (U_nominal,cov_prime), (states_nominal, states_MPPI), cost_MPPI, key = MPPI_control(state, U_nominal, cov, key,
                                                                             dynamic_rollout, action_space,
                                                                             mppi, mppi_scores, weight_fn,
@@ -96,7 +102,7 @@ class P_MPPI:
                                                                             args=args)
 
             state = states_nominal[0]
-            rewards.append(cart_pole_cost(state))
+            rewards.append(true_cost_fn(state))
             # state_seq_mppi.append(
             #     CartPoleEnvState(t=i + 1, x=state[0], x_dot=state[1], theta=state[2], theta_dot=state[3]))
 
@@ -104,15 +110,14 @@ class P_MPPI:
             # print("U: ",U_nominal)
 
             probs_fun=jax.vmap(self.predict_probs,(0,None,0))
-            prob=self.predict_probs(U_nominal[0,:], cov_prime[args.a_dim:(2*args.a_dim),args.a_dim:(2*args.a_dim)],U_nominal[0,:])
+            prob=self.predict_probs(U_nominal[-1,:], cov_prime[args.a_dim:(2*args.a_dim),args.a_dim:(2*args.a_dim)],U_nominal[-1,:])
             prob=jnp.array([1])
 
 
-            states.append(state)
             traj_probs.append(prob.flatten())
-            actions.append(U_nominal[0,:].flatten())
+            actions.append(U_nominal[-1,:].flatten())
 
-            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {cart_pole_cost(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel().item():.4f}")
+            pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {true_cost_fn(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel().item():.4f}")
             pbar.update(1)
 
 
@@ -135,19 +140,25 @@ class P_MPPI:
     
     
          # ==================== MPPI CONFIGURATION ================================= #
-         dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
-    
+         dynamic_rollout = jax.jit(partial(kinematics, step_fn=get_step_model(args.gym_env)))
+
          mppi = MPPI_wrapper(dynamic_rollout)
     
-         mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
+         mpc_obj = MPC_decorator(None, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
     
          mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
     
          weight_fn = weighting()
-    
-         action_space = jnp.array([[-10,10]])
-    
-         cov_timestep = jnp.eye(args.a_dim)*10
+
+         action_space = get_action_space(args.gym_env)
+
+         def cov_coef(env_name):
+             if env_name == "CartPole-v1":
+                 return 10.
+             if env_name == "Pendulum-v1":
+                 return 1.5
+
+         cov_timestep = jnp.eye(args.a_dim) * cov_coef(args.gym_env)
          cov = jax.scipy.linalg.block_diag(*[cov_timestep for _ in range(args.horizon)])
     
     
@@ -156,8 +167,9 @@ class P_MPPI:
     
          U_MPPI_init= jnp.array(np.random.randn(15, args.horizon, args.a_dim) * 0.2)
          U_nominal = U_MPPI_init.mean(axis=0)
-    
-         rewards = [cart_pole_cost(state)]
+         true_cost_fn = get_cost(args.gym_env)
+
+         rewards = [true_cost_fn(state)]
     
          pbar = tqdm(total=args.N_steps, desc="Starting")
          
@@ -171,7 +183,7 @@ class P_MPPI:
                                                                              args=args)
     
              state = states_nominal[0]
-             rewards.append(cart_pole_cost(state))
+             rewards.append(true_cost_fn(state))
              # state_seq_mppi.append(
              #     CartPoleEnvState(t=i + 1, x=state[0], x_dot=state[1], theta=state[2], theta_dot=state[3]))
     
@@ -187,7 +199,7 @@ class P_MPPI:
              traj_probs.append(prob.flatten())
              actions.append(U_nominal[0,:].flatten())
     
-             pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {cart_pole_cost(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel().item():.4f}")
+             pbar.set_description(f"State = {state} , Action = {U_nominal[-1]} , Cost True = {true_cost_fn(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel().item():.4f}")
              pbar.update(1)
              
              gradient_s=get_gradients(state_train,params,state,args.N_steps)

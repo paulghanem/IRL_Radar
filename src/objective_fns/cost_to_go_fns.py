@@ -14,3 +14,16 @@ def cart_pole_cost(state,goal_x = 0.0,goal_theta = 0.0):
 
     return 2.5*pos_cost + 5*theta_cost
 
+def pendudulum_cost(state):
+    theta,theta_vel = state[0],state[1]
+
+    # see gymlibrary dev https://www.gymlibrary.dev/environments/classic_control/pendulum/
+    return (theta**2 + 0.1 * theta_vel**2)
+
+
+
+def get_cost(env_name):
+    if env_name == "CartPole-v1":
+        return cart_pole_cost
+    if env_name == "Pendulum-v1":
+        return pendudulum_cost
