@@ -81,8 +81,8 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 
 parser.add_argument('--lr', default=1e-3,type=float, help='learning rate')
 
-parser.add_argument('--gail', default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
-parser.add_argument('--airl', default=False,type=bool, help='airl method flag')
+parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
+parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 
@@ -102,6 +102,9 @@ args = parser.parse_args()
 
 
 args.airl = True if args.gail else args.airl
+
+print("Using AIRL: ",args.airl)
+print("Using GAIL: ",args.gail)
 
 args.results_savepath = os.path.join(args.results_savepath,args.experiment_name) + f"_{args.seed}"
 args.tmp_img_savepath = os.path.join( args.results_savepath,"tmp_img") #('--tmp_img_savepath', default=os.path.join("results","tmp_images"),type=str, help='Folder to save temporary images to make GIFs')
