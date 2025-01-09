@@ -50,10 +50,10 @@ class CostNN(nn.Module):
     return x
 
 def cost_fn(state_train,params,states,N):
-    distances=states[:,:3]-states[:,3:]
+   
     #costs_demo = -jnp.log(state_train.apply_fn({'params': params}, states_expert)+1e-2)
     #costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
-    costs = -jnp.log(state_train.apply_fn({'params': params}, distances)+1e-6).flatten()/N
+    costs = (state_train.apply_fn({'params': params}, states)+1e-6).flatten()/N
     
     return costs[0].astype(float)
 
