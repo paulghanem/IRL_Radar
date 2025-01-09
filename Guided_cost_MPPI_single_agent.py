@@ -36,7 +36,7 @@ from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
 
 from src.objective_fns.objectives import *
-from src.objective_fns.cost_to_go_fns import cart_pole_cost
+from src.objective_fns.cost_to_go_fns import get_cost
 from src.control.dynamics import get_state
 
 from utils.helpers import generate_demo,load_config
@@ -149,7 +149,7 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-for i in range(30):
+for i in range(6):
     if i== 0:
         policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
         base = osp.join("expert_agents", args.gym_env, policy_method_agent)
@@ -250,7 +250,7 @@ for i in range(30):
 
 visualization_irl = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
 states_mppi_irl = [get_state(state=state,action=action,time=i,env_name=args.gym_env) for i,(state,action) in enumerate(zip(visualization_irl[0][0],visualization_irl[0][1]))]
-costs_mppi_irl = [cart_pole_cost(state) for state in visualization_irl[0][0]]
+costs_mppi_irl = [get_cost(args.gym_env)(state) for state in visualization_irl[0][0]]
 
 vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
 vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
