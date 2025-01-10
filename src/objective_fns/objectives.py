@@ -27,7 +27,7 @@ def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,
             for t in range(1,horizon+1):
                 # iterate through cost to go for each element!
 
-                J = cost_to_go(state=states[t])
+                J = cost_to_go(state=states[t-1])
                 Js[t-1] = J
 
             Js = jnp.stack(Js,axis=-1)
@@ -54,7 +54,7 @@ def MPC_decorator(cost_to_go,kinematic_model,gamma,state_train=None,thetas=None,
             for t in range(1, horizon + 1):
                 # iterate through each FIM corresponding to a target
 
-                J = state_train.apply_fn({'params':state_train.params},states[t].reshape(1,-1)).ravel()
+                J = state_train.apply_fn({'params':state_train.params},states[t-1].reshape(1,-1)).ravel()
 
                 Js[t - 1] = J
 
