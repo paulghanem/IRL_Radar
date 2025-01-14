@@ -77,6 +77,8 @@ class P_MPPI:
                 return 10.
             if env_name == "Pendulum-v1":
                 return 1.0
+            if env_name == "MountainCarContinuous-v0":
+                return 0.7
 
         cov_timestep = jnp.eye(args.a_dim)*cov_coef(args.gym_env)
         cov = jax.scipy.linalg.block_diag(*[cov_timestep for _ in range(args.horizon)])
@@ -157,6 +159,8 @@ class P_MPPI:
                  return 10.
              if env_name == "Pendulum-v1":
                  return 1.5
+             if env_name == "MountainCarContinuous-v0":
+                 return 0.7
 
          cov_timestep = jnp.eye(args.a_dim) * cov_coef(args.gym_env)
          cov = jax.scipy.linalg.block_diag(*[cov_timestep for _ in range(args.horizon)])

@@ -35,6 +35,41 @@ class MountainCar(environment.EnvState):
     velocity: jnp.ndarray
     time: int
 
+def mountaincar_step(
+    action,state
+):
+    min_action = -1.0
+    max_action = 1.0
+    min_position = -1.2
+    max_position = 0.6
+    max_speed = 0.07
+    goal_position = 0.45
+    goal_velocity = 0.0
+    power = 0.0015
+    gravity = 0.0025
+    # max_steps_in_episode: int = 999
+
+    position = state[...,0]
+    velocity = state[...,1]
+
+    """Perform single timestep state transition."""
+    force = jnp.clip(action, min_action, max_action)
+    velocity = (
+        velocity
+        + force * power
+        - jnp.cos(3 * position) * gravity
+    )
+    velocity = jnp.clip(velocity, -max_speed, max_speed)
+    position = position + velocity
+    position = jnp.clip(position, min_position, max_position)
+    velocity = velocity * (1 - (position >= goal_position) * (velocity < 0))
+
+
+    # Update state dict and evaluate termination conditions
+
+    return lax.stop_gradient(jnp.array([position, velocity]).ravel())
+
+
 def cartpole_step(
         action,
         state):
@@ -122,6 +157,9 @@ def get_action_space(env_name):
     if env_name == "Pendulum-v1":
         return jnp.array([[-2.,2.]])
 
+    if env_name == "MountainCarContinuous-v0":
+        return jnp.array([[-1.,1.]])
+
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":
         return CartPoleEnvState(x=state[0],x_dot=state[1],theta=state[2],theta_dot=state[3],time=time)
@@ -129,12 +167,17 @@ def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "Pendulum-v1":
         return PendulumEnvState(x=state[0],y=state[1],theta_dot=state[2],last_u=action,time=time)
 
+    if env_name == "MountainCarContinuous-v0":
+        return MountainCar(position=state[0],velocity=state[1],time=time)
+
 
 def get_step_model(env_name):
     if env_name == "CartPole-v1":
         return cartpole_step
     if env_name == "Pendulum-v1":
         return pendulum_step
+    if env_name == "MountainCarContinuous-v0":
+        return mountaincar_step
 
 
 def kinematics(action, state, step_fn):

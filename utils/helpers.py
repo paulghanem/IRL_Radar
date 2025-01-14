@@ -105,14 +105,6 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
 
         rng, rng_act, rng_step = jax.random.split(rng, 3)
 
-        v, pi = model.apply(model_params, obs, rng_act)
-
-        action = pi.sample(seed=rng_act)
-
-        next_obs, next_env_state, reward, done, info = env.step(
-            rng_step, env_state, action, env_params
-        )
-
         if model.model_name.startswith("separate"):
             v, pi = model.apply(model_params, obs, rng_act)
             action = pi.sample(seed=rng_act)
@@ -122,6 +114,9 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
         else:
             action = model.apply(model_params, obs, rng_act)
 
+        next_obs, next_env_state, reward, done, info = env.step(
+            rng_step, env_state, action, env_params
+        )
 
         action_seq.append(action)
         reward_seq.append(reward)
@@ -129,12 +124,15 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
         print(t_counter, reward, action, done)
         print(10 * "=")
         t_counter += 1
+        if env.name == "MountainCarContinuous-v0":
+            if done:
+                break
         if t_counter == max_frames:
             break
         else:
             env_state = next_env_state
             obs = next_obs
-    print(f"{env.name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, SObs")
+    print(f"{env.name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, State: {obs}")
 
     if len(action.shape) == 0:
         return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq)

@@ -135,7 +135,7 @@ mean_rewards = []
 mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
-REWARD_FUNCTION_UPDATE = 25
+REWARD_FUNCTION_UPDATE = 10
 DEMO_BATCH = args.N_steps
 sample_trajs = []
 
@@ -149,7 +149,7 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-for i in range(6):
+for i in range(15):
     if i== 0:
         policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
         base = osp.join("expert_agents", args.gym_env, policy_method_agent)
@@ -168,7 +168,8 @@ for i in range(6):
         states_d,actions_d,_ =generate_demo(
             env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
 
-
+        args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
+        args.N_steps = min(DEMO_BATCH,states_d.shape[0])
 
         # initalize Neural Network...
         args.a_dim = actions_d.shape[-1]
@@ -233,7 +234,6 @@ for i in range(6):
         if args.airl:
             grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
         else :
-            
             grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
        
         state_train = update_model(state_train, grads)
