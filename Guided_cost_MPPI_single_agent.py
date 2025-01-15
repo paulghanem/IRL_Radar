@@ -32,15 +32,18 @@ from flax import struct
 from gymnax.environments import EnvState
 
 
-from experts.P_MPPI import P_MPPI
+# from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
 
 from src.objective_fns.objectives import *
 from src.objective_fns.cost_to_go_fns import get_cost
 from src.control.dynamics import get_state
+from src.control.mppi_class import MPPI
+from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 
 from utils.helpers import generate_demo,load_config
 from utils.models import load_neural_network
+
 
 
 
@@ -90,7 +93,7 @@ parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym envir
 
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=250,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--num_traj', default=1000,type=int, help='Number of MPPI control sequences samples to generate')
 parser.add_argument('--MPPI_iterations', default=75,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
 parser.add_argument('--gamma',default=0.99,type=float,help='The discount factor in the MPC objective')
 
@@ -177,8 +180,36 @@ for i in range(15):
         thetas = jnp.ones((1, args.s_dim))
 
         # INITILIZING POLICY AND REWARD FUNCTION
-        policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
+        u_min, u_max = get_action_space(args.gym_env)
+        cov_scaler = get_action_cov(args.gym_env)
+
+
+
+
+        # policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
         cost_f = CostNN(state_dims=args.s_dim)
+
+        def cost_function(state,state_train):
+
+            return state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel()
+
+
+        u_min, u_max = get_action_space(args.gym_env)
+        cov_scaler = get_action_cov(args.gym_env)
+
+        policy = MPPI(
+            horizon=args.horizon,
+            num_samples=args.num_traj,
+            # subiterations=args.MPPI_iterations,
+            dim_state=args.s_dim,
+            dim_control=args.a_dim,
+            dynamics=get_step_model(args.gym_env),
+            cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
+            u_min=u_min,
+            u_max=u_max,
+            sigmas=cov_scaler,
+            lambda_=0.1,
+        )
 
         # cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
         init_rng = jax.random.key(0)
@@ -199,7 +230,7 @@ for i in range(15):
 
 
 
-    trajs = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
+    trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
 
    
     sample_trajs = trajs #+ sample_trajs

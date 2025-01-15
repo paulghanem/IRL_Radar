@@ -143,9 +143,9 @@ def MPPI_control(
                 weights.reshape(args.num_traj, 1, 1) * E.reshape(args.num_traj, horizon, a_dim),
                 axis=0)
 
-            lw_cov, shrinkage = ledoit_wolf(X=E[weights != 0], assume_centered=True)
-
-            cov_prime = jnp.array(lw_cov)
+            # lw_cov, shrinkage = ledoit_wolf(X=E[weights != 0], assume_centered=True)
+            #
+            # cov_prime = jnp.array(lw_cov)
 
             if mppi_iter == 0:
                 # print("Oracle Approx Shrinkage: ",np.round(shrinkage,5))

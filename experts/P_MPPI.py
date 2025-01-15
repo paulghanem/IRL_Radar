@@ -32,17 +32,9 @@ import shutil
 from tqdm import tqdm
 
 class P_MPPI:
-    def __init__(self, state_shape, n_actions,args):
-        
+    def __init__(self,mppi_policy, state_shape, n_actions,args):
+        pass
 
-        self.state_shape = state_shape
-        self.n_actions = n_actions
-        self.MPPI_iterations=10
-        self.gamma=args.gamma
-        self.temperature=0.1
-        self.num_traj=500
-        self.seed = 123
-        self.args = args
 
     def predict_probs(self,mean,cov,x):
        x=x.T

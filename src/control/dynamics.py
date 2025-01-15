@@ -36,7 +36,7 @@ class MountainCar(environment.EnvState):
     time: int
 
 def mountaincar_step(
-    action,state
+    state,action
 ):
     min_action = -1.0
     max_action = 1.0
@@ -49,11 +49,11 @@ def mountaincar_step(
     gravity = 0.0025
     # max_steps_in_episode: int = 999
 
-    position = state[...,0]
-    velocity = state[...,1]
+    position = state[...,0].reshape(-1, 1)
+    velocity = state[...,1].reshape(-1, 1)
 
     """Perform single timestep state transition."""
-    force = jnp.clip(action, min_action, max_action)
+    force = jnp.clip(action[...,0].reshape(-1, 1), min_action, max_action)
     velocity = (
         velocity
         + force * power
@@ -69,12 +69,12 @@ def mountaincar_step(
 
     # Update state dict and evaluate termination conditions
 
-    return lax.stop_gradient(jnp.array([position, velocity]).ravel())
+    return jnp.concatenate([position, velocity],axis=-1)
 
 
 def cartpole_step(
-        action,
-        state):
+        state,
+        action):
 
     gravity = 9.8
     masscart = 1.0
@@ -85,7 +85,7 @@ def cartpole_step(
     force_mag = 10.0
     tau = 0.02
 
-    x, x_dot, theta, theta_dot = state[...,0],state[...,1],state[...,2],state[...,3]
+    x, x_dot, theta, theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1),state[...,3].reshape(-1, 1)
 
     force = action[...,0]
 
@@ -109,13 +109,10 @@ def cartpole_step(
     theta = theta + tau * theta_dot
     theta_dot = theta_dot + tau * thetaacc
 
-
-    return lax.stop_gradient(jnp.array([x, x_dot, theta, theta_dot]))
-
-
+    return jnp.concatenate([x, x_dot,theta,theta_dot], axis=-1)
 
 def pendulum_step(
-    action,state
+    state,action
 ):
     max_speed = 8.0
     max_torque = 2.0
@@ -125,9 +122,9 @@ def pendulum_step(
     l = 1.0  # length
 
     """Integrate pendulum ODE and return transition."""
-    u = jnp.clip(action, -max_torque, max_torque)
+    u = jnp.clip(action[...,0], -max_torque, max_torque)
 
-    x,y,theta_dot = state[...,0],state[...,1],state[...,2]
+    x,y,theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1)
 
     theta = jnp.atan2(y,x)
 
@@ -143,24 +140,32 @@ def pendulum_step(
     newth = theta + newthdot * dt
 
 
-    theta = newth.squeeze()
-    theta_dot = newthdot.squeeze()
-    x = jnp.cos(theta)
-    y = jnp.sin(theta)
+    theta = newth.reshape(-1,1)
+    theta_dot = newthdot.reshape(-1,1)
+    x = jnp.cos(theta).reshape(-1,1)
+    y = jnp.sin(theta).reshape(-1,1)
 
-    return lax.stop_gradient(jnp.array([x,y, theta_dot]))
+    return jnp.concatenate([x, y,theta_dot], axis=-1)
 
 
 
 def get_action_space(env_name):
     if env_name == "CartPole-v1":
-        return jnp.array([[-10.,10.]])
+        return jnp.array([-10.]),jnp.array([10.])
 
     if env_name == "Pendulum-v1":
-        return jnp.array([[-2.,2.]])
+        return jnp.array([-2.]),jnp.array([2.])
 
     if env_name == "MountainCarContinuous-v0":
-        return jnp.array([[-1.,1.]])
+        return jnp.array([-1.]),jnp.array([1.])
+
+def get_action_cov(env_name):
+    if env_name == "CartPole-v1":
+        return jnp.array([2.0])
+    if env_name == "Pendulum-v1":
+        return jnp.array([0.4])
+    if env_name == "MountainCarContinuous-v0":
+        return jnp.array([0.3])
 
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":
@@ -181,15 +186,16 @@ def get_step_model(env_name):
     if env_name == "MountainCarContinuous-v0":
         return mountaincar_step
 
-
-def kinematics(action, state, step_fn):
+from functools import partial
+@partial(jax.jit, static_argnames=("step_fn",))
+def kinematics(state, action, step_fn):
     """Rollout a jitted gymnax episode with lax.scan."""
 
     def policy_step(state_input, tmp):
         """lax.scan compatible step transition in jax env."""
 
         action = tmp
-        next_state = step_fn(action,state_input)
+        next_state = step_fn(state_input,action)
 
         carry = next_state
         return carry, carry
