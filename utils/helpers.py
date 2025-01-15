@@ -121,7 +121,8 @@ def generate_demo(env, env_params, model, model_params, max_frames=200,seed=123)
         action_seq.append(action)
         reward_seq.append(reward)
 
-        print(t_counter, reward, action, done)
+        # print(t_counter, obs, reward, action, done)
+        print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward}, Done: {done}")
         print(10 * "=")
         t_counter += 1
         if env.name == "MountainCarContinuous-v0":

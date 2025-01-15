@@ -43,7 +43,7 @@ def mountaincar_step(
     min_position = -1.2
     max_position = 0.6
     max_speed = 0.07
-    goal_position = 0.45
+    goal_position = 0.45 # seems a bit odd???
     goal_velocity = 0.0
     power = 0.0015
     gravity = 0.0025
@@ -62,7 +62,9 @@ def mountaincar_step(
     velocity = jnp.clip(velocity, -max_speed, max_speed)
     position = position + velocity
     position = jnp.clip(position, min_position, max_position)
-    velocity = velocity * (1 - (position >= goal_position) * (velocity < 0))
+
+    # this seems like cheating somehow - but it is in the original code
+    # velocity = velocity * (1 - (position >= goal_position) * (velocity < 0))
 
 
     # Update state dict and evaluate termination conditions
