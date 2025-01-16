@@ -78,7 +78,7 @@ parser.add_argument('--frame_skip',default=4,type=int, help='Save the images at 
 parser.add_argument('--dt_ckf', default=0.1,type=float, help='Frequency at which the radar receives measurements and updated Cubature Kalman Filter')
 parser.add_argument('--dt_control', default=0.1,type=float,help='Frequency at which the control optimization problem occurs with MPPI')
 parser.add_argument('--N_radar',default=1,type=int,help="The number of radars in the experiment")
-parser.add_argument("--N_steps",default=500,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
+parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment. Total real time duration of experiment is N_steps x dt_ckf")
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
@@ -180,8 +180,8 @@ mean_rewards = []
 mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
-REWARD_FUNCTION_UPDATE = 10
-DEMO_BATCH = 100
+REWARD_FUNCTION_UPDATE = 1
+DEMO_BATCH = 500
 sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])
@@ -195,10 +195,13 @@ return_list, sum_of_cost_list = [], []
 thetas=jnp.ones((1,4))
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
-for i in range(100):
+FIM_true=[]
+FIM_predicted=[]
+epoch_time=[]
+for i in range(500):
     if (i== 0): 
     
-        demo_trajs,demo_trajs_sindy=generate_demo_MPPI_single(args,state_train=None)
+        demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
         demo_trajs=np.array(demo_trajs)
     
         states_d=demo_trajs[:,:-2]
@@ -209,9 +212,12 @@ for i in range(100):
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
         D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
     
+    start_time=time()
     trajs = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
 
-   
+    FIMs=trajs[0][3]
+    FIMs_NN=trajs[0][4]
+    trajs=[trajs[0][:3]]
     sample_trajs = trajs + sample_trajs
     #sample_trajs = demo_trajs + sample_trajs
     D_samp = preprocess_traj(trajs, D_samp)
@@ -222,16 +228,16 @@ for i in range(100):
     for _ in range(REWARD_FUNCTION_UPDATE):
         selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
         selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
-
+    
         D_s_samp = D_samp[selected_samp]
         D_s_demo = D_demo[selected_demo]
-
+    
         #D̂ samp ← D̂ demo ∪ D̂ samp
         D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
-
+    
         states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
         states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
-
+    
         # Reducing from float64 to float32 for making computaton faster
         #states = torch.tensor(states, dtype=torch.float32)
         #probs = torch.tensor(probs, dtype=torch.float32)
@@ -240,51 +246,54 @@ for i in range(100):
         #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
         grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
         state_train = update_model(state_train, grads)
-        
-       
-     
-        # UPDATING THE COST FUNCTION
-       # cost_optimizer.zero_grad()
-        #loss_IOC.backward()
-        #cost_optimizer.step()
-
-        loss_rew.append(loss_IOC)
-
-    # for traj in trajs:
-    #     states, probs ,actions= traj
-        
-    #     states = torch.tensor(states, dtype=torch.float32)
-    #     actions = torch.tensor(actions, dtype=torch.float32)
-        
             
-    #     costs = cost_f(torch.cat((states, actions), dim=-1))
-    #     cumulative_returns = torch.tensor(get_cumulative_rewards(-costs, 0.99))
-    #     #cumulative_returns = torch.tensor(cumulative_returns, dtype=torch.float32)
+           
+         
+            # UPDATING THE COST FUNCTION
+           # cost_optimizer.zero_grad()
+            #loss_IOC.backward()
+            #cost_optimizer.step()
+    
+        loss_rew.append(loss_IOC)
+    
+        # for traj in trajs:
+        #     states, probs ,actions= traj
+            
+        #     states = torch.tensor(states, dtype=torch.float32)
+        #     actions = torch.tensor(actions, dtype=torch.float32)
+            
+                
+        #     costs = cost_f(torch.cat((states, actions), dim=-1))
+        #     cumulative_returns = torch.tensor(get_cumulative_rewards(-costs, 0.99))
+        #     #cumulative_returns = torch.tensor(cumulative_returns, dtype=torch.float32)
+            
+            
+        #     probs=policy(states)
+        #     log_probs = torch.log(probs)
+    
         
+        #     entropy = -torch.mean(torch.sum(probs*log_probs), dim = -1 )
+        #     loss = torch.mean(costs-1e-2*log_probs.reshape(-1,1))-entropy*1e-2 
+        #     #loss = -torch.mean(log_probs*cumulative_returns -entropy*1e-2)
+    
+        #     # UPDATING THE POLICY NETWORK
+            
+            
+            
+    
         
-    #     probs=policy(states)
-    #     log_probs = torch.log(probs)
-
-    
-    #     entropy = -torch.mean(torch.sum(probs*log_probs), dim = -1 )
-    #     loss = torch.mean(costs-1e-2*log_probs.reshape(-1,1))-entropy*1e-2 
-    #     #loss = -torch.mean(log_probs*cumulative_returns -entropy*1e-2)
-
-    #     # UPDATING THE POLICY NETWORK
+        # sum_of_cost = np.sum(costs.detach().numpy())
         
+        # sum_of_cost_list.append(sum_of_cost)
+    
         
-        
-
+        # mean_costs.append(np.mean(sum_of_cost_list))
+        mean_loss_rew.append(np.mean(loss_rew))
     
-    # sum_of_cost = np.sum(costs.detach().numpy())
-    
-    # sum_of_cost_list.append(sum_of_cost)
-
-    
-    # mean_costs.append(np.mean(sum_of_cost_list))
-    mean_loss_rew.append(np.mean(loss_rew))
-    
-    
+    end_time=time()
+    epoch_time.append(end_time-start_time)
+    FIM_true.append(FIMs)
+    FIM_predicted.append(FIMs_NN)
 
     # PLOTTING PERFORMANCE
     if i % 10 == 0:

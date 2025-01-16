@@ -838,7 +838,7 @@ def generate_demo_MPPI_single(args,state_train):
        #     if args.remove_tmp_images:
        #         shutil.rmtree(args.tmp_img_savepath)
     
-       return traj_list , traj_sindy_list
+       return traj_list , traj_sindy_list,FIMs
    
 
 def generate_demo_MPPI_NCIRL(args,state_train):

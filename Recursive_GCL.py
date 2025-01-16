@@ -206,13 +206,16 @@ return_list, sum_of_cost_list = [], []
 #U,chis,radar_states,target_states
 thetas=jnp.ones((1,4))
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
-
-for i in range(100):
-    if (i %10 ==0 and i >0) :
-        Q_theta=1e-1*Q_theta
+FIM_true=[]
+FIM_predicted=[]
+epoch_time=[]
+for i in range(50):
+    
+    if (i %15 ==0 and i >0) :
+         Q_theta=1e-2*Q_theta
     if (i== 0): 
     
-        demo_trajs,demo_trajs_sindy=generate_demo_MPPI_single(args,state_train=None)
+        demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
         demo_trajs=np.array(demo_trajs)
     
         states_d=demo_trajs[:,:-2]
@@ -223,7 +226,7 @@ for i in range(100):
         D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
         D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
         
-        
+    start_time=time()   
     mpl.rcParams['path.simplify_threshold'] = 1.0
     mplstyle.use('fast')
     mplstyle.use(['ggplot', 'fast'])
@@ -377,7 +380,7 @@ for i in range(100):
     radar_state_history = np.zeros((args.N_steps+1,)+radar_state.shape)
 
     FIMs = np.zeros(args.N_steps//update_freq_control + 1)
-
+    FIMs_NN = np.zeros(args.N_steps//update_freq_control + 1)
 
     fig_main,axes_main = plt.subplots(1,2,figsize=(10,5))
     imgs_main =  []
@@ -391,7 +394,7 @@ for i in range(100):
     P=np.eye(M_target*dm) * 50
     
     J = jnp.linalg.inv(P)
-
+    J_NN=J
     #trajs = [policy.generate_session(args,i,state_train,D_demo,mpc_method)]
     
     
@@ -568,15 +571,18 @@ for i in range(100):
         params['Dense_1']['bias']=theta[len(params['Dense_0']['bias'])+params['Dense_0']['kernel'].shape[0]*params['Dense_0']['kernel'].shape[1]:len(params['Dense_0']['bias'])+params['Dense_0']['kernel'].shape[0]*params['Dense_0']['kernel'].shape[1]+len(params['Dense_1']['bias'])]
         params['Dense_1']['kernel']=theta[len(params['Dense_0']['bias'])+params['Dense_0']['kernel'].shape[0]*params['Dense_0']['kernel'].shape[1]+len(params['Dense_1']['bias']):].reshape(-1,1)
         
-        J = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
+        J_NN = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
                   J=J,method="NN",state_train=state_train,thetas=thetas)
-        
+        J = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
+                  J=J)
 
         # print(jnp.linalg.slogdet(J)[1].ravel().item())
         if args.N_radar==1 and M_target==1:
-            FIMs[step] = jnp.log(J).ravel().item()
+            FIMs_NN[step] = jnp.log(J_NN).ravel().item()
+            FIMs[step]=jnp.log(J).ravel().item()
         else:
             
+            FIMs_NN[step] = jnp.linalg.slogdet(J_NN)[1].ravel().item()
             FIMs[step] = jnp.linalg.slogdet(J)[1].ravel().item()
 
         radar_state_history[step] = radar_state
@@ -621,9 +627,10 @@ for i in range(100):
         # J = IM_fn(radar_state=radar_state,target_state=m0,J=J)
 
         # CKF ! ! ! !
-       
-
-    
+    end_time=time()
+    epoch_time.append(end_time-start_time)
+    FIM_true.append(FIMs)
+    FIM_predicted.append(FIMs_NN)
     np.savetxt(os.path.join(args.results_savepath,f'rmse_{args.seed}.csv'), np.c_[np.arange(1,args.N_steps+1),target_state_mse], delimiter=',',header="k,rmse",comments='')
 
     if args.save_images:

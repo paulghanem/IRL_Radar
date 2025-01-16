@@ -218,7 +218,7 @@ class P_MPPI:
         radar_state_history = np.zeros((args.N_steps+1,)+radar_state.shape)
 
         FIMs = np.zeros(args.N_steps//update_freq_control + 1)
-
+        FIMs_NN = np.zeros(args.N_steps//update_freq_control + 1)
 
         fig_main,axes_main = plt.subplots(1,2,figsize=(10,5))
         imgs_main =  []
@@ -231,7 +231,9 @@ class P_MPPI:
         target_state_mse = np.zeros(args.N_steps)
         P=np.eye(M_target*dm) * 50
         
-        J = jnp.linalg.inv(P)
+        J_NN = jnp.linalg.inv(P)
+        J=J_NN.copy()
+        
         
         
         for step in range(1,args.N_steps+1):
@@ -379,16 +381,19 @@ class P_MPPI:
             actions.append(U[:,0,:].flatten())
             
 
-            J = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
+            J_NN = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
                       J=J,method="NN",state_train=state_train,thetas=thetas)
+            J = IM_fn_update(radar_state=radar_state, target_state=target_state_true,
+                      J=J)
             
             traj_sindy=jnp.concatenate((radar_state[:,:3],target_state_true[:,0:3]))
             traj_sindy_list.append(traj_sindy)
             # print(jnp.linalg.slogdet(J)[1].ravel().item())
             if args.N_radar==1 and M_target==1:
+                FIMs_NN[step] = jnp.log(J_NN).ravel().item()
                 FIMs[step] = jnp.log(J).ravel().item()
             else:
-                
+                FIMs_NN[step] = jnp.linalg.slogdet(J_NN)[1].ravel().item()
                 FIMs[step] = jnp.linalg.slogdet(J)[1].ravel().item()
 
             radar_state_history[step] = radar_state
@@ -453,7 +458,7 @@ class P_MPPI:
     
            
                
-        return states,traj_probs,actions
+        return states,traj_probs,actions,FIMs,FIMs_NN
     
     
     
