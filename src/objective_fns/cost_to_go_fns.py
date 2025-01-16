@@ -13,7 +13,7 @@ def cart_pole_cost(state,goal_x = 0.0,goal_theta = 0.0):
     pos_cost = (x-goal_x)**2
     theta_cost = (theta-goal_theta)**2
 
-    return 2.5*pos_cost + 5*theta_cost
+    return 5*pos_cost + 5*theta_cost
 
 def pendudulum_cost(state):
     x,y,theta_vel = state[...,0],state[...,1],state[...,2]
@@ -28,10 +28,10 @@ def mountaincar_cost(state):
     goal_position = 0.45
     goal_velocity = 0.0
 
-    cost = 100 * (
-        np.logical_or(position <= goal_position,velocity <= goal_velocity)
-    )
-
+    # cost = 100 * (
+    #     np.logical_or(position <= goal_position,velocity <= goal_velocity)
+    # )
+    cost = 10 * (position - goal_position)**2
     return cost
 
 

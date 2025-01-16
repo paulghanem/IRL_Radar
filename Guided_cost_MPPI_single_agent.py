@@ -66,13 +66,13 @@ def preprocess_traj(traj_list, step_list, is_Demo = False):
 
 # ENV SETUP
 
-parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(description = 'GYM Environments IRL', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_epochs",default=5,type=int,help="The number of epoch updates")
+parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward function updates")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
@@ -83,7 +83,7 @@ parser.add_argument('--lr', default=1e-3,type=float, help='learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
-parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1, ContinuousMountainCar-v0)')
 
 
 
@@ -91,7 +91,7 @@ parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym envir
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
 parser.add_argument('--num_traj', default=250,type=int, help='Number of MPPI control sequences samples to generate')
-parser.add_argument('--MPPI_iterations', default=75,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
+parser.add_argument('--MPPI_iterations', default=150,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
 parser.add_argument('--gamma',default=0.99,type=float,help='The discount factor in the MPC objective')
 
 
@@ -135,7 +135,7 @@ mean_rewards = []
 mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
-REWARD_FUNCTION_UPDATE = 10
+REWARD_FUNCTION_UPDATE = args.reward_fn_updates
 DEMO_BATCH = args.N_steps
 sample_trajs = []
 
@@ -174,7 +174,7 @@ for i in range(15):
         # initalize Neural Network...
         args.a_dim = actions_d.shape[-1]
         args.s_dim = states_d.shape[-1]
-        thetas = jnp.ones((1, args.s_dim))
+        thetas = jnp.array(np.random.randn(1,args.s_dim)) #jnp.ones((1, args.s_dim))
 
         # INITILIZING POLICY AND REWARD FUNCTION
         policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
@@ -235,7 +235,7 @@ for i in range(15):
             grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
         else :
             grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-       
+
         state_train = update_model(state_train, grads)
         
 

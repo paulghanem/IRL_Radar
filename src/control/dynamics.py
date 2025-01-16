@@ -162,6 +162,15 @@ def get_action_space(env_name):
     if env_name == "MountainCarContinuous-v0":
         return jnp.array([[-1.,1.]])
 
+
+def get_cov_coef(env_name):
+    if env_name == "CartPole-v1":
+        return 7.5
+    if env_name == "Pendulum-v1":
+        return 1.5
+    if env_name == "MountainCarContinuous-v0":
+        return 1.0
+
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":
         return CartPoleEnvState(x=state[0],x_dot=state[1],theta=state[2],theta_dot=state[3],time=time)

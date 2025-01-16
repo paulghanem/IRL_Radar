@@ -44,9 +44,12 @@ class CostNN(nn.Module):
   def __call__(self, x):  
     #x = nn.relu(x)
     x = nn.Dense(self.hidden_dim1)(x)
-    x = nn.relu(x)
+    x = nn.leaky_relu(x)
     x = nn.Dense(self.out_features)(x)
-    x = nn.softplus(x)
+    x = nn.leaky_relu(x)
+    x = nn.Dense(self.out_features)(x)
+    x = jnp.pow(x,2)# ** 2
+    # x = nn.softplus(x)
     return x
 
 def cost_fn(state_train,params,states,N):
