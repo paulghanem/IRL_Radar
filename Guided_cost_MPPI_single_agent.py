@@ -78,14 +78,14 @@ parser.add_argument("--N_steps",default=150,type=int,help="The number of steps i
 parser.add_argument("--rirl_iterations",default=15,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=32,type=int,help="The number of hidden neurons")
-parser.add_argument("--lambda_",default=1.0,type=float,help="Temperature in MPPI (lower makers sharper)")
+parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
 parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 
 
-parser.add_argument('--lr', default=1e-3,type=float, help='learning rate')
+parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
