@@ -97,7 +97,7 @@ parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym envir
 
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=1000,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--num_traj', default=2500,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
