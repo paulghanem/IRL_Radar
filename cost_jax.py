@@ -35,19 +35,20 @@ from functools import partial
 
 
 class CostNN(nn.Module):
- 
+
   state_dims: int
-  hidden_dim1 = 64
+  hidden_dim: int
   out_features = 1
 
   @nn.compact
-  def __call__(self, x):  
+  def __call__(self, x):
     #x = nn.relu(x)
-    x = nn.Dense(self.hidden_dim1)(x)
+    x = nn.Dense(self.hidden_dim)(x)
     x = nn.relu(x)
     x = nn.Dense(self.out_features)(x)
-    x = nn.softplus(x)
+    x = x**2 #
     return x
+
 
 def cost_fn(state_train,params,states,N):
    

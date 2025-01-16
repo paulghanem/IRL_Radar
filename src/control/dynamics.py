@@ -64,7 +64,7 @@ def mountaincar_step(
     position = jnp.clip(position, min_position, max_position)
 
     # this seems like cheating somehow - but it is in the original code
-    # velocity = velocity * (1 - (position >= goal_position) * (velocity < 0))
+    velocity = velocity * (1 - (position >= goal_position) * (velocity < 0))
 
 
     # Update state dict and evaluate termination conditions
@@ -161,11 +161,11 @@ def get_action_space(env_name):
 
 def get_action_cov(env_name):
     if env_name == "CartPole-v1":
-        return jnp.array([2.0])
+        return jnp.array([5.0])
     if env_name == "Pendulum-v1":
-        return jnp.array([0.4])
+        return jnp.array([2.0])
     if env_name == "MountainCarContinuous-v0":
-        return jnp.array([0.3])
+        return jnp.array([1.0])
 
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":

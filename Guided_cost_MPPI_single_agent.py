@@ -25,6 +25,7 @@ import os.path as osp
 import numpy as np
 import jax.numpy as jnp
 import jax
+from jax import vmap,jit
 
 import gymnax
 from gymnax.visualize import Visualizer
@@ -35,7 +36,6 @@ from gymnax.environments import EnvState
 # from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
 
-from src.objective_fns.objectives import *
 from src.objective_fns.cost_to_go_fns import get_cost
 from src.control.dynamics import get_state
 from src.control.mppi_class import MPPI
@@ -75,7 +75,10 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_epochs",default=5,type=int,help="The number of epoch updates")
+parser.add_argument("--rirl_iterations",default=15,type=int,help="The number of epoch updates")
+parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
+parser.add_argument("--hidden_dim",default=32,type=int,help="The number of hidden neurons")
+parser.add_argument("--lambda_",default=1.0,type=float,help="Temperature in MPPI (lower makers sharper)")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
@@ -86,6 +89,7 @@ parser.add_argument('--lr', default=1e-3,type=float, help='learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
 parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 
@@ -94,9 +98,6 @@ parser.add_argument('--gym_env', default="Pendulum-v1",type=str, help='gym envir
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
 parser.add_argument('--num_traj', default=1000,type=int, help='Number of MPPI control sequences samples to generate')
-parser.add_argument('--MPPI_iterations', default=75,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
-parser.add_argument('--gamma',default=0.99,type=float,help='The discount factor in the MPC objective')
-
 
 
 
@@ -105,9 +106,12 @@ args = parser.parse_args()
 
 
 args.airl = True if args.gail else args.airl
+args.airl = False if args.rgcl else args.airl
+args.gail = False if args.rgcl else args.gail
 
 print("Using AIRL: ",args.airl)
 print("Using GAIL: ",args.gail)
+print("Using RGCL: ",args.rgcl)
 
 args.results_savepath = os.path.join(args.results_savepath,args.experiment_name) + f"_{args.seed}"
 args.tmp_img_savepath = os.path.join( args.results_savepath,"tmp_img") #('--tmp_img_savepath', default=os.path.join("results","tmp_images"),type=str, help='Folder to save temporary images to make GIFs')
@@ -138,7 +142,7 @@ mean_rewards = []
 mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
-REWARD_FUNCTION_UPDATE = 10
+REWARD_FUNCTION_UPDATE = args.reward_fn_updates
 DEMO_BATCH = args.N_steps
 sample_trajs = []
 
@@ -152,7 +156,7 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-for i in range(15):
+for i in range(args.rirl_iterations):
     if i== 0:
         policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
         base = osp.join("expert_agents", args.gym_env, policy_method_agent)
@@ -187,7 +191,7 @@ for i in range(15):
 
 
         # policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
-        cost_f = CostNN(state_dims=args.s_dim)
+        cost_f = CostNN(state_dims=args.s_dim,hidden_dim=args.hidden_dim) #CostNN(state_dims=args.s_dim)
 
         def cost_function(state,state_train):
 
@@ -208,7 +212,7 @@ for i in range(15):
             u_min=u_min,
             u_max=u_max,
             sigmas=cov_scaler,
-            lambda_=0.1,
+            lambda_=args.lambda_,
         )
 
         # cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
@@ -229,57 +233,57 @@ for i in range(15):
         D_demo=jnp.concatenate((D_demo[:,:args.s_dim],D_demo[:,args.s_dim:]),axis=1)
 
 
+    if args.rgcl:
+        trajs = [policy.RGCL(args,params,state_train,D_demo,thetas)]
+    else:
+        trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
 
-    trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
-
-   
-    sample_trajs = trajs #+ sample_trajs
-    #sample_trajs = demo_trajs + sample_trajs
-    D_samp=np.array([])
-    D_samp = preprocess_traj(trajs, D_samp)
+        sample_trajs = trajs #+ sample_trajs
+        #sample_trajs = demo_trajs + sample_trajs
+        D_samp=np.array([])
+        D_samp = preprocess_traj(trajs, D_samp)
     
     #D_samp = D_demo
 
     # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
-    loss_rew = []
-    for _ in range(REWARD_FUNCTION_UPDATE):
-        selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
-        selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
+    if not args.rgcl:
+        loss_rew = []
+        for _ in range(REWARD_FUNCTION_UPDATE):
+            selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
+            selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
 
-        #D_s_samp = D_samp[selected_samp]
-        #D_s_demo = D_demo[selected_demo]
-        D_s_samp = D_samp
-        D_s_demo = D_demo
-        #D̂ samp ← D̂ demo ∪ D̂ samp
-        #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
+            #D_s_samp = D_samp[selected_samp]
+            #D_s_demo = D_demo[selected_demo]
+            D_s_samp = D_samp
+            D_s_demo = D_demo
+            #D̂ samp ← D̂ demo ∪ D̂ samp
+            #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
 
-        states, probs, actions = D_s_samp[:,:args.s_dim], D_s_samp[:,args.s_dim], D_s_samp[:,args.s_dim+1:]
-        states_expert,probs_experts, actions_expert = D_s_demo[:,:args.s_dim], D_s_demo[:,args.s_dim], D_s_demo[:,args.s_dim+1:]
+            states, probs, actions = D_s_samp[:,:args.s_dim], D_s_samp[:,args.s_dim], D_s_samp[:,args.s_dim+1:]
+            states_expert,probs_experts, actions_expert = D_s_demo[:,:args.s_dim], D_s_demo[:,args.s_dim], D_s_demo[:,args.s_dim+1:]
 
-        # Reducing from float64 to float32 for making computaton faster
-        #states = torch.tensor(states, dtype=torch.float32)
-        #probs = torch.tensor(probs, dtype=torch.float32)
-        #actions = torch.tensor(actions, dtype=torch.float32)
-        #states_expert = torch.tensor(states_expert, dtype=torch.float32)
-        #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-        if args.airl:
-            grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-        else :
-            grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-       
-        state_train = update_model(state_train, grads)
-        
+            # Reducing from float64 to float32 for making computaton faster
+            #states = torch.tensor(states, dtype=torch.float32)
+            #probs = torch.tensor(probs, dtype=torch.float32)
+            #actions = torch.tensor(actions, dtype=torch.float32)
+            #states_expert = torch.tensor(states_expert, dtype=torch.float32)
+            #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
+            if args.airl:
+                grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+            else :
+                grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+
+            state_train = update_model(state_train, grads)
 
 
-        loss_rew.append(loss_IOC)
-    
-    # mean_costs.append(np.mean(sum_of_cost_list))
-    mean_loss_rew.append(np.mean(loss_rew))
+
+            loss_rew.append(loss_IOC)
+
+        # mean_costs.append(np.mean(sum_of_cost_list))
+        mean_loss_rew.append(np.mean(loss_rew))
 
 # just for cartpole...
-
-
-visualization_irl = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
+visualization_irl = [policy.generate_session(args,state_train,D_demo,mpc_method,thetas)]
 states_mppi_irl = [get_state(state=state,action=action,time=i,env_name=args.gym_env) for i,(state,action) in enumerate(zip(visualization_irl[0][0],visualization_irl[0][1]))]
 costs_mppi_irl = [get_cost(args.gym_env)(state) for state in visualization_irl[0][0]]
 

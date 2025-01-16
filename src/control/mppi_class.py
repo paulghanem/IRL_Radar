@@ -11,10 +11,12 @@ from jax.random import multivariate_normal
 
 from src.control.dynamics import kinematics
 from src.objective_fns.cost_to_go_fns import get_cost
+from cost_jax import get_gradients,get_hessian
 
 import numpy as np
 import math
 from tqdm import tqdm
+from copy import deepcopy
 
 class MPPI:
     """
@@ -58,6 +60,7 @@ class MPPI:
 
         # jax seed
         self.key = jax.random.PRNGKey(seed)
+        self.seed = seed
 
         # check dimensions
         assert u_min.shape == (dim_control,)
@@ -107,6 +110,7 @@ class MPPI:
         # sampling with reparameting trick
         self._action_noises = multivariate_normal(self.key, mean=self.zero_mean, cov=self._covariance)
         self.key,_ = jax.random.split(self.key)
+        self.og_key = deepcopy(self.key)
 
         zero_mean_seq = jnp.zeros((self._horizon, self._dim_control))
 
@@ -294,13 +298,17 @@ class MPPI:
 
         pbar = tqdm(total=args.N_steps, desc="Starting")
 
+        total_cost = 0
+
         for step in range(1, args.N_steps + 1):
             states.append(state)
 
             action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
 
+            step_cost = true_cost_fn(state)
+            total_cost += step_cost
             pbar.set_description(
-                f"State = {state} , Action = {action_seq[0].flatten()} , Cost True = {true_cost_fn(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
+                f"State = {state} , Action = {action_seq[0].flatten()} , Total True Cost = {total_cost:.4f} , Cost True = {step_cost:.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
             pbar.update(1)
 
             state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
@@ -326,5 +334,75 @@ class MPPI:
 
         return states, traj_probs, actions
 
+    def RGCL(self, args, params, state_train, D_demo, thetas=None):
 
+        theta = jnp.concatenate((params['Dense_0']['bias'].flatten(), params['Dense_0']['kernel'].flatten(),
+                                 params['Dense_1']['bias'].flatten(), params['Dense_1']['kernel'].flatten()))
+        n_theta = len(theta)
+        P_theta = 1e-1 * jnp.identity(n_theta)
+
+        Q_theta = 1e-3 * jnp.identity(n_theta)
+        states, traj_probs, actions, FIMs = [], [], [], []
+
+        key = jax.random.PRNGKey(args.seed)
+        np.random.seed(args.seed)
+
+
+
+
+        state = D_demo[0, :args.s_dim]
+
+        true_cost_fn = get_cost(args.gym_env)
+
+        rewards = [true_cost_fn(state)]
+
+        pbar = tqdm(total=args.N_steps, desc="Starting")
+
+        states_expert, actions_expert = D_demo[:, :state.shape[0]], D_demo[:, state.shape[0]:]
+
+        for step in range(1, args.N_steps + 1):
+            states.append(state)
+
+            action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
+
+            pbar.set_description(
+                f"State = {state} , Action = {action_seq[0].flatten()} , Cost True = {true_cost_fn(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
+            pbar.update(1)
+
+            state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
+            state = state.ravel()
+
+            gradient_s = get_gradients(state_train, params, state, args.N_steps)
+            gradient_d = get_gradients(state_train, params, states_expert[step - 1], args.N_steps)
+            hessian_s = get_hessian(state_train, params, state, args.N_steps)
+            hessian_d = get_hessian(state_train, params, states_expert[step - 1], args.N_steps)
+
+            P_theta = jnp.linalg.inv(jnp.linalg.inv(P_theta + Q_theta) + hessian_d - hessian_s)
+            # print(gradient_d)
+            # print(gradient_s)
+
+            theta = theta - jnp.matmul(P_theta, gradient_d - gradient_s)
+
+            params['Dense_0']['bias'] = theta[:len(params['Dense_0']['bias'])]
+            params['Dense_0']['kernel'] = theta[len(params['Dense_0']['bias']):len(params['Dense_0']['bias']) +
+                                                                               params['Dense_0']['kernel'].shape[0] *
+                                                                               params['Dense_0']['kernel'].shape[
+                                                                                   1]].reshape(
+                params['Dense_0']['kernel'].shape)
+            params['Dense_1']['bias'] = theta[len(params['Dense_0']['bias']) + params['Dense_0']['kernel'].shape[0] *
+                                              params['Dense_0']['kernel'].shape[1]:len(params['Dense_0']['bias']) +
+                                                                                   params['Dense_0']['kernel'].shape[
+                                                                                       0] *
+                                                                                   params['Dense_0']['kernel'].shape[
+                                                                                       1] + len(
+                params['Dense_1']['bias'])]
+            params['Dense_1']['kernel'] = theta[len(params['Dense_0']['bias']) + params['Dense_0']['kernel'].shape[0] *
+                                                params['Dense_0']['kernel'].shape[1] + len(
+                params['Dense_1']['bias']):].reshape(-1, 1)
+
+        rewards = np.array(rewards)
+        pbar.close()
+        self.reset()
+
+        return states, traj_probs, actions
 
