@@ -46,7 +46,7 @@ class CostNN(nn.Module):
     x = nn.Dense(self.hidden_dim)(x)
     x = nn.relu(x)
     x = nn.Dense(self.out_features)(x)
-    x = x**2 #
+    x = jnp.clip(x**2,min=0,max=5) #
     return x
 
 
