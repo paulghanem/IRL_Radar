@@ -359,14 +359,16 @@ class MPPI:
         pbar = tqdm(total=args.N_steps, desc="Starting")
 
         states_expert, actions_expert = D_demo[:, :state.shape[0]], D_demo[:, state.shape[0]:]
+        total_cost = 0
 
         for step in range(1, args.N_steps + 1):
             states.append(state)
 
             action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
-
+            step_cost = true_cost_fn(state)
+            total_cost += step_cost
             pbar.set_description(
-                f"State = {state} , Action = {action_seq[0].flatten()} , Cost True = {true_cost_fn(state):.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
+                f"State = {state} , Action = {action_seq[0].flatten()} , Total True Cost = {total_cost:.4f} , Cost True = {step_cost:.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
             pbar.update(1)
 
             state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
