@@ -288,14 +288,30 @@ visualization_irl = [policy.generate_session(args,state_train,D_demo,mpc_method,
 states_mppi_irl = [get_state(state=state,action=action,time=i,env_name=args.gym_env) for i,(state,action) in enumerate(zip(visualization_irl[0][0],visualization_irl[0][1]))]
 costs_mppi_irl = [get_cost(args.gym_env)(state) for state in visualization_irl[0][0]]
 
+from utils.helpers import load_config
+policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
+base = osp.join("expert_agents",args.gym_env, policy_method_agent)
+configs = load_config(base + ".yaml")
+
+env, env_params = gymnax.make(
+    configs.train_config.env_name,
+    **configs.train_config.env_kwargs,
+)
+
 vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
 vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
 
+print("Simulation completed. Check the 'results' folder for the recorded episodes.")
 
-config = {'dimensions': np.array([5, 3])}
-ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}
-checkpoints.save_checkpoint(ckpt_dir='/tmp/flax_ckpt/flax-checkpointing',
-                            target=ckpt_single,
-                            step=0,
-                            overwrite=True,
-                            keep=2)
+
+# vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
+# vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
+
+
+# config = {'dimensions': np.array([5, 3])}
+# ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}
+# checkpoints.save_checkpoint(ckpt_dir='/tmp/flax_ckpt/flax-checkpointing',
+#                             target=ckpt_single,
+#                             step=0,
+#                             overwrite=True,
+#                             keep=2)
