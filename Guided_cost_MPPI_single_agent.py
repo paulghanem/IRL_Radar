@@ -41,8 +41,7 @@ from src.control.dynamics import get_state
 from src.control.mppi_class import MPPI
 from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 
-from utils.helpers import generate_demo,load_config
-from utils.models import load_neural_network
+from utils.helpers import GenerateDemo
 
 
 
@@ -158,22 +157,24 @@ mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 for i in range(args.rirl_iterations):
     if i== 0:
-        policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
-        base = osp.join("expert_agents", args.gym_env, policy_method_agent)
-        configs = load_config(base + ".yaml")
-        model, model_params = load_neural_network(
-            configs.train_config, base + ".pkl"
-        )
-
-        env, env_params = gymnax.make(
-            configs.train_config.env_name,
-            **configs.train_config.env_kwargs,
-        )
-        env_params.replace(**configs.train_config.env_params)
-
-
-        states_d,actions_d,_ =generate_demo(
-            env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
+        # policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
+        # base = osp.join("expert_agents", args.gym_env, policy_method_agent)
+        # configs = load_config(base + ".yaml")
+        # model, model_params = load_neural_network(
+        #     configs.train_config, base + ".pkl"
+        # )
+        #
+        # env, env_params = gymnax.make(
+        #     configs.train_config.env_name,
+        #     **configs.train_config.env_kwargs,
+        # )
+        # env_params.replace(**configs.train_config.env_params)
+        #
+        #
+        # states_d,actions_d,_ =generate_demo(
+        #     env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
+        demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps)
+        states_d,actions_d,_ = demo_generator.generate_demo(args.seed)
 
         args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
         args.N_steps = min(DEMO_BATCH,states_d.shape[0])
