@@ -137,9 +137,9 @@ class GenerateDemo(object):
 
     def generate_demo(self,seed=123):
         if self.env_name in ["MountainCarContinuous-v0"]:
-            states,actions,rewards = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=123)
+            states,actions,rewards = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
         else:
-            states,actions,rewards = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=123)
+            states,actions,rewards = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=seed)
 
         return states,actions,rewards
 
@@ -148,6 +148,7 @@ class GenerateDemo(object):
 
         np.random.seed(seed)
         torch.manual_seed(seed)
+        random.seed(seed)
 
         base = osp.join(self.base,f"{env_name}.zip")
 
@@ -158,6 +159,7 @@ class GenerateDemo(object):
 
 
         vec_env = model.get_env()
+        vec_env._seeds = [seed]
         obs = vec_env.reset()
 
 
