@@ -15,3 +15,9 @@ mlcollections
 tensorflow
 tensorflow-probability
 tensorboard
+stable-baselines3
+gymnasium-robotics
+shimmy
+pyglet==1.5.27
+opencv-python
+rl_zoo3
