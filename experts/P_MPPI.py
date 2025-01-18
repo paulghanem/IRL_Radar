@@ -16,9 +16,9 @@ config.update("jax_enable_x64", True)
 
 from functools import partial
 
-from src.control.dynamics import cartpole_step,CartPoleEnvState,kinematics
+from src.control.dynamics import cartpole_step,CartPoleEnvState,kinematics,pendulum_step
 from src.control.MPPI import MPPI_wrapper,weighting,MPPI_scores_wrapper,MPPI_control
-from src.objective_fns.cost_to_go_fns import cart_pole_cost
+from src.objective_fns.cost_to_go_fns import cart_pole_cost,pendulum_cost
 from src.objective_fns.objectives import MPC_decorator
 
 from cost_jax import get_gradients,get_hessian
@@ -62,11 +62,14 @@ class P_MPPI:
 
 
         # ==================== MPPI CONFIGURATION ================================= #
-        dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
+        #dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
+        dynamic_rollout = jax.jit(partial(kinematics, step_fn=pendulum_step))
 
         mppi = MPPI_wrapper(dynamic_rollout)
 
-        mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
+        #mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
+        
+        mpc_obj = MPC_decorator(pendulum_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
 
         mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
 
@@ -84,7 +87,8 @@ class P_MPPI:
         U_MPPI_init= jnp.array(np.random.randn(15, args.horizon, args.a_dim) * 0.2)
         U_nominal = U_MPPI_init.mean(axis=0)
 
-        rewards = [cart_pole_cost(state)]
+        #rewards = [cart_pole_cost(state)]
+        rewards= [pendulum_cost(state)]
 
         pbar = tqdm(total=args.N_steps, desc="Starting")
 
@@ -96,7 +100,8 @@ class P_MPPI:
                                                                             args=args)
 
             state = states_nominal[0]
-            rewards.append(cart_pole_cost(state))
+            #rewards.append(cart_pole_cost(state))
+            rewards.append(pendulum_cost(state))
             # state_seq_mppi.append(
             #     CartPoleEnvState(t=i + 1, x=state[0], x_dot=state[1], theta=state[2], theta_dot=state[3]))
 
@@ -135,12 +140,13 @@ class P_MPPI:
     
     
          # ==================== MPPI CONFIGURATION ================================= #
-         dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
-    
+         #dynamic_rollout = jax.jit(partial(kinematics, step_fn=cartpole_step))
+         dynamic_rollout = jax.jit(partial(kinematics, step_fn=pendulum_step))
          mppi = MPPI_wrapper(dynamic_rollout)
     
          mpc_obj = MPC_decorator(cart_pole_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
-    
+         mpc_obj = MPC_decorator(pendulum_cost, dynamic_rollout,self.gamma,method="Single_FIM_3D_action_NN_MPPI",args=args)
+
          mppi_scores = MPPI_scores_wrapper(mpc_obj,method="NN")
     
          weight_fn = weighting()
