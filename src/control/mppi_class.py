@@ -332,7 +332,7 @@ class MPPI:
 
         self.reset()
 
-        return states, traj_probs, actions
+        return states, traj_probs, actions,rewards
 
     def RGCL(self, args, params, state_train, D_demo, thetas=None):
 
@@ -341,7 +341,7 @@ class MPPI:
         n_theta = len(theta)
         P_theta = 1e-1 * jnp.identity(n_theta)
 
-        Q_theta = 1e-3 * jnp.identity(n_theta)
+        Q_theta = 1e-4 * jnp.identity(n_theta)
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)
@@ -402,9 +402,9 @@ class MPPI:
                                                 params['Dense_0']['kernel'].shape[1] + len(
                 params['Dense_1']['bias']):].reshape(-1, 1)
 
-        rewards = np.array(rewards)
+        #rewards = np.array(rewards)
         pbar.close()
         self.reset()
 
-        return states, traj_probs, actions
+        return states, traj_probs, actions,total_cost
 
