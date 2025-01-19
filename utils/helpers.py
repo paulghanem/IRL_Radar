@@ -5,6 +5,7 @@ import torch
 from gymnax.environments import EnvState
 import jax
 import jax.numpy as jnp
+import pdb
 
 def load_config(config_fname, seed_id=0, lrate=None):
     """Load training configuration and random seed of experiment."""
@@ -234,7 +235,7 @@ class GenerateDemo(object):
 
             else:
                 action = model.apply(model_params, obs, rng_act)
-
+            #pdb.set_trace()
             next_obs, next_env_state, reward, done, info = env.step(
                 rng_step, env_state, action, env_params
             )

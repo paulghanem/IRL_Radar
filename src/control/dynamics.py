@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 from jax import lax
 from gymnax.environments import environment
 from gymnax.environments import spaces
+import pdb
 
 @struct.dataclass
 class CartPoleEnvState(environment.EnvState):
@@ -144,6 +145,8 @@ def pendulum_step(
     theta_dot = newthdot.reshape(-1,1)
     x = jnp.cos(theta).reshape(-1,1)
     y = jnp.sin(theta).reshape(-1,1)
+   
+   
 
     return jnp.concatenate([x, y,theta_dot], axis=-1)
 

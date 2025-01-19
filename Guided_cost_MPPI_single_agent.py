@@ -74,10 +74,10 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps",default=150,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=450,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=10,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
+parser.add_argument("--hidden_dim",default=256,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
@@ -89,8 +89,8 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
-parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=True,type=bool, help='rgcl method flag')
+parser.add_argument('--gym_env', default="MountainCarContinuous-v0",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 
 
@@ -113,7 +113,7 @@ print("Using AIRL: ",args.airl)
 print("Using GAIL: ",args.gail)
 print("Using RGCL: ",args.rgcl)
 
-if args.airl:
+if args.airl and not args.gail:
     method="airl"
 elif args.gail:
     method="gail"
@@ -250,12 +250,12 @@ for i in range(args.rirl_iterations):
     if args.rgcl:
         trajs = [policy.RGCL(args,params,state_train,D_demo,thetas)]
         rewards=trajs[0][-1]
-        total_cost=np.sum(rewards)
+        total_cost=rewards
     else:
         trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
         
         rewards=trajs[0][-1]
-        total_cost=np.sum(rewards)
+        total_cost=rewards
         sample_trajs = [trajs[0][:-1]] #+ sample_trajs
         #sample_trajs = demo_trajs + sample_trajs
         D_samp=np.array([])
@@ -314,7 +314,10 @@ if not os.path.exists(epoch_cost_dir):
 # Save the array
 np.save(epoch_time_dir+'/'+method+'_epoch_time.npy', epoch_time)
 np.save(epoch_cost_dir+'/'+method+'_epoch_cost.npy', epoch_cost)
+
+
 # just for cartpole...
+
 visualization_irl = [policy.generate_session(args,state_train,D_demo,mpc_method,thetas)]
 states_mppi_irl = [get_state(state=state,action=action,time=i,env_name=args.gym_env) for i,(state,action) in enumerate(zip(visualization_irl[0][0],visualization_irl[0][1]))]
 costs_mppi_irl = [get_cost(args.gym_env)(state) for state in visualization_irl[0][0]]
