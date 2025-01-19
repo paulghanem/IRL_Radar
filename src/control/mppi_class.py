@@ -500,7 +500,7 @@ class MPPI:
                 goal_velocity = 0.0
                 x=state[0]
                 xd=state[1]
-                if goal_position-0.01 <= x <= goal_position +0.01:
+                if goal_position <= x :
                     r+=100 
                     
                 

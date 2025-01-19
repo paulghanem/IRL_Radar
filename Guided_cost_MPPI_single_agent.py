@@ -32,7 +32,7 @@ import gymnax
 from gymnax.visualize import Visualizer
 from flax import struct
 from gymnax.environments import EnvState
-
+import pdb
 
 # from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
@@ -188,6 +188,7 @@ for i in range(args.rirl_iterations):
         #     env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
         demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps)
         states_d,actions_d,_ = demo_generator.generate_demo(args.seed)
+       
 
         args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
         args.N_steps = min(DEMO_BATCH,states_d.shape[0])
