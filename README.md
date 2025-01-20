@@ -18,3 +18,8 @@ $ python3.8 main.py
 
 
 "# IRL_Radar" 
+
+```bash
+pip install setuptools==65.5.0 pip==21
+pip install gym=0.19.0
+```
