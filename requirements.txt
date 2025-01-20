@@ -11,7 +11,7 @@ gymnax~=0.0.8
 evosax~=0.1.6
 torch
 pytz~=2024.2
-mlcollections
+ml-collections
 tensorflow
 tensorflow-probability
 tensorboard
@@ -21,3 +21,4 @@ shimmy
 pyglet==1.5.27
 opencv-python
 rl_zoo3
+tf_keras

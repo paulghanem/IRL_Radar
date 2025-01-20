@@ -47,6 +47,8 @@ from utils.helpers import GenerateDemo
 
 
 import gymnax
+
+print(jax.devices())
 # CONVERTS TRAJ LIST TO STEP LIST
 def preprocess_traj(traj_list, step_list, is_Demo = False):
     step_list = step_list.tolist()
