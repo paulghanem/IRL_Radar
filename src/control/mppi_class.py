@@ -374,7 +374,7 @@ class MPPI:
 
             state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
             state = state.ravel()
-            pdb.set_trace()
+           
             if args.gym_env == "CartPole-v1":
                 x=state[0]
                 x_threshold=2.4
@@ -438,7 +438,7 @@ class MPPI:
         n_theta = len(theta)
         P_theta = 1e-1 * jnp.identity(n_theta)
 
-        Q_theta = 1e-4* jnp.identity(n_theta)
+        Q_theta = 1e-3* jnp.identity(n_theta)
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)

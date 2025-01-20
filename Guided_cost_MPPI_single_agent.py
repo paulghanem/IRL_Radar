@@ -17,7 +17,6 @@ Created on Sat Apr 27 00:00:04 2024
 from flax.training import train_state,checkpoints
 import flax 
 import optax
-
 import os
 import argparse
 import os.path as osp
@@ -75,7 +74,7 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps",default=450,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=10,type=int,help="The number of epoch updates")
+parser.add_argument("--rirl_iterations",default=1,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=256,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
@@ -89,7 +88,7 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
-parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=True,type=bool, help='rgcl method flag')
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
 parser.add_argument('--gym_env', default="MountainCarContinuous-v0",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 
@@ -306,15 +305,16 @@ for i in range(args.rirl_iterations):
     epoch_cost.append(total_cost)
     
     
-epoch_time_dir = 'C:/Users/siliconsynapse/Desktop/guided-cost-learning-master/guided-cost-learning-master/results/plotting/'+args.gym_env
-epoch_cost_dir = 'C:/Users/siliconsynapse/Desktop/guided-cost-learning-master/guided-cost-learning-master/results/plotting/'+args.gym_env
+epoch_time_dir = osp.join('results','plotting',args.gym_env)
+epoch_cost_dir = osp.join('results','plotting',args.gym_env)
+
 if not os.path.exists(epoch_time_dir):
     os.mkdir(epoch_time_dir)
 if not os.path.exists(epoch_cost_dir):
     os.mkdir(epoch_cost_dir)
 # Save the array
-np.save(epoch_time_dir+'/'+method+'_epoch_time.npy', epoch_time)
-np.save(epoch_cost_dir+'/'+method+'_epoch_cost.npy', epoch_cost)
+np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time)
+np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost)
 
 
 # just for cartpole...
