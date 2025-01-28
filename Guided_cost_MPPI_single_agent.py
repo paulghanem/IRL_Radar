@@ -169,7 +169,7 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-seeds=np.array([123,123,124,13,14,15])
+seeds=np.array([122,123,124,13,14,15])
 args.runs=np.shape(seeds)[0]
 epoch_time_runs=[]
 epoch_cost_runs=[]
