@@ -387,8 +387,9 @@ class MPPI:
                 or theta_cart > theta_threshold_radians
                 )
 
+                r= jnp.array([0.0])
                 if not terminated:
-                    r= 1.0
+                    r= jnp.array([1.0])
             if args.gym_env == "Pendulum-v1":
                 x=state[0]
                 y=state[1]
@@ -435,10 +436,11 @@ class MPPI:
         #                          params['Dense_1']['bias'].flatten(), params['Dense_1']['kernel'].flatten()))
         flat_params, treedef = jax.tree_util.tree_flatten(params)
         theta=jnp.concatenate([p.flatten() for p in flat_params])
+        #pdb.set_trace()
         n_theta = len(theta)
         P_theta = 1e-1 * jnp.identity(n_theta)
 
-        Q_theta = 1e-3* jnp.identity(n_theta)
+        Q_theta = 1e-4* jnp.identity(n_theta)
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)
@@ -484,9 +486,11 @@ class MPPI:
                 or theta_cart < -theta_threshold_radians
                 or theta_cart > theta_threshold_radians
                 )
-
+                r= jnp.array([0.0])
                 if not terminated:
-                    r= 1.0
+                    r= jnp.array([1.0])
+              
+                   
             if args.gym_env == "Pendulum-v1":
                 x=state[0]
                 y=state[1]
@@ -506,8 +510,9 @@ class MPPI:
                 
            
             #rewards.append(true_cost_fn(state))
-            rewards=rewards+r[0]
             #pdb.set_trace()
+            rewards=rewards+r[0]
+           
             pbar.set_description(
                 f"State = {state} , Action = {action_seq[0].flatten()} , Total True Reward = {rewards:.4f} , Reward True = {r[0]:.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
             pbar.update(1)

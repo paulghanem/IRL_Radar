@@ -31,6 +31,8 @@ import ml_collections
 import numpy as np
 import optax
 from functools import partial
+import pdb
+from jax.tree_util import tree_flatten, tree_unflatten
 #import tensorflow_datasets as tfds
 
 
@@ -43,6 +45,8 @@ class CostNN(nn.Module):
   @nn.compact
   def __call__(self, x):
     #x = nn.relu(x)
+    x = nn.Dense(self.hidden_dim)(x)
+    x = nn.relu(x)
     x = nn.Dense(self.hidden_dim)(x)
     x = nn.relu(x)
     x = nn.Dense(self.out_features)(x)
@@ -172,13 +176,16 @@ def apply_model_multi(state_train, states, actions,states_expert,actions_expert,
     
 @jax.jit 
 def get_gradients(state_train,params,state,N_steps):
+    #pdb.set_trace()
     dc_d_theta=jax.grad(cost_fn,argnums=1)(state_train,params,state.reshape(1,-1),N_steps)
-    Dense_0_bias_g=dc_d_theta['Dense_0']['bias']
-    Dense_0_kernel_g=dc_d_theta['Dense_0']['kernel'].reshape((dc_d_theta['Dense_0']['kernel'].shape[0]*dc_d_theta['Dense_0']['kernel'].shape[1]))
-    Dense_1_bias_g=dc_d_theta['Dense_1']['bias']
-    Dense_1_kernel_g=dc_d_theta['Dense_1']['kernel'].reshape((dc_d_theta['Dense_1']['kernel'].shape[0]*dc_d_theta['Dense_1']['kernel'].shape[1]))
+    # Dense_0_bias_g=dc_d_theta['Dense_0']['bias']
+    # Dense_0_kernel_g=dc_d_theta['Dense_0']['kernel'].reshape((dc_d_theta['Dense_0']['kernel'].shape[0]*dc_d_theta['Dense_0']['kernel'].shape[1]))
+    # Dense_1_bias_g=dc_d_theta['Dense_1']['bias']
+    # Dense_1_kernel_g=dc_d_theta['Dense_1']['kernel'].reshape((dc_d_theta['Dense_1']['kernel'].shape[0]*dc_d_theta['Dense_1']['kernel'].shape[1]))
     
-    gradients=jnp.concatenate((Dense_0_bias_g,Dense_0_kernel_g,Dense_1_bias_g,Dense_1_kernel_g))
+    # gradients=jnp.concatenate((Dense_0_bias_g,Dense_0_kernel_g,Dense_1_bias_g,Dense_1_kernel_g))
+    flat_grads, tree_def = tree_flatten(dc_d_theta)
+    gradients=jnp.concatenate([p.flatten() for p in flat_grads])
     return gradients
 
 @jax.jit 
@@ -188,14 +195,20 @@ def get_hessian(state_train,params,state,N_steps):
     Dense_0_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['kernel'])
     Dense_1_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['bias'])
     Dense_1_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['kernel'])
+    Dense_2_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['bias'])
+    Dense_2_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['kernel'])
     
     for j in range(len(Dense_0_bias_h[0])):
         Dense_0_bias_h[0][j]=Dense_0_bias_h[0][j].reshape((Dense_0_bias_h[0][j].shape[0],-1))
         Dense_1_bias_h[0][j]=Dense_1_bias_h[0][j].reshape((Dense_1_bias_h[0][j].shape[0],-1))
+        Dense_2_bias_h[0][j]=Dense_2_bias_h[0][j].reshape((Dense_2_bias_h[0][j].shape[0],-1))
         Dense_0_kernel_h[0][j]=Dense_0_kernel_h[0][j].reshape((Dense_0_kernel_h[0][j].shape[0]*Dense_0_kernel_h[0][j].shape[1],-1))
         Dense_1_kernel_h[0][j]=Dense_1_kernel_h[0][j].reshape((Dense_1_kernel_h[0][j].shape[0]*Dense_1_kernel_h[0][j].shape[1],-1))
+        Dense_2_kernel_h[0][j]=Dense_2_kernel_h[0][j].reshape((Dense_2_kernel_h[0][j].shape[0]*Dense_2_kernel_h[0][j].shape[1],-1))
     
-    hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1)),axis=0) 
+    hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1),jnp.concatenate(Dense_2_bias_h[0],axis=1),jnp.concatenate(Dense_2_kernel_h[0],axis=1)),axis=0)
+    #flat_hessian, tree_def = tree_flatten(d2c_d2_theta)
+   # hessian=jnp.concatenate([p.flatten() for p in flat_hessian])
     return hessian
 
 @jax.jit
