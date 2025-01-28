@@ -36,13 +36,13 @@ import optax
 class CostNN(nn.Module):
  
   state_dims: int
-  hidden_dim1 = 128
+  hidden_dim : int
   out_features = 1
 
   @nn.compact
   def __call__(self, x):  
     #x = nn.relu(x)
-    x = nn.Dense(self.hidden_dim1)(x)
+    x = nn.Dense(self.hidden_dim)(x)
     x = nn.relu(x)
     x = nn.Dense(self.out_features)(x)
     x = nn.relu(x)
@@ -99,7 +99,7 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
 
 
 @jax.jit
-def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
+def apply_model_GANGCL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
     """Computes gradients, loss and accuracy for a single batch."""
     
 

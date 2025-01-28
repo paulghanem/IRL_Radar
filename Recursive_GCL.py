@@ -23,6 +23,7 @@ import optax
 import argparse
 from time import time
 import os
+from tqdm import tqdm
 
 
 
@@ -68,7 +69,7 @@ parser.add_argument('--experiment_name', default="experiment",type=str, help='Na
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
 parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
 parser.add_argument('--tail_length',default=10,type=int,help="The length of the tail of the radar trajectories in plottings")
-parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
+parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=False,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
 
@@ -211,8 +212,8 @@ FIM_predicted=[]
 epoch_time=[]
 for i in range(50):
     
-    if (i %15 ==0 and i >0) :
-         Q_theta=1e-2*Q_theta
+    if (i %10 ==0 and i >0) :
+         Q_theta=1e-1*Q_theta
     if (i== 0): 
     
         demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
@@ -286,13 +287,13 @@ for i in range(50):
     # coef = Gt * Gr * lam ** 2 * rcs / L / (4 * jnp.pi)** 3 / (R ** 4)
     C = c**2 * sigmaW**2 / (jnp.pi**2 * 8 * args.fc**2) * 1/K
 
-    print("Noise Power: ",sigmaW**2)
-    print("Power Return (RCS): ",Pr)
-    print("K",K)
+    #print("Noise Power: ",sigmaW**2)
+    #print("Power Return (RCS): ",Pr)
+    #print("K",K)
 
-    print("Pt (peak power)={:.9f}".format(args.Pt))
-    print("lam ={:.9f}".format(c/args.fc))
-    print("C=",C)
+    #print("Pt (peak power)={:.9f}".format(args.Pt))
+    #print("lam ={:.9f}".format(c/args.fc))
+    #print("C=",C)
 
     # ========================= Target State Space ============================== #
 
@@ -410,14 +411,16 @@ for i in range(50):
     #states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
     states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
     traj=[]
-    
+    MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train,thetas=thetas)
+    #MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method)
+    MPPI_scores = MPPI_scores_wrapper(MPC_obj,method="NN")
+    pbar = tqdm(total=args.N_steps, desc="Starting")
+
     for step in range(1,args.N_steps+1):
         
-        MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method,state_train=state_train,thetas=thetas)
-        #MPC_obj = MPC_decorator(IM_fn=IM_fn,kinematic_model=kinematic_model,dt=args.dt_control,gamma=args.gamma,method=mpc_method)
-        MPPI_scores = MPPI_scores_wrapper(MPC_obj)
 
-        MPPI = MPPI_wrapper(kinematic_model=kinematic_model,dt=args.dt_control)
+
+        #MPPI = MPPI_wrapper(kinematic_model=kinematic_model,dt=args.dt_control)
 
         target_state_true = target_states_true[:, step-1].reshape(M_target,dm)
         #radar_state=states_expert[step-1].reshape(1,-1)
@@ -443,7 +446,7 @@ for i in range(50):
             cov_prime = deepcopy(cov)
         
 
-            print(f"\n Step {step} MPPI CONTROL ")
+            #print(f"\n Step {step} MPPI CONTROL ")
 
 
             for mppi_iter in range(args.MPPI_iterations):
@@ -475,7 +478,7 @@ for i in range(50):
                 mppi_score_start = time()
                 # Score all the rollouts
                 cost_trajectory = MPPI_scores(radar_state, target_states_rollout, V,
-                                          A=A,J=J)
+                                          A=A,J=J,state_train=state_train)
                 
 
                 mppi_score_end = time()
@@ -505,8 +508,8 @@ for i in range(50):
 
                     oas = OAS(assume_centered=True).fit(E[weights != 0])
                     cov_prime = jnp.array(oas.covariance_)
-                    if mppi_iter == 0 and i%10 ==0:
-                        print("Oracle Approx Shrinkage: ",np.round(oas.shrinkage_,5))
+                    #if mppi_iter == 0 and i%10 ==0:
+                       # print("Oracle Approx Shrinkage: ",np.round(oas.shrinkage_,5))
 
             mppi_round_time_end = time()
 
@@ -545,7 +548,7 @@ for i in range(50):
 
             mppi_end_time = time()
             
-            print(f"MPPI Round Time {step} ",np.round(mppi_end_time-mppi_start_time,3))
+            #print(f"MPPI Round Time {step} ",np.round(mppi_end_time-mppi_start_time,3))
 
 
 
@@ -587,21 +590,24 @@ for i in range(50):
 
         radar_state_history[step] = radar_state
        
-        print("FIM :" , FIMs[step])
-        print("Thetas :" , thetas)
+        #print("FIM :" , FIMs[step])
+        #print("Thetas :" , thetas)
+        pbar.set_description(
+                f"FIM = {FIMs[step]} ")
+        pbar.update(1)
         
         
         if args.save_images and (step % 4 == 0):
-            print(f"Step {step} - Saving Figure ")
+            #print(f"Step {step} - Saving Figure ")
 
             axes_main[0].plot(radar_state_init[:, 0], radar_state_init[:, 1], 'mo',
                      label="Radar Initial Position")
 
             thetas_1 = jnp.arcsin(target_state_true[:, 2] / args.R2T)
             radius_projected = args.R2T * jnp.cos(thetas_1)
-
-            print("Target Height :",target_state_true[:,2])
-            print("Radius Projected: ",radius_projected)
+#
+            #print("Target Height :",target_state_true[:,2])
+            #print("Radius Projected: ",radius_projected)
 
             # radar_state_history[step] = radar_state
 
@@ -627,6 +633,7 @@ for i in range(50):
         # J = IM_fn(radar_state=radar_state,target_state=m0,J=J)
 
         # CKF ! ! ! !
+    pbar.close()
     end_time=time()
     epoch_time.append(end_time-start_time)
     FIM_true.append(FIMs)

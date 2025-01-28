@@ -33,6 +33,7 @@ from flax.training import train_state,checkpoints
 import flax 
 import optax
 import scipy 
+from tqdm import tqdm
 
 config.update("jax_enable_x64", True)
 
@@ -653,6 +654,7 @@ def generate_demo_MPPI_single(args,state_train):
        P=np.eye(M_target*dm) * 50
        
        J = jnp.linalg.inv(P)
+       pbar = tqdm(total=args.N_steps, desc="Starting")
 
        for step in range(1,args.N_steps+1):
            target_state_true = target_states_true[:, step-1].reshape(M_target,dm)
@@ -678,7 +680,7 @@ def generate_demo_MPPI_single(args,state_train):
                U_prime = deepcopy(U)
                cov_prime = deepcopy(cov)
 
-               print(f"\n Step {step} MPPI CONTROL ")
+               #print(f"\n Step {step} MPPI CONTROL ")
 
 
                for mppi_iter in range(args.MPPI_iterations):
@@ -728,8 +730,8 @@ def generate_demo_MPPI_single(args,state_train):
 
                        oas = OAS(assume_centered=True).fit(E[weights != 0])
                        cov_prime = jnp.array(oas.covariance_)
-                       if mppi_iter == 0:
-                           print("Oracle Approx Shrinkage: ",np.round(oas.shrinkage_,5))
+                    #   if mppi_iter == 0:
+                          # print("Oracle Approx Shrinkage: ",np.round(oas.shrinkage_,5))
 
                mppi_round_time_end = time()
 
@@ -762,7 +764,7 @@ def generate_demo_MPPI_single(args,state_train):
                ps=radar_state[:,:3]
 
                mppi_end_time = time()
-               print(f"MPPI Round Time {step} ",np.round(mppi_end_time-mppi_start_time,3))
+               #print(f"MPPI Round Time {step} ",np.round(mppi_end_time-mppi_start_time,3))
 
 
 
@@ -782,10 +784,13 @@ def generate_demo_MPPI_single(args,state_train):
                FIMs[step] = jnp.linalg.slogdet(J)[1].ravel().item()
 
            radar_state_history[step] = radar_state
-           print("FIM :" , FIMs[step])
+           #print("FIM :" , FIMs[step])
+           pbar.set_description(
+               f"FIM_demo = {FIMs[step]} ")
+           pbar.update(1)
 
            if args.save_images and (step % 4 == 0):
-               print(f"Step {step} - Saving Figure ")
+               #print(f"Step {step} - Saving Figure ")
 
                axes_main[0].plot(radar_state_init[:, 0], radar_state_init[:, 1], 'mo',
                         label="Radar Initial Position")
@@ -793,8 +798,8 @@ def generate_demo_MPPI_single(args,state_train):
                thetas = jnp.arcsin(target_state_true[:, 2] / args.R2T)
                radius_projected = args.R2T * jnp.cos(thetas)
 
-               print("Target Height :",target_state_true[:,2])
-               print("Radius Projected: ",radius_projected)
+              # print("Target Height :",target_state_true[:,2])
+               #print("Radius Projected: ",radius_projected)
 
                # radar_state_history[step] = radar_state
 
@@ -822,7 +827,7 @@ def generate_demo_MPPI_single(args,state_train):
            # CKF ! ! ! !
           
 
-
+       pbar.close()
        np.savetxt(os.path.join(args.results_savepath,f'rmse_{args.seed}.csv'), np.c_[np.arange(1,args.N_steps+1),target_state_mse], delimiter=',',header="k,rmse",comments='')
 
        # if args.save_images:

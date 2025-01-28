@@ -73,7 +73,7 @@ def MPC_decorator(IM_fn,kinematic_model,dt,gamma,state_train=None,thetas=None,me
         
     elif method=="Single_FIM_3D_action_NN_MPPI":
         @jit
-        def MPC_obj(U,radar_state,target_state,J,A):
+        def MPC_obj(U,radar_state,target_state,J,A,state_train):
 
             # horizon = U.shape[1]
             M,horizon,dm = target_state.shape

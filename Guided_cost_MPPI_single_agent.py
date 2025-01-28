@@ -30,12 +30,13 @@ import argparse
 from time import time
 import os
 
+import os.path as osp
 
 
 
 
 from experts.P_MPPI import *
-from cost_jax import CostNN, apply_model, update_model
+from cost_jax import CostNN, apply_model, update_model,apply_model_GANGCL
 from utils import to_one_hot, get_cumulative_rewards
 
 from torch.optim.lr_scheduler import StepLR
@@ -84,10 +85,19 @@ parser.add_argument('--experiment_name', default="experiment",type=str, help='Na
 parser.add_argument('--move_radars', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to allow the radars to move? --move_radars for yes --no-move_radars for no')
 parser.add_argument('--remove_tmp_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to remove tmp images? --remove_tmp_images for yes --no-remove_tmp_images for no')
 parser.add_argument('--tail_length',default=10,type=int,help="The length of the tail of the radar trajectories in plottings")
-parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=True,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
+parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,default=False,help='Do you wish to saves images/gifs? --save_images for yes --no-save_images for no')
 parser.add_argument('--fim_method_policy', default="SFIM_NN",type=str, help='FIM Calculation [SFIM,PFIM]')
 parser.add_argument('--fim_method_demo', default="SFIM",type=str, help='FIM Calculation [SFIM,PFIM]')
-parser.add_argument('--gail', default=False,type=bool, help='gail metod flag')
+parser.add_argument("--rirl_iterations",default=20,type=int,help="number of epochs")
+parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
+parser.add_argument("--hidden_dim",default=128,type=int,help="The number of hidden neurons")
+parser.add_argument("--runs",default=7,type=int,help="The number of runs")
+parser.add_argument("--lr",default=1e-3,type=float,help="learning rate")
+
+parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
+parser.add_argument('--gangcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
+
 
 # ==================== RADAR CONFIGURATION ======================== #
 parser.add_argument('--fc', default=1e8,type=float, help='Radar Signal Carrier Frequency (Hz)')
@@ -132,7 +142,14 @@ args = parser.parse_args()
 args.results_savepath = os.path.join(args.results_savepath,args.experiment_name) + f"_{args.seed}"
 args.tmp_img_savepath = os.path.join( args.results_savepath,"tmp_img") #('--tmp_img_savepath', default=os.path.join("results","tmp_images"),type=str, help='Folder to save temporary images to make GIFs')
 
-
+if args.gangcl and not args.gail:
+    method="gan-gcl"
+elif args.gail:
+    method="gail"
+elif args.rgcl:
+    method="rgcl"
+else :
+    method="gcl"
 
 from datetime import datetime
 from pytz import timezone
@@ -164,7 +181,7 @@ state_shape =((M*(dm//2),))
 
 # INITILIZING POLICY AND REWARD FUNCTION
 policy = P_MPPI(state_shape, n_actions)
-cost_f = CostNN(state_dims=state_shape[0])
+cost_f = CostNN(state_dims=state_shape[0],hidden_dim=args.hidden_dim)
 #cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
 init_rng = jax.random.key(0)
 
@@ -173,15 +190,14 @@ variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0])))
 params = variables['params']
 #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
 #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-tx = optax.adam(learning_rate=1e-3)
+tx = optax.adam(learning_rate=args.lr)
 state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
 
 mean_rewards = []
 mean_costs = []
 mean_loss_rew = []
 EPISODES_TO_PLAY = 1
-REWARD_FUNCTION_UPDATE = 1
-DEMO_BATCH = 500
+DEMO_BATCH = args.N_steps
 sample_trajs = []
 
 D_demo, D_samp = np.array([]), jnp.array([])
@@ -194,139 +210,120 @@ return_list, sum_of_cost_list = [], []
 #U,chis,radar_states,target_states
 thetas=jnp.ones((1,4))
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
-FIM_true=[]
-FIM_predicted=[]
-epoch_time=[]
-for i in range(100):
-    if (i== 0): 
+
+FIM_true_runs=[]
+FIM_predicted_runs=[]
+FIM_demos_runs=[]
+epoch_time_runs=[]
+seeds=np.array([12,13,14,15,16,17,18,123])
+args.runs=np.shape(seeds)[0]
+
+for runs in range (args.runs):
     
-        demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
-        demo_trajs=np.array(demo_trajs)
-    
-        states_d=demo_trajs[:,:-2]
-        actions_d=demo_trajs[:,-2:]
-        D_demo=np.array([])
-    
-        demo_trajs=[[states_d,actions_d,actions_d]]
-        D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
-        D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
+    args.seed = seeds[runs]
+    print(args.seed)
+    FIM_true=[]
+    FIM_predicted=[]
+    FIM_demos=[]
+    epoch_time=[]
+    for i in range(args.rirl_iterations):
+        if (i== 0): 
         
-    start_time=time()  
-    trajs = [policy.generate_session(args,i,state_train,D_demo,mpc_method,thetas)]
-
-    FIMs=trajs[0][3]
-    FIMs_NN=trajs[0][4]
-    trajs=[trajs[0][:3]]
-    sample_trajs = trajs #+ sample_trajs
-    #sample_trajs = demo_trajs + sample_trajs
-    D_samp=np.array([])
-    D_samp = preprocess_traj(trajs, D_samp)
-    
-    #D_samp = D_demo
-
-    # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
-    loss_rew = []
-    #for _ in range(REWARD_FUNCTION_UPDATE):
-    selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
-    selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
-
-     #D_s_samp = D_samp[selected_samp]
-     #D_s_demo = D_demo[selected_demo]
-    D_s_samp = D_samp
-    D_s_demo = D_demo
-     #D̂ samp ← D̂ demo ∪ D̂ samp
-     #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
-
-    states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
-    states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
-
-     # Reducing from float64 to float32 for making computaton faster
-     #states = torch.tensor(states, dtype=torch.float32)
-     #probs = torch.tensor(probs, dtype=torch.float32)
-     #actions = torch.tensor(actions, dtype=torch.float32)
-     #states_expert = torch.tensor(states_expert, dtype=torch.float32)
-     #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-    grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-    state_train = update_model(state_train, grads)
-     
-    
-  
-     # UPDATING THE COST FUNCTION
-    # cost_optimizer.zero_grad()
-     #loss_IOC.backward()
-     #cost_optimizer.step()
-
-    loss_rew.append(loss_IOC)
-
-    # for traj in trajs:
-    #     states, probs ,actions= traj
+            demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
+            demo_trajs=np.array(demo_trajs)
         
-    #     states = torch.tensor(states, dtype=torch.float32)
-    #     actions = torch.tensor(actions, dtype=torch.float32)
+            states_d=demo_trajs[:,:-2]
+            actions_d=demo_trajs[:,-2:]
+            D_demo=np.array([])
         
+            demo_trajs=[[states_d,actions_d,actions_d]]
+            D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
+            D_demo=jnp.concatenate((D_demo[:,:2],D_demo[:,2:]),axis=1)
             
-    #     costs = cost_f(torch.cat((states, actions), dim=-1))
-    #     cumulative_returns = torch.tensor(get_cumulative_rewards(-costs, 0.99))
-    #     #cumulative_returns = torch.tensor(cumulative_returns, dtype=torch.float32)
-        
-        
-    #     probs=policy(states)
-    #     log_probs = torch.log(probs)
-
-    
-    #     entropy = -torch.mean(torch.sum(probs*log_probs), dim = -1 )
-    #     loss = torch.mean(costs-1e-2*log_probs.reshape(-1,1))-entropy*1e-2 
-    #     #loss = -torch.mean(log_probs*cumulative_returns -entropy*1e-2)
-
-    #     # UPDATING THE POLICY NETWORK
-        
-        
-        
-
-    
-    # sum_of_cost = np.sum(costs.detach().numpy())
-    
-    # sum_of_cost_list.append(sum_of_cost)
-
-    
-    # mean_costs.append(np.mean(sum_of_cost_list))
-    mean_loss_rew.append(np.mean(loss_rew))
-    
-    end_time=time()
-    epoch_time.append(end_time-start_time)
-    FIM_true.append(FIMs)
-    FIM_predicted.append(FIMs_NN)
-
-    # PLOTTING PERFORMANCE
-    if i % 10 == 0:
-        
-        costs_GT=0
-        # for j in range(M):
-        #     ps=states_expert[:,:3]
-        #     qs=states_expert[:,3+(j*dm):3+(j+1)*dm]
+        start_time=time()  
+        if args.rgcl:
+            theta=jnp.concatenate((params['Dense_0']['bias'].flatten(),params['Dense_0']['kernel'].flatten(),params['Dense_1']['bias'].flatten(),params['Dense_1']['kernel'].flatten()))
+            n_theta=len(theta)
+            Q_theta=1e-3*jnp.identity(n_theta)
             
-        #     costs_GT+= JU_FIM_radareqn_target_logdet(ps,qs,
-        #                                Pt,Gt,Gr,L,lam,rcs,c,B,alpha)
-        # # clear_output(True)
-        print(f"mean loss:{np.mean(loss_rew)} loss: {loss_IOC} epoch: {i}")
-        # print(f"learned cost:{np.sum(costs_demo.detach().numpy())} GT: {costs_GT} Loss_policy: {loss} loss_IOC: {loss_IOC}")
-        # plt.subplot(2, 2, 1)
-        # plt.title(f"Mean cost per {EPISODES_TO_PLAY} games")
-        # plt.plot(mean_costs)
-        # plt.grid()
-
-        plt.subplot(2, 2, 2)
-        plt.title(f"Mean loss per {REWARD_FUNCTION_UPDATE} batches")
-        plt.plot(mean_loss_rew)
-        plt.grid()
-
-        # plt.show()
-        plt.savefig('plots/GCL_learning_curve.png')
-        plt.close()
-
-    if np.mean(return_list) > 500:
-        break
+            if (i %10 ==0 and i >0) :
+                 Q_theta=1e-1*Q_theta
+            trajs = [policy.RGCL(args,params,Q_theta,state_train,D_demo,mpc_method)]
+            FIMs=trajs[0][3]
+            FIMs_NN=trajs[0][4]
+            trajs=[trajs[0][:3]]
+        else:
+            trajs = [policy.generate_session(args,state_train,D_demo,mpc_method)]
+        
+            FIMs=trajs[0][3]
+            FIMs_NN=trajs[0][4]
+            trajs=[trajs[0][:3]]
+            sample_trajs = trajs #+ sample_trajs
+            #sample_trajs = demo_trajs + sample_trajs
+            D_samp=np.array([])
+            D_samp = preprocess_traj(trajs, D_samp)
+            
+        #D_samp = D_demo
+        if not args.rgcl:
+            # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
+            loss_rew = []
+            for _ in range(args.reward_fn_updates):
+                selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
+                selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
+            
+                 #D_s_samp = D_samp[selected_samp]
+                 #D_s_demo = D_demo[selected_demo]
+                D_s_samp = D_samp
+                D_s_demo = D_demo
+                 #D̂ samp ← D̂ demo ∪ D̂ samp
+                 #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
+            
+                states, probs, actions = D_s_samp[:,:-3], D_s_samp[:,-3], D_s_samp[:,-2:]
+                states_expert,probs_experts, actions_expert = D_s_demo[:,:-3], D_s_demo[:,-3], D_s_demo[:,-2:]
+            
+                 # Reducing from float64 to float32 for making computaton faster
+                 #states = torch.tensor(states, dtype=torch.float32)
+                 #probs = torch.tensor(probs, dtype=torch.float32)
+                 #actions = torch.tensor(actions, dtype=torch.float32)
+                 #states_expert = torch.tensor(states_expert, dtype=torch.float32)
+                 #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
+                if args.gangcl:
+                     grads, loss_IOC =  apply_model_GANGCL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                else :
+                     grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                    
+                    
+                     
+               
+                state_train = update_model(state_train, grads)
     
+                loss_rew.append(loss_IOC)
+    
+                
+                # mean_costs.append(np.mean(sum_of_cost_list))
+                mean_loss_rew.append(np.mean(loss_rew))
+            
+        end_time=time()
+        epoch_time.append(end_time-start_time)
+        FIM_true.append(FIMs)
+        FIM_predicted.append(FIMs_NN)
+        FIM_demos.append(FIM_demo)
+    FIM_true_runs.append(FIM_true)
+    FIM_predicted_runs.append(FIM_predicted)
+    epoch_time_runs.append(epoch_time)
+    FIM_demos_runs.append(FIM_demos)
+epoch_time_dir = osp.join('results','plotting','radar')
+epoch_cost_dir = osp.join('results','plotting','radar')
+
+if not os.path.exists(epoch_time_dir):
+    os.mkdir(epoch_time_dir)
+if not os.path.exists(epoch_cost_dir):
+    os.mkdir(epoch_cost_dir)
+# Save the array
+np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time_runs)
+np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), FIM_true_runs)
+np.save(osp.join(epoch_cost_dir,method+'_epoch_expert_cost.npy'), FIM_demos_runs)    
+
 config = {'dimensions': np.array([5, 3])}
 ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}
 checkpoints.save_checkpoint(ckpt_dir='/tmp/flax_ckpt/flax-checkpointing',

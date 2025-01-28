@@ -171,11 +171,10 @@ def MPPI_scores_wrapper(score_fn,method="single"):
         
     if method == "NN":
         @jit
-        def MPPI_scores(radar_states,target_states,U_MPPI,chis,time_step_size,A,J,gamma,state_train):
+        def MPPI_scores(radar_state,target_state,U_MPPI,A,J,state_train):
             # the lower the value, the better
-            score_fn_partial = partial(score_fn,chis=chis, radar_states=radar_states, target_states=target_states, time_step_size=time_step_size,
-                                                    A=A,J=J,
-                                                    gamma=gamma,state_train=state_train)
+            score_fn_partial = partial(score_fn, radar_state=radar_state, target_state=target_state,
+                                                    A=A,J=J,state_train=state_train)
             MPPI_score_fn = vmap(score_fn_partial)
             scores = MPPI_score_fn(U_MPPI)
 
