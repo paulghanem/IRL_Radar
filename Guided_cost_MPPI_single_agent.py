@@ -219,13 +219,28 @@ seeds=np.array([13,14,15,16,17,123])
 args.runs=np.shape(seeds)[0]
 
 for runs in range (args.runs):
+    # INITILIZING POLICY AND REWARD FUNCTION
+    policy = P_MPPI(state_shape, n_actions)
+    cost_f = CostNN(state_dims=state_shape[0],hidden_dim=args.hidden_dim)
+    #cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
+    init_rng = jax.random.key(0)
+
+    variables = cost_f.init(init_rng, jnp.ones((1,state_shape[0]))) 
+
+    params = variables['params']
+    #params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
+    #params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
+    tx = optax.adam(learning_rate=args.lr)
+    state_train=train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
     
-    args.seed = seeds[runs]
+    args.seed = int(seeds[runs])
     print(args.seed)
     FIM_true=[]
     FIM_predicted=[]
     FIM_demos=[]
     epoch_time=[]
+    D_demo, D_samp = np.array([]), jnp.array([])
+    sample_trajs = []
     for i in range(args.rirl_iterations):
         if (i== 0): 
         
