@@ -215,7 +215,7 @@ FIM_true_runs=[]
 FIM_predicted_runs=[]
 FIM_demos_runs=[]
 epoch_time_runs=[]
-seeds=np.array([12,13,14,15,16,17,18,123])
+seeds=np.array([13,14,15,16,17,123])
 args.runs=np.shape(seeds)[0]
 
 for runs in range (args.runs):
