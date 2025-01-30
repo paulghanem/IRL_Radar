@@ -325,8 +325,8 @@ epoch_cost_dir = osp.join('results','plotting',args.gym_env)
 os.makedirs(epoch_time_dir,exist_ok=True)
 os.makedirs(epoch_cost_dir,exist_ok=True)
 # Save the array
-np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time)
-np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost)
+np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time_runs)
+np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
 
 
 # just for cartpole...
