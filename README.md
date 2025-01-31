@@ -1,5 +1,5 @@
 # Guided Cost Learning
-This repo is a working implementation of guided cost learning (https://arxiv.org/abs/1603.00448) for discrete action space. Currently, it supports the `CartPole-v0` environment.
+This repo is a working implementation of Recursive Deep Inverse Reinforcement Learning, Currently, it supports the `CartPole-v1` and `MountainCarContinuous-v0` environments.
 
 ## How to run:
 
@@ -14,8 +14,8 @@ $ python main.py --horizon=50 --N_steps=150 --gym_env=CartPole-v1 --lr=1e-4 --nu
 
 
 ## Results:
-![](results/plotting/): resulting reward functions 
-![](per_episode_reward_IRL_gym.pdf): resulting plots
+![results/plotting/](results/plotting/): resulting reward functions 
+![per_episode_reward_IRL_gym.pdf](per_episode_reward_IRL_gym.pdf): resulting plots
 
 
 "# IRL_Radar" 
