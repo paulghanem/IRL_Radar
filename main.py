@@ -171,13 +171,11 @@ mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 seeds=np.array([122,123,124,13,14,15])
 args.runs=np.shape(seeds)[0]
-epoch_time_runs=[]
 epoch_cost_runs=[]
 expert_cost_runs=[]
 for runs in range (args.runs):
     args.seed = int(seeds[runs])
     print(args.seed)
-    epoch_time=[]
     epoch_cost=[]
     expert_cost=[]
     for i in range(args.rirl_iterations):
@@ -259,7 +257,7 @@ for runs in range (args.runs):
             D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
             D_demo=jnp.concatenate((D_demo[:,:args.s_dim],D_demo[:,args.s_dim:]),axis=1)
     
-        start=time.time()
+       
         if args.rgcl:
             trajs = [policy.RGCL(args,params,state_train,D_demo,thetas)]
             rewards=trajs[0][-1]
@@ -313,24 +311,21 @@ for runs in range (args.runs):
             
             # mean_costs.append(np.mean(sum_of_cost_list))
             mean_loss_rew.append(np.mean(loss_rew))
-        end=time.time()
-        epoch_time.append(end-start)
+       
+      
         epoch_cost.append(total_cost)
         expert_cost.append(rewards_demo)
         
-    epoch_time_runs.append(epoch_time)
+   
     epoch_cost_runs.append(epoch_cost)
     expert_cost_runs.append(expert_cost)
  
 
-epoch_time_dir = osp.join('results','plotting',args.gym_env)
 epoch_cost_dir = osp.join('results','plotting',args.gym_env)
 
-os.makedirs(epoch_time_dir,exist_ok=True)
 os.makedirs(epoch_cost_dir,exist_ok=True)
 # Save the array
-#np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time_runs)
-#np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
+np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
 np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 
 # just for cartpole...
