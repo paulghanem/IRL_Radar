@@ -1,4 +1,4 @@
-# Guided Cost Learning
+# Recursive Deep Inverse Reinforcement Learning (RDIRL)
 This repo is a working implementation of Recursive Deep Inverse Reinforcement Learning, Currently, it supports the `CartPole-v1` and `MountainCarContinuous-v0` environments.
 
 ## How to run:
@@ -11,14 +11,15 @@ $ python main.py --horizon=50 --N_steps=150 --gym_env=CartPole-v1 --lr=1e-4 --nu
 ## Description of files:
 - [generating_expert.py](generating_expert.py): Generates an expert on CartPole, by training vanilla policy gradient, and finally stores trained trajecteries as expert samples at [expert_samples](expert_samples).
 - [experts/PG.py](experts/PG.py): Implementation of vanilla policy gradient. This is reused at several places.
+- [main.py](main.py): Implementation of RDIRL and other benchmarking methods, main file to be ran.
 
 
 ## Results:
-![results/plotting/](results/plotting/): resulting reward functions 
-![per_episode_reward_IRL_gym.pdf](per_episode_reward_IRL_gym.pdf): resulting plots
+-[results/plotting/](results/plotting/): resulting reward functions 
+-[per_episode_reward_IRL_gym.pdf](per_episode_reward_IRL_gym.pdf): resulting plots
 
 
-"# IRL_Radar" 
+## How to install required packages
 
 ```bash
 pip install requirements.txt
