@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun May  5 13:38:21 2024
-
-@author: siliconsynapse
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 27 00:00:04 2024
-
-@author: siliconsynapse
-"""
-
 
 
 from flax.training import train_state,checkpoints

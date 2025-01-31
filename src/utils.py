@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May  9 16:06:30 2024
 
-@author: siliconsynapse
-"""
 
 import jax.numpy as jnp
 import jax

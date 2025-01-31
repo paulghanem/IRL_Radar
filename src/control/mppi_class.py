@@ -1,6 +1,3 @@
-"""
-Kohei Honda, 2023.
-"""
 
 from __future__ import annotations
 
