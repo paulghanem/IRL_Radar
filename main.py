@@ -173,11 +173,13 @@ seeds=np.array([122,123,124,13,14,15])
 args.runs=np.shape(seeds)[0]
 epoch_time_runs=[]
 epoch_cost_runs=[]
+expert_cost_runs=[]
 for runs in range (args.runs):
     args.seed = int(seeds[runs])
     print(args.seed)
     epoch_time=[]
     epoch_cost=[]
+    expert_cost=[]
     for i in range(args.rirl_iterations):
         if i== 0:
             # policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
@@ -197,7 +199,7 @@ for runs in range (args.runs):
             # states_d,actions_d,_ =generate_demo(
             #     env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
             demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps)
-            states_d,actions_d,_ = demo_generator.generate_demo(args.seed)
+            states_d,actions_d,rewards_demo = demo_generator.generate_demo(args.seed)
            
     
             args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
@@ -314,9 +316,11 @@ for runs in range (args.runs):
         end=time.time()
         epoch_time.append(end-start)
         epoch_cost.append(total_cost)
+        expert_cost.append(rewards_demo)
         
     epoch_time_runs.append(epoch_time)
     epoch_cost_runs.append(epoch_cost)
+    expert_cost_runs.append(expert_cost)
  
 
 epoch_time_dir = osp.join('results','plotting',args.gym_env)
@@ -325,9 +329,9 @@ epoch_cost_dir = osp.join('results','plotting',args.gym_env)
 os.makedirs(epoch_time_dir,exist_ok=True)
 os.makedirs(epoch_cost_dir,exist_ok=True)
 # Save the array
-np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time_runs)
-np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
-
+#np.save(osp.join(epoch_time_dir,method+'_epoch_time.npy'), epoch_time_runs)
+#np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
+np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 
 # just for cartpole...
 

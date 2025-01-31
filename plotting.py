@@ -14,8 +14,11 @@ import pdb
 import os.path as osp
 
 gymenvs=['CartPole-v1','MountainCarContinuous-v0']
+#gymenvs=['CartPole-v1']
 i=0
 fig, ax1 = plt.subplots(1,2)
+means_table={}
+std_table={}
 for env in gymenvs:
 
     epoch_time_dir = osp.join('results','plotting',env)
@@ -26,14 +29,16 @@ for env in gymenvs:
     for method in methods:
         results[method+'_epoch_time']=np.load(osp.join(epoch_time_dir,method+'_epoch_time.npy'))
         results[method+'_epoch_cost']= np.load(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'))
-        #results[method+'_epoch_expert_cost']=np.load(osp.join(epoch_cost_dir,method+'_epoch_expert_cost.npy'))    
+        results[method+'_expert_cost']=np.load(osp.join(epoch_cost_dir,'gail'+'_expert_cost.npy'))    
     
     
     mean={}
     std={}
+    expert={}
     for method in methods: 
         mean[method]=np.mean(results[method+'_epoch_cost'],axis=0)
         std[method]=np.std(results[method+'_epoch_cost'],axis=0)
+        expert[method]=np.mean(results[method+'_expert_cost'][0][0][-1]*np.ones((6,10)),axis=0)
            
     # epoch_time_GCL=np.load('epoch_time_GCL.npy')
     # FIM_expert_GCL=np.load('FIM_expert_GCL.npy')
@@ -68,8 +73,9 @@ for env in gymenvs:
     
     
     
-    
-    
+    #pdb.set_trace()
+        means_table[method+'_'+env]=np.mean(mean[method])
+        std_table[method+'_'+env]=np.std(results[method+'_epoch_cost'])
     
     
     x=np.linspace(1,10,10)
@@ -87,6 +93,8 @@ for env in gymenvs:
             label='GAIL'
     
         ax1[i].plot( x,mean[method],label=label)
+        if method=='gail':
+            ax1[i].plot( x,expert[method],label='Expert')
         ax1[i].fill_between(x, mean[method]-std[method],mean[method]+std[method],alpha=0.1)
         ax1[i].set_xlabel('Episodes')
     
@@ -96,10 +104,12 @@ for env in gymenvs:
         ax1[i].set_xticks([1,2,3,4,5,6,7,8,9,10]) 
     i=i+1
 #plt.xticks([5])
+y_label=fig.supylabel('Reward')
+plt.subplots_adjust(wspace=0.25,hspace=.5)
 handles, labels = ax1[0].get_legend_handles_labels()
-legend=fig.legend(handles,labels,bbox_to_anchor=(0.5, -0.05),loc='lower center',ncol=4)
+legend=fig.legend(handles,labels,bbox_to_anchor=(0.5, -0.05),loc='lower center',ncol=5)
 
-plt.savefig('per_episode_reward_IRL_gym.pdf',bbox_extra_artists=(legend,), bbox_inches='tight')
+plt.savefig('per_episode_reward_IRL_gym.pdf',bbox_extra_artists=(legend,y_label),bbox_inches='tight')
 plt.show()
 
 

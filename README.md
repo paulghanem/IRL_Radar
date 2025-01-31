@@ -4,22 +4,22 @@ This repo is a working implementation of guided cost learning (https://arxiv.org
 ## How to run:
 
 ```bash
-$ python3.8 main.py 
-
+$ python main.py --horizon=85 --N_steps=150 --gym_env=MountainCarContinuous-v0 --lr=1e-4 --num_traj=3500 --reward_fn_updates=15 --lambda_=0.001 --rirl_iterations=10 --rgcl                    
+$ python main.py --horizon=50 --N_steps=150 --gym_env=CartPole-v1 --lr=1e-4 --num_traj=2000 --reward_fn_updates=15 --lambda_=0.01 --rirl_iterations=10 --rgcl                          
 ```
 
 ## Description of files:
 - [generating_expert.py](generating_expert.py): Generates an expert on CartPole, by training vanilla policy gradient, and finally stores trained trajecteries as expert samples at [expert_samples](expert_samples).
 - [experts/PG.py](experts/PG.py): Implementation of vanilla policy gradient. This is reused at several places.
-- [main.py](main.py): Contains the main implementation of GCL.
+
 
 ## Results:
-![](plots/GCL_learning_curve.png)
+![](results/plotting/): resulting reward functions 
+![](per_episode_reward_IRL_gym.pdf): resulting plots
 
 
 "# IRL_Radar" 
 
 ```bash
-pip install setuptools==65.5.0 pip==21
-pip install gym=0.19.0
+pip install requirements.txt
 ```
