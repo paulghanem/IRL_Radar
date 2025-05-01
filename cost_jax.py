@@ -45,7 +45,7 @@ def cost_fn(state_train,params,states,N):
     return costs[0].astype(float)
 
 jax.jit
-def apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
+def apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,UB=False):
     """Computes gradients, loss and accuracy for a single batch."""
     
 
@@ -73,8 +73,14 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
          #      jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7))) #+ jnp.sum(g_demo) + jnp.sum(g_samp)+jnp.sum(g_mono_demo)+jnp.sum(g_mono_samp)
                #jnp.mean((jnp.exp(-costs_demo))/(probs_experts))
         #loss=jnp.mean(optax.l2_loss(predictions=costs_samp,targets=jnp.ones((200,1))))
-        loss = jnp.mean(costs_demo) + \
-               jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7)))
+        if UB:
+            loss = jnp.mean(costs_demo) + \
+                   jnp.mean(-costs_samp)
+        else: 
+            loss = jnp.mean(costs_demo) + \
+                   jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7)))
+       
+            
         # loss = jnp.mean(((costs_demo) + \
         #        jnp.log(jnp.exp(-costs_samp)/(probs+1e-7)))**2)
    
@@ -86,7 +92,7 @@ def apply_model(state_train, states, actions,states_expert,actions_expert,probs,
 
 
 @jax.jit
-def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts):
+def apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,UB=False):
     """Computes gradients, loss and accuracy for a single batch."""
     
 

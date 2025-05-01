@@ -14,10 +14,13 @@ from jax import vmap,jit
 import time 
 
 import gymnax
+import gymnasium as gym
+import mujoco
 from gymnax.visualize import Visualizer
 from flax import struct
 from gymnax.environments import EnvState
 import pdb
+from mujoco import mjx 
 
 # from experts.P_MPPI import P_MPPI
 from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
@@ -28,9 +31,6 @@ from src.control.mppi_class import MPPI
 from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 
 from utils.helpers import GenerateDemo
-
-
-
 
 import gymnax
 
@@ -61,12 +61,12 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps",default=450,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=1,type=int,help="The number of epoch updates")
+parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=32,type=int,help="The number of hidden neurons")
+parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
-parser.add_argument("--runs",default=6,type=int,help="The number of runs")
+parser.add_argument("--runs",default=1,type=int,help="The number of runs")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
@@ -78,14 +78,14 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
-
-
+parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument("--UB",default=False,type=bool,help="Upper bound loss  ")
+parser.add_argument("--online",default=False,type=bool,help="online version of bechmarks ")
 
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=2500,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=25,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -134,7 +134,20 @@ os.makedirs(args.results_savepath,exist_ok=True)
 with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as outfile:
     json.dump(vars(args), outfile)
 
+assets_dir="/Users/siliconsynapse/anaconda3/envs/rirl/Lib/site-packages/gym/envs/mujoco/assets"
+if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]:
+    if args.gym_env=="HalfCheetah-v4":
+        env_xml = "half_cheetah.xml"
+    elif args.gym_env=="Ant":
+        env_xml = "ant.xml"
+    elif args.gym_env=="Hopper":
+        env_xml = "hopper.xml"
+    elif args.gym_env=="Walker2d":
+        env_xml = "walker2d.xml"
 
+    model_path=os.path.join(assets_dir,env_xml)
+    model = mujoco.MjModel.from_xml_path(model_path)
+    mjx_model = mjx.put_model(model)
 
 
 mean_rewards = []
@@ -155,7 +168,7 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-seeds=np.array([122,123,124,13,14,15])
+seeds=np.array([122])
 args.runs=np.shape(seeds)[0]
 epoch_cost_runs=[]
 expert_cost_runs=[]
@@ -183,20 +196,23 @@ for runs in range (args.runs):
             # states_d,actions_d,_ =generate_demo(
             #     env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
             demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps)
-            states_d,actions_d,rewards_demo = demo_generator.generate_demo(args.seed)
+            states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
+            if args.gym_env=="Ant":
+                states_d=states_d[:,:29]
            
     
             args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
             args.N_steps = min(DEMO_BATCH,states_d.shape[0])
     
             # initalize Neural Network...
+            
             args.a_dim = actions_d.shape[-1]
             args.s_dim = states_d.shape[-1]
             thetas = jnp.ones((1, args.s_dim))
     
             # INITILIZING POLICY AND REWARD FUNCTION
-            u_min, u_max = get_action_space(args.gym_env)
-            cov_scaler = get_action_cov(args.gym_env)
+            u_min, u_max = get_action_space(args.gym_env,env)
+            cov_scaler = get_action_cov(args.gym_env,env)
     
     
     
@@ -209,8 +225,9 @@ for runs in range (args.runs):
                 return state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel()
     
     
-            u_min, u_max = get_action_space(args.gym_env)
-            cov_scaler = get_action_cov(args.gym_env)
+            u_min, u_max = get_action_space(args.gym_env,env)
+            cov_scaler = get_action_cov(args.gym_env,env)
+            
     
             policy = MPPI(
                 horizon=args.horizon,
@@ -218,12 +235,15 @@ for runs in range (args.runs):
                 # subiterations=args.MPPI_iterations,
                 dim_state=args.s_dim,
                 dim_control=args.a_dim,
-                dynamics=get_step_model(args.gym_env),
+                dynamics=get_step_model(args.gym_env,env),
                 cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
                 u_min=u_min,
                 u_max=u_max,
                 sigmas=cov_scaler,
                 lambda_=args.lambda_,
+                env=env,
+                mjx_model=mjx_model,
+                gym_env=args.gym_env
             )
     
             # cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
@@ -248,6 +268,10 @@ for runs in range (args.runs):
             trajs = [policy.RGCL(args,params,state_train,D_demo,thetas)]
             rewards=trajs[0][-1]
             total_cost=rewards
+        elif args.online:
+            trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
+            rewards=trajs[0][-1]
+            total_cost=rewards
         else:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
             
@@ -261,7 +285,7 @@ for runs in range (args.runs):
         #D_samp = D_demo
     
         # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
-        if not args.rgcl:
+        if not args.rgcl and not args.online:
             loss_rew = []
             for _ in range(REWARD_FUNCTION_UPDATE):
                 selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
@@ -284,9 +308,9 @@ for runs in range (args.runs):
                 #states_expert = torch.tensor(states_expert, dtype=torch.float32)
                 #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
                 if args.airl:
-                    grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                    grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
                 else :
-                    grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                    grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
     
                 state_train = update_model(state_train, grads)
     
@@ -347,3 +371,5 @@ np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 #                             step=0,
 #                             overwrite=True,
 #                             keep=2)
+
+

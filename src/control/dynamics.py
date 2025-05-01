@@ -13,6 +13,7 @@ from jax import lax
 from gymnax.environments import environment
 from gymnax.environments import spaces
 import pdb
+from mujoco import mjx 
 
 @struct.dataclass
 class CartPoleEnvState(environment.EnvState):
@@ -35,6 +36,49 @@ class MountainCar(environment.EnvState):
     position: jnp.ndarray
     velocity: jnp.ndarray
     time: int
+    
+def mjx_step(mjx_model, mjx_data, state,action,gym_env):
+    """
+    JAX-compatible MJX step function.
+
+    Args:
+        mjx_model (mjx.Model): The MJX-compiled MuJoCo model.
+        mjx_data (mjx.Data): Current simulation data (state).
+        action (jnp.ndarray): Control input to apply.
+
+    Returns:
+        mjx.Data: Updated simulation state.
+    """
+
+    
+    if gym_env=="HalfCheetah-v4":
+        # Apply control to mjx_data
+        mjx_data = mjx_data.replace(qpos=state[:9],qvel=state[9:],ctrl=action)
+
+        # Advance simulation
+        mjx_data = mjx.step(mjx_model, mjx_data)
+        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+    elif gym_env=="Ant":
+        mjx_data = mjx_data.replace(qpos=state[:15],qvel=state[15:],ctrl=action)
+
+        # Advance simulation
+        mjx_data = mjx.step(mjx_model, mjx_data)
+        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+    
+    elif gym_env=="Hopper":
+        mjx_data = mjx_data.replace(qpos=state[:6],qvel=state[6:],ctrl=action)
+
+        # Advance simulation
+        mjx_data = mjx.step(mjx_model, mjx_data)
+        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+        
+    elif gym_env=="Walker2d":
+        mjx_data = mjx_data.replace(qpos=state[:9],qvel=state[9:],ctrl=action)
+
+        # Advance simulation
+        mjx_data = mjx.step(mjx_model, mjx_data)
+        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+    return res
 
 def mountaincar_step(
     state,action
@@ -152,23 +196,23 @@ def pendulum_step(
 
 
 
-def get_action_space(env_name):
+def get_action_space(env_name,env):
     if env_name == "CartPole-v1":
         return jnp.array([-10.]),jnp.array([10.])
 
     if env_name == "Pendulum-v1":
         return jnp.array([-2.]),jnp.array([2.])
 
-    if env_name == "MountainCarContinuous-v0":
-        return jnp.array([-1.]),jnp.array([1.])
+    else:      
+          return jnp.array(env.action_space.low),jnp.array(env.action_space.high)
 
-def get_action_cov(env_name):
+def get_action_cov(env_name,env):
     if env_name == "CartPole-v1":
         return jnp.array([5.0])
     if env_name == "Pendulum-v1":
         return jnp.array([2.0])
-    if env_name == "MountainCarContinuous-v0":
-        return jnp.array([1.0])
+    else:
+        return jnp.array([1.0])*jnp.ones((env.action_space.shape))
 
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":
@@ -181,13 +225,15 @@ def get_state(state,action=None,time=None,env_name="CartPole-v1"):
         return MountainCar(position=state[0],velocity=state[1],time=time)
 
 
-def get_step_model(env_name):
+def get_step_model(env_name,env):
     if env_name == "CartPole-v1":
         return cartpole_step
     if env_name == "Pendulum-v1":
         return pendulum_step
     if env_name == "MountainCarContinuous-v0":
         return mountaincar_step
+    else:
+        return mjx_step
 
 from functools import partial
 @partial(jax.jit, static_argnames=("step_fn",))
@@ -199,6 +245,53 @@ def kinematics(state, action, step_fn):
 
         action = tmp
         next_state = step_fn(state_input,action)
+
+        carry = next_state
+        return carry, carry
+
+    # Scan over episode step loop
+    _, scan_out = jax.lax.scan(
+        policy_step,
+        state,
+        action,
+    )
+    # Return masked sum of rewards accumulated by agent in episode
+    states = scan_out
+    return states
+
+# @partial(jax.jit, static_argnames=("step_fn",))
+# def kinematics_mujoco(mjx_model,mjx_data,action, step_fn):
+#     """Rollout a jitted gymnax episode with lax.scan."""
+
+#     def policy_step(mjx_data, tmp):
+#         """lax.scan compatible step transition in jax env."""
+
+#         action = tmp
+#         next_data = step_fn(mjx_model,mjx_data,action)
+
+#         carry = next_data
+#         return carry, carry
+
+#     # Scan over episode step loop
+#     _, scan_out = jax.lax.scan(
+#         policy_step,
+#         mjx_data,
+#         action,
+#     )
+#     # Return masked sum of rewards accumulated by agent in episode
+#     states = scan_out
+#     return states
+
+
+@partial(jax.jit, static_argnames=("step_fn","gym_env"))
+def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):
+    """Rollout a jitted gymnax episode with lax.scan."""
+
+    def policy_step(state, tmp):
+        """lax.scan compatible step transition in jax env."""
+
+        action = tmp
+        next_state = step_fn(mjx_model,mjx_data,state,action,gym_env)
 
         carry = next_state
         return carry, carry

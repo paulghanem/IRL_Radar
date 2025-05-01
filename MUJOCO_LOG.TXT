@@ -1,0 +1,3 @@
+Tue Apr 29 16:20:44 2025
+ERROR: plugin 'mujoco.elasticity.cable' is already registered
+

@@ -137,12 +137,13 @@ class GenerateDemo(object):
 
 
     def generate_demo(self,seed=123):
-        if self.env_name in ["MountainCarContinuous-v0"]:
-            states,actions,rewards = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
+        if self.env_name in ["MountainCarContinuous-v0","HalfCheetah-v4","Ant","Hopper","Walker2d"]:
+            states,actions,rewards,env = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
+            
         else:
-            states,actions,rewards = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=seed)
+            states,actions,rewards,env = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=seed)
 
-        return states,actions,rewards
+        return states,actions,rewards,env
 
     def generate_gymnasium_demo(self,env_name,max_frames=200,seed=123):
         # Enjoy trained agent
@@ -151,12 +152,17 @@ class GenerateDemo(object):
         torch.manual_seed(seed)
         random.seed(seed)
 
-        base = osp.join(self.base,f"{env_name}.zip")
+        
 
         env = CustomTerminationWrapper(gym.make(env_name, render_mode='rgb_array'),max_steps=max_frames)
-
-        model = DDPG("MlpPolicy", env)
+        if self.env_name in ["MountainCarContinuous-v0"]:
+            model = DDPG("MlpPolicy", env)
+            base = osp.join(self.base,f"{env_name}.zip")
+        else:
+            model=PPO("MlpPolicy", env,verbose=1)
+            base = osp.join(self.base,"PPO.zip")
         model = model.load(base, env)
+       
 
 
         vec_env = model.get_env()
@@ -178,9 +184,10 @@ class GenerateDemo(object):
 
             action_seq.append(action.ravel())
             reward_seq.append(reward)
+            reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)
-            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward}, Done: {done}")
+            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
             print(10 * "=")
             t_counter += 1
             if t_counter == max_frames:
@@ -190,9 +197,9 @@ class GenerateDemo(object):
         print(f"{env_name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, State: {obs}")
 
         if len(action.shape) == 0:
-            return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq)
+            return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq),vec_env
         else:
-            return np.stack(state_seq,axis=0), np.stack(action_seq,axis=0), np.cumsum(reward_seq)
+            return np.stack(state_seq,axis=0), np.stack(action_seq,axis=0), np.cumsum(reward_seq),vec_env
 
 
 
@@ -242,9 +249,11 @@ class GenerateDemo(object):
 
             action_seq.append(action)
             reward_seq.append(reward)
+            reward_seq.append(reward)
+            reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)
-            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward}, Done: {done}")
+            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
             print(10 * "=")
             t_counter += 1
             if env.name == "MountainCarContinuous-v0":
@@ -258,6 +267,6 @@ class GenerateDemo(object):
         print(f"{env.name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, State: {obs}")
 
         if len(action.shape) == 0:
-            return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq)
+            return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq),env
         else:
-            return np.stack(state_seq,axis=0), np.stack(action_seq,axis=0), np.cumsum(reward_seq)
+            return np.stack(state_seq,axis=0), np.stack(action_seq,axis=0), np.cumsum(reward_seq),env
