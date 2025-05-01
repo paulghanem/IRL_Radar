@@ -134,7 +134,7 @@ os.makedirs(args.results_savepath,exist_ok=True)
 with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as outfile:
     json.dump(vars(args), outfile)
 
-assets_dir="/Users/siliconsynapse/anaconda3/envs/rirl/Lib/site-packages/gym/envs/mujoco/assets"
+assets_dir="assets"
 if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]:
     if args.gym_env=="HalfCheetah-v4":
         env_xml = "half_cheetah.xml"
