@@ -154,11 +154,14 @@ class GenerateDemo(object):
 
         
 
-        env = CustomTerminationWrapper(gym.make(env_name, render_mode='rgb_array'),max_steps=max_frames)
         if self.env_name in ["MountainCarContinuous-v0"]:
+            env = CustomTerminationWrapper(gym.make(env_name, render_mode='rgb_array'),max_steps=max_frames)
+           
             model = DDPG("MlpPolicy", env)
             base = osp.join(self.base,f"{env_name}.zip")
         else:
+            env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False, render_mode='rgb_array'),max_steps=max_frames)
+           
             model=PPO("MlpPolicy", env,verbose=1)
             base = osp.join(self.base,"PPO.zip")
         model = model.load(base, env)

@@ -14,6 +14,7 @@ from gymnax.environments import environment
 from gymnax.environments import spaces
 import pdb
 from mujoco import mjx 
+from functools import partial
 
 @struct.dataclass
 class CartPoleEnvState(environment.EnvState):
@@ -36,7 +37,9 @@ class MountainCar(environment.EnvState):
     position: jnp.ndarray
     velocity: jnp.ndarray
     time: int
-    
+
+
+@partial(jax.jit, static_argnames=("gym_env"))
 def mjx_step(mjx_model, mjx_data, state,action,gym_env):
     """
     JAX-compatible MJX step function.
@@ -235,7 +238,7 @@ def get_step_model(env_name,env):
     else:
         return mjx_step
 
-from functools import partial
+
 @partial(jax.jit, static_argnames=("step_fn",))
 def kinematics(state, action, step_fn):
     """Rollout a jitted gymnax episode with lax.scan."""

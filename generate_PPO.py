@@ -14,11 +14,11 @@ os.makedirs(model_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 sb3_algo="PPO"
 TIMESTEPS = 25000
-env_name="Walker2d"
+env_name="Ant"
 # Create environment (you can also try "Ant-v4", "Humanoid-v4", etc.)
-env = gym.make(env_name,render_mode="human")
+env = gym.make(env_name,exclude_current_positions_from_observation=False,render_mode="human")
 train=True
-load=False
+load=True
 if train==True:
     iterations=0
     model = PPO("MlpPolicy", env, verbose=1)
@@ -35,7 +35,7 @@ while iterations<300:
 model.save(f"{model_dir}/{env_name}/{sb3_algo}")
 # Test the trained agent
 obs, _ = env.reset()
-for _ in range(25000):
+for _ in range(TIMESTEPS):
     action, _states = model.predict(obs)
     obs, reward, terminated, truncated, _ = env.step(action)
     env.render()
