@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --partition=gpu
+#SBATCH --nodes=1
+
+#SBATCH --gres=gpu:v100-sxm2:1
+#SBATCH --time=8:00:00
+#SBATCH --job-name=gpu_run
+#SBATCH --mem=4GB
+#SBATCH --ntasks=1
+#SBATCH --output=myjob.%j.out
+#SBATCH --error=myjob.%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ghanem.p@northeastern.edu
+
+
+module load cuda
+python main.py --seed=134 --horizon=50 --N_steps=200 --gym_env=Hopper  --lr=1e-4 --num_traj=500 --reward_fn_updates=15 --lambda_=0.01  --rirl_iterations=100  --Q=1e-4 --P=1e-2 --hidden_dim=16 --airl
