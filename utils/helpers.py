@@ -160,7 +160,10 @@ class GenerateDemo(object):
             model = DDPG("MlpPolicy", env)
             base = osp.join(self.base,f"{env_name}.zip")
         else:
-            env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False, render_mode='rgb_array'),max_steps=max_frames)
+            if self.env_name =="Ant":
+                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=True, render_mode='rgb_array'),max_steps=max_frames)
+            else:  
+                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False, render_mode='rgb_array'),max_steps=max_frames)
            
             model=PPO("MlpPolicy", env,verbose=1)
             base = osp.join(self.base,"PPO.zip")
@@ -252,7 +255,7 @@ class GenerateDemo(object):
 
             action_seq.append(action)
             reward_seq.append(reward)
-            reward_seq.append(reward)
+            #reward_seq.append(reward)
             reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)

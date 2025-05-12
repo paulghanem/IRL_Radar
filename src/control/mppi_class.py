@@ -26,10 +26,9 @@ from mujoco import mjx
 @jax.jit
 def update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s):
     P_theta = jnp.linalg.inv(jnp.linalg.inv(P_theta + Q_theta) + hessian_d - hessian_s)
-   
+    #P_theta = jnp.linalg.inv( hessian_d - hessian_s)
     theta = theta - jnp.matmul(P_theta, gradient_d - gradient_s)
     return theta,P_theta
-
 def load_config(config_fname, seed_id=0, lrate=None):
     """Load training configuration and random seed of experiment."""
     import yaml
@@ -138,7 +137,8 @@ class MPPI:
         self.env=env
         self.mjx_model=mjx_model
         self.gym_env=gym_env
-        self.mjx_data = mjx.make_data(self.mjx_model)
+        if self.mjx_model is not None :
+            self.mjx_data = mjx.make_data(self.mjx_model)
 
         # noise distribution
         self._covariance = np.zeros((
@@ -254,17 +254,17 @@ class MPPI:
         
         
         if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]:
-            #if self.gym_env in ["Hopper","Walker2d"]:
-                #state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0],(1,)),state))
+            if self.gym_env in ["Ant"]:
+                state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
             initial_state =  jnp.tile(state,(self._num_samples,1))
             #init_data.replace(qpos=state[:8],qvel=state[8:])
             #batch_mjx_data = jax.tree_util.tree_map(lambda x: jnp.stack([x]*self._num_samples), init_data)
             self._state_seq_batch = jax.vmap(kinematics_mujoco,in_axes=(None,None,0,0,None,None))(self.mjx_model,self.mjx_data,initial_state,self._perturbed_action_seqs,self._dynamics,self.gym_env)
             initial_state=initial_state.reshape((initial_state.shape[0],1,initial_state.shape[1]))
             self._state_seq_batch = jnp.concatenate((initial_state, self._state_seq_batch), axis=1)
-           # if self.gym_env in ["Hopper","Walker2d"]:
-                #self._state_seq_batch = self._state_seq_batch[:,:,1:]
-                #state=state[1:]
+            if self.gym_env in ["Ant"]:
+                self._state_seq_batch = self._state_seq_batch[:,:,2:]
+                state=state[2:]
         else:  
             initial_state =  jnp.tile(state,(self._num_samples, 1,1))
             self._state_seq_batch = jax.vmap(kinematics,in_axes=(0,0,None))(initial_state, self._perturbed_action_seqs,self._dynamics)
@@ -335,14 +335,14 @@ class MPPI:
         
         if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]: 
             initial_state=state
-            #if self.gym_env in ["Hopper","Walker2d"]:
-                #initial_state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0],(1,)),state))
+            if self.gym_env in ["Ant"]:
+                initial_state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
             initial_state=jnp.array(initial_state.reshape((1,-1)),dtype=jnp.float64)
             action_seqs=jnp.array(action_seqs,dtype=jnp.float64)
             state_seqs=jax.vmap(kinematics_mujoco,in_axes=(None,None,0,0,None,None))(self.mjx_model,self.mjx_data,initial_state,action_seqs,self._dynamics,self.gym_env)
             state_seqs= jnp.concatenate((jnp.tile(initial_state,(1,1,1)), state_seqs), axis=1)
-            #if self.gym_env in ["Hopper","Walker2d"]:
-                #state_seqs=state_seqs[:,:,1:]
+            if self.gym_env in ["Ant"]:
+                state_seqs=state_seqs[:,:,2:]
         else:
             state_seqs = np.zeros((
                 action_seqs.shape[0],
@@ -418,12 +418,13 @@ class MPPI:
             #     rng_step, env_state, action_seq[0,:], env_params
             # )
             if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]: 
-                #if self.gym_env in ["Hopper","Walker2d"]:
-                    #state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0],(1,)),state))
+                if self.gym_env in ["Ant"]:
+                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
                 state=jnp.array(state,dtype=jnp.float64)
                 action_seq=jnp.array(action_seq,dtype=jnp.float64)
                 state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-               
+                if self.gym_env in ["Ant"]:
+                    state=state[2:]
                 #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
                 if self.gym_env =="HalfCheetah-v4":
                     #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
@@ -434,12 +435,17 @@ class MPPI:
                     forward_reward=state[9]
                     #state=state[1:]
                 elif self.gym_env=="Ant":
-                    forward_reward=state[15]
+                    forward_reward=state[13]
             
             else:
                 state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
             state = state.ravel()
             action=action_seq[0,:]
+            
+            prob = jnp.array([1])
+
+            traj_probs.append(prob.flatten())
+            actions.append(action_seq[0].flatten())
            
             if args.gym_env == "CartPole-v1":
                 x=state[0]
@@ -476,20 +482,42 @@ class MPPI:
                 ctrl_cost = 0.1 * np.sum(np.square(action))
                 r = forward_reward - ctrl_cost
                 r=r.reshape((1,1))
+                
             if args.gym_env == "Ant":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+                alive_bonus=1
+                if state[1] <0.2 or state[1]>1:
+                    alive_bonus=0
                 ctrl_cost = 0.5 * np.sum(np.square(action))
-                r = forward_reward - ctrl_cost
+                r = forward_reward - ctrl_cost+alive_bonus
                 r=r.reshape((1,1))
                 
-            if args.gym_env in ["Hopper","Walker2d"]:
+            if args.gym_env == "Hopper":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=0
+                alive_bonus=1
+                if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+                    alive_bonus=0
+                   # break
+                if state[2] < -0.2  or state[2] > 0.2:
+                    alive_bonus=0
+                   # break 
+                if state[1] < 0.7:
+                    alive_bonus=0
+                    #break  
+               
                 ctrl_cost = 0.001 * np.sum(np.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
-          
+            if args.gym_env == "Walker2d":
+                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+                alive_bonus=1
+                if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                    alive_bonus=0
+                
+                ctrl_cost = 0.001 * np.sum(np.square(action))
+                r = forward_reward - ctrl_cost + alive_bonus
+                r=r.reshape((1,1))
                 
                 
                 
@@ -505,10 +533,6 @@ class MPPI:
             #                           self.covariance[0],
             #                           ction_seq)
 
-            prob = jnp.array([1])
-
-            traj_probs.append(prob.flatten())
-            actions.append(action_seq[0].flatten())
             if args.online:
                 state_expert,prob_expert, action_expert = D_demo[step,:args.s_dim], D_demo[step,args.s_dim], D_demo[step,args.s_dim+1:]
     
@@ -527,7 +551,7 @@ class MPPI:
 
         return states, traj_probs, actions,rewards
 
-    def RGCL(self, args, params, state_train, D_demo, thetas=None):
+    def RGCL(self, args, params, state_train, D_demo,P_theta, thetas=None):
 
         # theta = jnp.concatenate((params['Dense_0']['bias'].flatten(), params['Dense_0']['kernel'].flatten(),
         #                          params['Dense_1']['bias'].flatten(), params['Dense_1']['kernel'].flatten()))
@@ -535,9 +559,9 @@ class MPPI:
         theta=jnp.concatenate([p.flatten() for p in flat_params])
         #pdb.set_trace()
         n_theta = len(theta)
-        P_theta = 1e-1 * jnp.identity(n_theta)
+        P_theta = args.P * jnp.identity(n_theta)
 
-        Q_theta = 1e-4* jnp.identity(n_theta)
+        Q_theta = args.Q* jnp.identity(n_theta)
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)
@@ -579,12 +603,13 @@ class MPPI:
             # pbar.update(1)
 
             if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d"]: 
-               #if self.gym_env in ["Hopper","Walker2d"]:
-                   #state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0],(1,)),state))
+               if self.gym_env in ["Ant"]:
+                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
                state=jnp.array(state,dtype=jnp.float64)
                action_seq=jnp.array(action_seq,dtype=jnp.float64)
                state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-              
+               if self.gym_env in ["Ant"]:
+                  state=state[2:]
                #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
                if self.gym_env =="HalfCheetah-v4":
                    #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
@@ -639,19 +664,42 @@ class MPPI:
                 ctrl_cost = 0.1 * np.sum(np.square(action))
                 r = forward_reward - ctrl_cost
                 r=r.reshape((1,1))
+                
             if args.gym_env == "Ant":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+                alive_bonus=1
+                if state[1] <0.2 or state[1]>1:
+                    alive_bonus=0
                 ctrl_cost = 0.5 * np.sum(np.square(action))
-                r = forward_reward - ctrl_cost
+                r = forward_reward - ctrl_cost+alive_bonus
                 r=r.reshape((1,1))
                 
-            if args.gym_env in ["Hopper","Walker2d"]:
+            if args.gym_env == "Hopper":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=0
+                alive_bonus=1
+                if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+                    alive_bonus=0
+                   # break
+                if state[2] < -0.2  or state[2] > 0.2:
+                    alive_bonus=0
+                   # break 
+                if state[1] < 0.7:
+                    alive_bonus=0
+                    #break  
+               
                 ctrl_cost = 0.001 * np.sum(np.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
+            if args.gym_env == "Walker2d":
+                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+                alive_bonus=1
+                if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                    alive_bonus=0
+                
+                ctrl_cost = 0.001 * np.sum(np.square(action))
+                r = forward_reward - ctrl_cost + alive_bonus
+                r=r.reshape((1,1))
            
             #rewards.append(true_cost_fn(state))
             #pdb.set_trace()
@@ -671,7 +719,7 @@ class MPPI:
             #pdb.set_trace()
             theta,P_theta= update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
 
-            
+            #print(P_theta)
             # params['Dense_0']['bias'] = theta[:len(params['Dense_0']['bias'])]
             # params['Dense_0']['kernel'] = theta[len(params['Dense_0']['bias']):len(params['Dense_0']['bias']) +
             #                                                                    params['Dense_0']['kernel'].shape[0] *
@@ -698,6 +746,7 @@ class MPPI:
         #rewards = np.array(rewards)
         pbar.close()
         self.reset()
+    
 
-        return states, traj_probs, actions,rewards
+        return states, traj_probs, actions,rewards,P_theta
 

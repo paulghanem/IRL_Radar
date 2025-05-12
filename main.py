@@ -62,9 +62,9 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=101,type=int,help="The number of epoch updates")
+parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=32,type=int,help="The number of hidden neurons")
+parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=1,type=int,help="The number of runs")
 
@@ -74,17 +74,19 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 
 
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
+parser.add_argument('--P', default=1e-1,type=float, help='rgcl initial covariance')
+parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
 
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="HalfCheetah-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="Ant",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument("--UB",default=False,type=bool,help="Upper bound loss  ")
 parser.add_argument("--online",default=False,type=bool,help="online version of bechmarks ")
 
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=200,type=int, help='Horizon for MPPI control')
+parser.add_argument('--horizon', default=10,type=int, help='Horizon for MPPI control')
 parser.add_argument('--num_traj', default=25,type=int, help='Number of MPPI control sequences samples to generate')
 
 
@@ -107,6 +109,8 @@ elif args.gail:
     method="gail"
 elif args.rgcl:
     method="rgcl"
+elif args.UB:
+    method="UB"
 else :
     method="gcl"
       
@@ -168,16 +172,17 @@ return_list, sum_of_cost_list = [], []
 mpc_method = "Single_FIM_3D_action_NN_MPPI"
 
 
-seeds=np.array([123])
+seeds=np.array([args.seed])
 args.runs=np.shape(seeds)[0]
 epoch_cost_runs=[]
 expert_cost_runs=[]
-epoch_cost_dir = osp.join('results','plotting',args.gym_env)
+epoch_cost_dir = osp.join('results',args.gym_env)
 for runs in range (args.runs):
     args.seed = int(seeds[runs])
     print(args.seed)
     epoch_cost=[]
     expert_cost=[]
+    
     for i in range(args.rirl_iterations):
         if i== 0:
             # policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
@@ -199,7 +204,7 @@ for runs in range (args.runs):
             demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps)
             states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
             if args.gym_env=="Ant":
-                states_d=states_d[:,:29]
+                states_d=states_d[:,:27]
            
     
             args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
@@ -263,11 +268,21 @@ for runs in range (args.runs):
             demo_trajs=[[states_d,actions_d,actions_d]]
             D_demo = preprocess_traj(demo_trajs, D_demo, is_Demo=True)
             D_demo=jnp.concatenate((D_demo[:,:args.s_dim],D_demo[:,args.s_dim:]),axis=1)
-    
+            
+            if args.rgcl:
+                flat_params, treedef = jax.tree_util.tree_flatten(params)
+                theta=jnp.concatenate([p.flatten() for p in flat_params])
+                #pdb.set_trace()
+                n_theta = len(theta)
+                P_theta = args.P * jnp.identity(n_theta)
+            
        
         if args.rgcl:
-            trajs = [policy.RGCL(args,params,state_train,D_demo,thetas)]
-            rewards=trajs[0][-1]
+            
+            trajs = [policy.RGCL(args,params,state_train,D_demo,P_theta,thetas)]
+            rewards=trajs[0][-2]
+            P_theta=trajs[0][-1]
+            print(P_theta)
             total_cost=rewards
         elif args.online:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
@@ -275,7 +290,6 @@ for runs in range (args.runs):
             total_cost=rewards
         else:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
-            
             rewards=trajs[0][-1]
             total_cost=rewards
             sample_trajs = [trajs[0][:-1]] #+ sample_trajs
@@ -330,8 +344,8 @@ for runs in range (args.runs):
         if np.remainder(i,10)==0:
             save_dir = f"{epoch_cost_dir}/{method}"
             os.makedirs(save_dir, exist_ok=True)
-            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_lr={args.lr}.npy",epoch_cost)
-            np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_lr={args.lr}.npy",expert_cost)
+            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
+            np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
             #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
             #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 
