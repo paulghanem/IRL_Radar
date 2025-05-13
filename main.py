@@ -77,7 +77,7 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-1,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
 
-parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
+parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=True,type=bool, help='sqil method flag (automatically turns sqil flag on)')
 parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns gail flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')

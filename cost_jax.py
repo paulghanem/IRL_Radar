@@ -135,9 +135,10 @@ def apply_model_SQIL(state_train, states, actions,states_expert,actions_expert,p
   
     def loss_fn(params):
  
-        costs_demo = state_train.apply_fn({'params': params}, states_expert)+1e-6
-        costs_samp = state_train.apply_fn({'params': params}, states)+1e-6
-        
+        costs_demo = state_train.apply_fn({'params': params}, states_expert[:-1])+1e-6
+        costs_demo_next = state_train.apply_fn({'params': params}, states_expert[1:])+1e-6
+        costs_samp = state_train.apply_fn({'params': params}, states[:-1])+1e-6
+        costs_samp_next = state_train.apply_fn({'params': params}, states[1:])+1e-6
 
         
 
@@ -153,11 +154,10 @@ def apply_model_SQIL(state_train, states, actions,states_expert,actions_expert,p
         # for i in range (costs_samp.shape[0]):
         #     g_samp=g_samp.at[i].set(jnp.pow((costs_samp[i]-costs_samp[i-1])-(costs_samp[i-1]-costs_samp[i-2]),2))
         #     g_mono_samp=g_mono_samp.at[i].set(jnp.pow(jnp.maximum(0,costs_samp[i]-costs_samp[i-1]-1),2))  
-        #delta_2_d=
-        #delta_2_s=
+        delta_2_d=jnp.mean(jnp.square(costs_demo-jnp.log((jnp.exp(costs_demo_next)))))
+        delta_2_s=np.mean(jnp.square(costs_samp-jnp.log((jnp.exp(costs_samp_next)))))
         
-        loss = jnp.mean(costs_demo) + \
-               jnp.log(jnp.mean(jnp.exp(-costs_samp)/(probs+1e-7)))
+        loss =  delta_2_d +delta_2_s
               
         return loss
       
