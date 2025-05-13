@@ -1,0 +1,53 @@
+2025-05-13 02:50:57.508348: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747104657.572269    4974 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747104657.585485    4974 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+E0513 02:51:37.138422    4974 cuda_dnn.cc:534] Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
+E0513 02:51:37.142093    4974 cuda_dnn.cc:538] Memory usage: 983040 bytes free, 16928342016 bytes total.
+E0513 02:51:37.258243    4974 cuda_dnn.cc:534] Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
+E0513 02:51:37.268881    4974 cuda_dnn.cc:538] Memory usage: 983040 bytes free, 16928342016 bytes total.
+E0513 02:51:38.878141    4974 cuda_dnn.cc:534] Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
+E0513 02:51:38.878750    4974 cuda_dnn.cc:538] Memory usage: 983040 bytes free, 16928342016 bytes total.
+E0513 02:51:38.922988    4974 cuda_dnn.cc:534] Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
+E0513 02:51:38.927640    4974 cuda_dnn.cc:538] Memory usage: 983040 bytes free, 16928342016 bytes total.
+[CudaDevice(id=0), CudaDevice(id=1), CudaDevice(id=2), CudaDevice(id=3)]
+Using AIRL:  False
+Using GAIL:  False
+Using RGCL:  True
+Experiment State @  2025-05-12 21:51:37.294331-05:00
+Experiment Saved @  results/experiment_134
+Experiment Settings Saved @  results/experiment_134
+jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ohowell_theaiinstitute_com/IRL_Radar/main.py", line 157, in <module>
+    mjx_model = mjx.put_model(model)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/mujoco/mjx/_src/io.py", line 214, in put_model
+    return _strip_weak_type(model)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/mujoco/mjx/_src/io.py", line 38, in _strip_weak_type
+    return jax.tree_util.tree_map(f, tree)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/tree_util.py", line 358, in tree_map
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/tree_util.py", line 358, in <genexpr>
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/mujoco/mjx/_src/io.py", line 35, in f
+    return leaf.astype(jax.dtypes.canonicalize_dtype(leaf.dtype))
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/numpy/array_methods.py", line 121, in _astype
+    return lax_numpy.astype(self, dtype, copy=copy, device=device)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/numpy/lax_numpy.py", line 5735, in astype
+    result = lax_internal._convert_element_type(
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/lax/lax.py", line 612, in _convert_element_type
+    return convert_element_type_p.bind(
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/core.py", line 463, in bind
+    return self.bind_with_trace(prev_trace, args, params)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/lax/lax.py", line 3254, in _convert_element_type_bind_with_trace
+    operand = core.Primitive.bind_with_trace(convert_element_type_p, trace, args, params)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/core.py", line 468, in bind_with_trace
+    return trace.process_primitive(self, args, params)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/core.py", line 954, in process_primitive
+    return primitive.impl(*args, **params)
+  File "/home/ohowell_theaiinstitute_com/miniconda3/envs/torch123/lib/python3.10/site-packages/jax/_src/dispatch.py", line 89, in apply_primitive
+    outs = fun(*args)
+jaxlib.xla_extension.XlaRuntimeError: FAILED_PRECONDITION: DNN library initialization failed. Look at the errors above for more details.

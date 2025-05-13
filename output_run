@@ -1,0 +1,48 @@
+2025-05-13 02:44:14.904938: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747104254.927935    3245 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747104254.935212    3245 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+usage: main.py [-h] [--seed SEED] [--N_steps N_STEPS]
+               [--rirl_iterations RIRL_ITERATIONS]
+               [--reward_fn_updates REWARD_FN_UPDATES]
+               [--hidden_dim HIDDEN_DIM] [--lambda_ LAMBDA_] [--runs RUNS]
+               [--results_savepath RESULTS_SAVEPATH]
+               [--experiment_name EXPERIMENT_NAME]
+               [--save_images | --no-save_images] [--lr LR] [--P P] [--Q Q]
+               [--sqil | --no-sqil] [--gail | --no-gail] [--airl | --no-airl]
+               [--rgcl | --no-rgcl] [--gym_env GYM_ENV] [--UB UB]
+               [--online ONLINE] [--horizon HORIZON] [--num_traj NUM_TRAJ]
+main.py: error: argument --seed: invalid int value: '{123..134}'
+[CudaDevice(id=0), CudaDevice(id=1), CudaDevice(id=2), CudaDevice(id=3)]
+2025-05-13 02:44:24.166020: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747104264.187587    3441 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747104264.194403    3441 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+usage: main.py [-h] [--seed SEED] [--N_steps N_STEPS]
+               [--rirl_iterations RIRL_ITERATIONS]
+               [--reward_fn_updates REWARD_FN_UPDATES]
+               [--hidden_dim HIDDEN_DIM] [--lambda_ LAMBDA_] [--runs RUNS]
+               [--results_savepath RESULTS_SAVEPATH]
+               [--experiment_name EXPERIMENT_NAME]
+               [--save_images | --no-save_images] [--lr LR] [--P P] [--Q Q]
+               [--sqil | --no-sqil] [--gail | --no-gail] [--airl | --no-airl]
+               [--rgcl | --no-rgcl] [--gym_env GYM_ENV] [--UB UB]
+               [--online ONLINE] [--horizon HORIZON] [--num_traj NUM_TRAJ]
+main.py: error: argument --seed: invalid int value: '{123..134}'
+[CudaDevice(id=0), CudaDevice(id=1), CudaDevice(id=2), CudaDevice(id=3)]
+2025-05-13 02:44:33.443297: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747104273.465739    3637 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747104273.472851    3637 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+usage: main.py [-h] [--seed SEED] [--N_steps N_STEPS]
+               [--rirl_iterations RIRL_ITERATIONS]
+               [--reward_fn_updates REWARD_FN_UPDATES]
+               [--hidden_dim HIDDEN_DIM] [--lambda_ LAMBDA_] [--runs RUNS]
+               [--results_savepath RESULTS_SAVEPATH]
+               [--experiment_name EXPERIMENT_NAME]
+               [--save_images | --no-save_images] [--lr LR] [--P P] [--Q Q]
+               [--sqil | --no-sqil] [--gail | --no-gail] [--airl | --no-airl]
+               [--rgcl | --no-rgcl] [--gym_env GYM_ENV] [--UB UB]
+               [--online ONLINE] [--horizon HORIZON] [--num_traj NUM_TRAJ]
+main.py: error: argument --seed: invalid int value: '{123..134}'
+[CudaDevice(id=0), CudaDevice(id=1), CudaDevice(id=2), CudaDevice(id=3)]
