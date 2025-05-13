@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for task in airl rgcl gail; do
-    for seed in {123..134}; do
+    for seed in {130..134}; do
         echo "Running task --$task with seed $seed"
         python main.py \
             --seed="$seed" \
