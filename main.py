@@ -77,13 +77,16 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-1,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
 
-parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=True,type=bool, help='sqil method flag (automatically turns sqil flag on)')
-parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns gail flag on)')
-parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
-parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument("--UB",default=False,type=bool,help="Upper bound loss  ")
-parser.add_argument("--online",default=False,type=bool,help="online version of bechmarks ")
+parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
+parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns gail flag on)')
+# %%
+parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
+
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+
+parser.add_argument("--online",default=True,type=bool,help="online version of bechmarks ")
 
 
 # ==================== MPPI CONFIGURATION ======================== #
@@ -105,17 +108,32 @@ print("Using GAIL: ",args.gail)
 print("Using RGCL: ",args.rgcl)
 
 if args.airl and not args.gail:
-    method="airl"
+    if args.online:
+        method="airl-online"
+    else:
+        method="airl"
 elif args.gail:
-    method="gail"
+    if args.online:
+        method="gail-online"
+    else:
+        method="gail"
 elif args.rgcl:
     method="rgcl"
 elif args.UB:
-    method="UB"
+    if args.online:
+        method="UB-online"
+    else:
+        method="UB"
 elif args.sqil:
-    method="sqil"
+    if args.online:
+        method="sqil-online"
+    else:
+        method="sqil"
 else :
-    method="gcl"
+    if args.online:
+        method="gcl-online"
+    else:
+        method="gcl"
       
     
 
@@ -289,7 +307,8 @@ for runs in range (args.runs):
             total_cost=rewards
         elif args.online:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]
-            rewards=trajs[0][-1]
+            rewards=trajs[0][-2]
+            state_train=trajs[0][-1]
             total_cost=rewards
         else:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]

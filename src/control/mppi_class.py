@@ -538,6 +538,7 @@ class MPPI:
     
                 if args.airl:
                     grads, loss = apply_model_AIRL(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
+                
                 else:
                     grads, loss = apply_model(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
     
@@ -548,8 +549,11 @@ class MPPI:
 
         self.reset()
    
-
-        return states, traj_probs, actions,rewards
+        if args.online:
+            return states, traj_probs, actions,rewards,state_train
+        else:
+            return states, traj_probs, actions,rewards
+            
 
     def RGCL(self, args, params, state_train, D_demo,P_theta, thetas=None):
 
