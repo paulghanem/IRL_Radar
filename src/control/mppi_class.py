@@ -674,6 +674,7 @@ class MPPI:
                 r = forward_reward - ctrl_cost+alive_bonus
                 r=r.reshape((1,1))
                 
+                            
             if args.gym_env == "Hopper":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=1
@@ -695,7 +696,6 @@ class MPPI:
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=1
                 if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
-                    break
                     alive_bonus=0
                 
                 ctrl_cost = 0.001 * np.sum(np.square(action))

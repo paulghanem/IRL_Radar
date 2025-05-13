@@ -23,7 +23,7 @@ import pdb
 from mujoco import mjx 
 
 # from experts.P_MPPI import P_MPPI
-from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model
+from cost_jax import CostNN, apply_model, apply_model_AIRL,update_model,apply_model_SQIL
 
 from src.objective_fns.cost_to_go_fns import get_cost
 from src.control.dynamics import get_state
@@ -77,7 +77,8 @@ parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-1,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
 
-parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns airl flag on)')
+parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
+parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=False,type=bool, help='gail method flag (automatically turns gail flag on)')
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
 parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
@@ -111,6 +112,8 @@ elif args.rgcl:
     method="rgcl"
 elif args.UB:
     method="UB"
+elif args.sqil:
+    method="sqil"
 else :
     method="gcl"
       
@@ -324,6 +327,9 @@ for runs in range (args.runs):
                 #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
                 if args.airl:
                     grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
+                elif args.sqil:
+                     grads, loss_IOC = apply_model_SQIL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                
                 else :
                     grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
     
@@ -344,7 +350,7 @@ for runs in range (args.runs):
         if np.remainder(i,10)==0:
             save_dir = f"{epoch_cost_dir}/{method}"
             os.makedirs(save_dir, exist_ok=True)
-            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}_break.npy",epoch_cost)
+            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
             np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
             #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
             #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
