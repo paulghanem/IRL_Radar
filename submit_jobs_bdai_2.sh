@@ -23,7 +23,7 @@ wait_for_gpu() {
 }
 
 # List of methods including empty
-for method in airl rgcl 
+for method in sqil ""
 do
   for seed in {123..134}
   do
