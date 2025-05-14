@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH --partition=gpu
+#SBATCH --nodes=1
+
+#SBATCH --gres=gpu:v100-sxm2:1
+#SBATCH --time=8:00:00
+#SBATCH --job-name=gpu_run
+#SBATCH --mem=4GB
+#SBATCH --ntasks=1
+#SBATCH --output=myjob.%j.out
+#SBATCH --error=myjob.%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ghanem.p@northeastern.edu
+
+
+
+module load cuda
+bash submit_jobs_bdai.sh
