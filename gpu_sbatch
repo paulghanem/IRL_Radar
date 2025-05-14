@@ -19,4 +19,4 @@ module load cuda
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate opa-ghanem-style
 
-python main.py --seed=$SEED --horizon=50 --N_steps=200 --gym_env=Walker2d  --lr=1e-4 --num_traj=500 --reward_fn_updates=15 --lambda_=0.01  --rirl_iterations=100  --Q=1e-4 --P=1e-2 --hidden_dim=16 --airl
+python main.py --seed=$SEED --horizon=50 --N_steps=200 --gym_env=Walker2d  --lr=1e-4 --num_traj=500 --reward_fn_updates=15 --lambda_=0.01  --rirl_iterations=100  --Q=1e-4 --P=1e-2 --hidden_dim=16 
