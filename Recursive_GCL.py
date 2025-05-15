@@ -94,7 +94,7 @@ parser.add_argument('--num_traj', default=250,type=int, help='Number of MPPI con
 parser.add_argument('--MPPI_iterations', default=25,type=int, help='Number of MPPI sub iterations (proposal adaptations)')
 
 # ==================== AIS  CONFIGURATION ======================== #
-parser.add_argument('--temperature', default=0.1,type=float, help='Temperature on the objective function. Lower temperature accentuates the differences between scores in MPPI')
+parser.add_argument('--temperature', default=0.01,type=float, help='Temperature on the objective function. Lower temperature accentuates the differences between scores in MPPI')
 parser.add_argument('--elite_threshold', default=0.9,type=float, help='Elite Threshold (between 0-1, where closer to 1 means reject most samaples)')
 parser.add_argument('--AIS_method', default="CE",type=str, help='Type of importance sampling. [CE,information]')
 
@@ -172,7 +172,7 @@ state_shape =((M*(dm//2),))
 
 # INITILIZING POLICY AND REWARD FUNCTION
 policy = P_MPPI(state_shape, n_actions)
-cost_f = CostNN(state_dims=state_shape[0])
+cost_f = CostNN(state_dims=state_shape[0],hidden_dim=128)
 #cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
 init_rng = jax.random.key(0)
 
@@ -212,8 +212,8 @@ FIM_predicted=[]
 epoch_time=[]
 for i in range(50):
     
-    if (i %10 ==0 and i >0) :
-         Q_theta=1e-1*Q_theta
+    #if (i %5 ==0 and i >0) :
+     #    Q_theta=1e-1*Q_theta
     if (i== 0): 
     
         demo_trajs,demo_trajs_sindy,FIM_demo=generate_demo_MPPI_single(args,state_train=None)
