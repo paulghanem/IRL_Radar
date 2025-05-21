@@ -1,0 +1,17 @@
+/var/spool/slurmd/job48804528/slurm_script: line 16: module: command not found
+2025-05-19 19:26:09.788685: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747697169.808963  174501 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747697169.815166  174501 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Traceback (most recent call last):
+  File "/home/howell.o/IRL_Radar/main.py", line 226, in <module>
+    states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
+  File "/home/howell.o/IRL_Radar/utils/helpers.py", line 144, in generate_demo
+    states,actions,rewards,env = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=seed)
+  File "/home/howell.o/IRL_Radar/utils/helpers.py", line 216, in generate_gymnax_demo
+    configs = load_config(base + ".yaml")
+  File "/home/howell.o/IRL_Radar/utils/helpers.py", line 37, in load_config
+    config = load_yaml(config_fname)
+  File "/home/howell.o/IRL_Radar/utils/helpers.py", line 33, in load_yaml
+    with open(config_fname) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'expert_agents/cartpole/ppo.yaml'

@@ -1,0 +1,17 @@
+/var/spool/slurmd/job48804551/slurm_script: line 16: module: command not found
+2025-05-19 19:29:14.896230: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1747697354.915552  138809 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1747697354.921681  138809 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+usage: main.py [-h] [--seed SEED] [--N_steps N_STEPS]
+               [--rirl_iterations RIRL_ITERATIONS]
+               [--reward_fn_updates REWARD_FN_UPDATES]
+               [--hidden_dim HIDDEN_DIM] [--lambda_ LAMBDA_] [--runs RUNS]
+               [--results_savepath RESULTS_SAVEPATH]
+               [--experiment_name EXPERIMENT_NAME]
+               [--save_images | --no-save_images] [--lr LR] [--P P] [--Q Q]
+               [--UB | --no-UB] [--sqil | --no-sqil] [--gail | --no-gail]
+               [--airl | --no-airl] [--rgcl | --no-rgcl] [--gym_env GYM_ENV]
+               [--online | --no-online] [--horizon HORIZON]
+               [--num_traj NUM_TRAJ]
+main.py: error: unrecognized arguments: --gcl

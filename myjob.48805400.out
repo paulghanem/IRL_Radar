@@ -1,0 +1,410 @@
+[CudaDevice(id=0)]
+Using AIRL:  True
+Using GAIL:  False
+Using RGCL:  False
+Experiment State @  2025-05-20 04:33:47.589793-05:00
+Experiment Saved @  results/experiment_134
+Experiment Settings Saved @  results/experiment_134
+134
+Loaded data from expert_agents/CartPole-v1/ppo.pkl.
+t: 0, State: [ 0.00827487  0.00103843 -0.02855914 -0.03856214], Action: -10.0, Reward: 1.0,Reward_sum: 1.0, Done: False
+==========
+t: 1, State: [ 0.00829564 -4.09586879 -0.02933038  6.09589746], Action: 10.0, Reward: 1.0,Reward_sum: 2.0, Done: False
+==========
+t: 2, State: [-0.07362174 -0.38942774  0.09258757  0.53000523], Action: 10.0, Reward: 1.0,Reward_sum: 3.0, Done: False
+==========
+t: 3, State: [-0.08141029  3.31427787  0.10318767 -4.97457594], Action: -10.0, Reward: 1.0,Reward_sum: 4.0, Done: False
+==========
+t: 4, State: [-0.01512474 -0.77908782  0.00369615  1.16309628], Action: 10.0, Reward: 1.0,Reward_sum: 5.0, Done: False
+==========
+t: 5, State: [-0.03070649  2.92817742  0.02695808 -4.39667692], Action: -10.0, Reward: 1.0,Reward_sum: 6.0, Done: False
+==========
+t: 6, State: [ 0.02785706 -1.16904382 -0.06097546  1.75484658], Action: 10.0, Reward: 1.0,Reward_sum: 7.0, Done: False
+==========
+t: 7, State: [ 0.00447618  2.53795525 -0.02587853 -3.81323392], Action: -10.0, Reward: 1.0,Reward_sum: 8.0, Done: False
+==========
+t: 8, State: [ 0.05523528 -1.5594011  -0.10214321  2.32313528], Action: 10.0, Reward: 1.0,Reward_sum: 9.0, Done: False
+==========
+t: 9, State: [ 0.02404726  2.14601489 -0.0556805  -3.23599721], Action: -10.0, Reward: 1.0,Reward_sum: 10.0, Done: False
+==========
+t: 10, State: [ 0.06696756 -1.95038943 -0.12040045  2.882725  ], Action: 10.0, Reward: 1.0,Reward_sum: 11.0, Done: False
+==========
+t: 11, State: [ 0.02795977  1.7537539  -0.06274595 -2.6685787 ], Action: -10.0, Reward: 1.0,Reward_sum: 12.0, Done: False
+==========
+t: 12, State: [ 0.06303485 -2.34216682 -0.11611752  3.44477676], Action: 10.0, Reward: 1.0,Reward_sum: 13.0, Done: False
+==========
+t: 13, State: [ 0.01619151  1.36182144 -0.04722198 -2.10785317], Action: -10.0, Reward: 1.0,Reward_sum: 14.0, Done: False
+==========
+t: 14, State: [ 0.04342794 -2.73460003 -0.08937905  4.0160512 ], Action: 10.0, Reward: 1.0,Reward_sum: 15.0, Done: False
+==========
+t: 15, State: [-0.01126406  0.97042757 -0.00905802 -1.54554892], Action: -10.0, Reward: 1.0,Reward_sum: 16.0, Done: False
+==========
+t: 16, State: [ 0.00814449 -3.12700002 -0.039969    4.59767731], Action: 10.0, Reward: 1.0,Reward_sum: 17.0, Done: False
+==========
+t: 17, State: [-0.05439551  0.57963255  0.05198454 -0.96957883], Action: -10.0, Reward: 1.0,Reward_sum: 18.0, Done: False
+==========
+t: 18, State: [-0.04280286 -3.51781547  0.03259297  5.18356697], Action: 10.0, Reward: 1.0,Reward_sum: 19.0, Done: False
+==========
+t: 19, State: [-0.11315917  0.18960067  0.13626431 -0.36502307], Action: -10.0, Reward: 1.0,Reward_sum: 20.0, Done: False
+==========
+t: 20, State: [-0.10936715 -3.90434496  0.12896385  5.7589092 ], Action: 10.0, Reward: 1.0,Reward_sum: 21.0, Done: True
+==========
+t: 21, State: [-0.04393272 -0.03199205 -0.04716688  0.04824621], Action: -10.0, Reward: 1.0,Reward_sum: 22.0, Done: False
+==========
+t: 22, State: [-0.04457257 -4.12821139 -0.04620195  6.17187988], Action: 10.0, Reward: 1.0,Reward_sum: 23.0, Done: False
+==========
+t: 23, State: [-0.12713679 -0.42252743  0.07723564  0.60570702], Action: 10.0, Reward: 1.0,Reward_sum: 24.0, Done: False
+==========
+t: 24, State: [-0.13558734  3.28210017  0.08934979 -4.91198338], Action: -10.0, Reward: 1.0,Reward_sum: 25.0, Done: False
+==========
+t: 25, State: [-0.06994534 -0.81224963 -0.00888988  1.23127645], Action: 10.0, Reward: 1.0,Reward_sum: 26.0, Done: False
+==========
+t: 26, State: [-0.08619033  2.89516035  0.01573565 -4.33223236], Action: -10.0, Reward: 1.0,Reward_sum: 27.0, Done: False
+==========
+t: 27, State: [-0.02828712 -1.20226392 -0.070909    1.81776922], Action: 10.0, Reward: 1.0,Reward_sum: 28.0, Done: False
+==========
+t: 28, State: [-0.0523324   2.50447683 -0.03455362 -3.74919918], Action: -10.0, Reward: 1.0,Reward_sum: 29.0, Done: False
+==========
+t: 29, State: [-2.24286596e-03 -1.59270495e+00 -1.09537600e-01  2.38274824e+00], Action: 10.0, Reward: 1.0,Reward_sum: 30.0, Done: False
+==========
+t: 30, State: [-0.03409697  2.1123252  -0.06188264 -3.17362894], Action: -10.0, Reward: 1.0,Reward_sum: 31.0, Done: False
+==========
+t: 31, State: [ 0.00814954 -1.98381195 -0.12535521  2.94063415], Action: 10.0, Reward: 1.0,Reward_sum: 32.0, Done: False
+==========
+t: 32, State: [-0.0315267   1.71999297 -0.06654253 -2.60823735], Action: -10.0, Reward: 1.0,Reward_sum: 33.0, Done: False
+==========
+t: 33, State: [ 2.87315932e-03 -2.37573279e+00 -1.18707278e-01  3.50220561e+00], Action: 10.0, Reward: 1.0,Reward_sum: 34.0, Done: False
+==========
+t: 34, State: [-0.0446415   1.32805263 -0.04866317 -2.0491928 ], Action: -10.0, Reward: 1.0,Reward_sum: 35.0, Done: False
+==========
+t: 35, State: [-0.01808044 -2.76830159 -0.08964702  4.0737632 ], Action: 10.0, Reward: 1.0,Reward_sum: 36.0, Done: False
+==========
+t: 36, State: [-0.07344648  0.93667191 -0.00817176 -1.48770143], Action: -10.0, Reward: 1.0,Reward_sum: 37.0, Done: False
+==========
+t: 37, State: [-0.05471304 -3.1607695  -0.03792579  4.655853  ], Action: 10.0, Reward: 1.0,Reward_sum: 38.0, Done: False
+==========
+t: 38, State: [-0.11792843  0.54589916  0.05519127 -0.91129932], Action: -10.0, Reward: 1.0,Reward_sum: 39.0, Done: False
+==========
+t: 39, State: [-0.10701044 -3.55149472  0.03696529  5.24165114], Action: 10.0, Reward: 1.0,Reward_sum: 40.0, Done: False
+==========
+t: 40, State: [-0.17804034  0.15591281  0.14179831 -0.30479583], Action: 10.0, Reward: 1.0,Reward_sum: 41.0, Done: False
+==========
+t: 41, State: [-0.17492208  3.85582922  0.13570239 -5.75741972], Action: -10.0, Reward: 1.0,Reward_sum: 42.0, Done: False
+==========
+t: 42, State: [-0.0978055  -0.23380222  0.020554    0.36040488], Action: 10.0, Reward: 1.0,Reward_sum: 43.0, Done: False
+==========
+t: 43, State: [-0.10248154  3.4731082   0.0277621  -5.1927438 ], Action: -10.0, Reward: 1.0,Reward_sum: 44.0, Done: False
+==========
+t: 44, State: [-0.03301938 -0.62388949 -0.07609278  0.95854562], Action: 10.0, Reward: 1.0,Reward_sum: 45.0, Done: False
+==========
+t: 45, State: [-0.04549717  3.08287911 -0.05692187 -4.60786779], Action: -10.0, Reward: 1.0,Reward_sum: 46.0, Done: False
+==========
+t: 46, State: [ 0.01616041 -1.0140755  -0.14907922  1.51088492], Action: 10.0, Reward: 1.0,Reward_sum: 47.0, Done: False
+==========
+t: 47, State: [-0.0041211   2.68903977 -0.11886152 -4.02584411], Action: -10.0, Reward: 1.0,Reward_sum: 48.0, Done: False
+==========
+t: 48, State: [ 0.0496597  -1.40449576 -0.19937841  2.03627187], Action: 10.0, Reward: 1.0,Reward_sum: 49.0, Done: False
+==========
+t: 49, State: [ 0.02156978  2.29418788 -0.15865297 -3.46007621], Action: -10.0, Reward: 1.0,Reward_sum: 50.0, Done: True
+==========
+t: 50, State: [-0.03905568 -0.0051727   0.02705556  0.03602114], Action: -10.0, Reward: 1.0,Reward_sum: 51.0, Done: False
+==========
+t: 51, State: [-0.03915914 -4.10290204  0.02777598  6.18831899], Action: 10.0, Reward: 1.0,Reward_sum: 52.0, Done: False
+==========
+t: 52, State: [-0.12121718 -0.39515475  0.15154236  0.63700842], Action: 10.0, Reward: 1.0,Reward_sum: 53.0, Done: False
+==========
+t: 53, State: [-0.12912027  3.30391349  0.16428253 -4.80362059], Action: -10.0, Reward: 1.0,Reward_sum: 54.0, Done: False
+==========
+t: 54, State: [-0.063042   -0.78427872  0.06821012  1.29418438], Action: 10.0, Reward: 1.0,Reward_sum: 55.0, Done: False
+==========
+t: 55, State: [-0.07872758  2.9209151   0.09409381 -4.23064398], Action: -10.0, Reward: 1.0,Reward_sum: 56.0, Done: False
+==========
+t: 56, State: [-0.02030928 -1.17370196  0.00948093  1.91173522], Action: 10.0, Reward: 1.0,Reward_sum: 57.0, Done: False
+==========
+t: 57, State: [-0.04378331  2.53348857  0.04771563 -3.64601331], Action: -10.0, Reward: 1.0,Reward_sum: 58.0, Done: False
+==========
+t: 58, State: [ 0.00688646 -1.56345507 -0.02520463  2.50643067], Action: 10.0, Reward: 1.0,Reward_sum: 59.0, Done: False
+==========
+t: 59, State: [-0.02438264  2.14389657  0.02492398 -3.06023986], Action: -10.0, Reward: 1.0,Reward_sum: 60.0, Done: False
+==========
+t: 60, State: [ 0.01849529 -1.9536078  -0.03628082  3.09143463], Action: 10.0, Reward: 1.0,Reward_sum: 61.0, Done: False
+==========
+t: 61, State: [-0.02057687  1.75353404  0.02554788 -2.47628297], Action: -10.0, Reward: 1.0,Reward_sum: 62.0, Done: False
+==========
+t: 62, State: [ 0.01449381 -2.3440447  -0.02397778  3.67558966], Action: 10.0, Reward: 1.0,Reward_sum: 63.0, Done: False
+==========
+t: 63, State: [-0.03238708  1.36314418  0.04953401 -1.890644  ], Action: -10.0, Reward: 1.0,Reward_sum: 64.0, Done: False
+==========
+t: 64, State: [-0.0051242  -2.73421834  0.01172113  4.26241835], Action: 10.0, Reward: 1.0,Reward_sum: 65.0, Done: False
+==========
+t: 65, State: [-0.05980857  0.97310114  0.0969695  -1.29473294], Action: -10.0, Reward: 1.0,Reward_sum: 66.0, Done: False
+==========
+t: 66, State: [-0.04034654 -3.12287415  0.07107484  4.84883089], Action: 10.0, Reward: 1.0,Reward_sum: 67.0, Done: False
+==========
+t: 67, State: [-0.10280403  0.5836882   0.16805146 -0.67609699], Action: 10.0, Reward: 1.0,Reward_sum: 68.0, Done: False
+==========
+t: 68, State: [-0.09113026  4.28114598  0.15452952 -6.09497715], Action: -10.0, Reward: 1.0,Reward_sum: 69.0, Done: False
+==========
+t: 69, State: [-0.00550734  0.19406681  0.03262997  0.00784056], Action: 10.0, Reward: 1.0,Reward_sum: 70.0, Done: False
+==========
+t: 70, State: [-1.62600579e-03  3.90062760e+00  3.27867847e-02 -5.53944954e+00], Action: -10.0, Reward: 1.0,Reward_sum: 71.0, Done: False
+==========
+t: 71, State: [ 0.07638655 -0.19609977 -0.07800221  0.61197649], Action: 10.0, Reward: 1.0,Reward_sum: 72.0, Done: False
+==========
+t: 72, State: [ 0.07246455  3.51065608 -0.06576268 -4.95416038], Action: -10.0, Reward: 1.0,Reward_sum: 73.0, Done: False
+==========
+t: 73, State: [ 0.14267767 -0.58624347 -0.16484588  1.15858495], Action: 10.0, Reward: 1.0,Reward_sum: 74.0, Done: False
+==========
+t: 74, State: [ 0.1309528   3.11588553 -0.14167418 -4.36757305], Action: -10.0, Reward: 1.0,Reward_sum: 75.0, Done: True
+==========
+t: 75, State: [ 0.03906365  0.02930726 -0.04157432 -0.04111059], Action: -10.0, Reward: 1.0,Reward_sum: 76.0, Done: False
+==========
+t: 76, State: [ 0.03964979 -4.06714045 -0.04239653  6.08603211], Action: 10.0, Reward: 1.0,Reward_sum: 77.0, Done: False
+==========
+t: 77, State: [-0.04169302 -0.36123479  0.07932411  0.51970796], Action: 10.0, Reward: 1.0,Reward_sum: 78.0, Done: False
+==========
+t: 78, State: [-0.04891771  3.34326827  0.08971827 -4.99627655], Action: -10.0, Reward: 1.0,Reward_sum: 79.0, Done: False
+==========
+t: 79, State: [ 0.01794765 -0.75098547 -0.01020726  1.14674533], Action: 10.0, Reward: 1.0,Reward_sum: 80.0, Done: False
+==========
+t: 80, State: [ 2.92794359e-03  2.95643662e+00  1.27276423e-02 -4.41709899e+00], Action: -10.0, Reward: 1.0,Reward_sum: 81.0, Done: False
+==========
+t: 81, State: [ 0.06205668 -1.14101604 -0.07561434  1.73232401], Action: 10.0, Reward: 1.0,Reward_sum: 82.0, Done: False
+==========
+t: 82, State: [ 0.03923636  2.56561242 -0.04096786 -3.83394112], Action: -10.0, Reward: 1.0,Reward_sum: 83.0, Done: False
+==========
+t: 83, State: [ 0.0905486  -1.53144615 -0.11764668  2.294449  ], Action: 10.0, Reward: 1.0,Reward_sum: 84.0, Done: False
+==========
+t: 84, State: [ 0.05991968  2.17320521 -0.0717577  -3.25862443], Action: -10.0, Reward: 1.0,Reward_sum: 85.0, Done: False
+==========
+t: 85, State: [ 0.10338378 -1.92253243 -0.13693019  2.84809293], Action: 10.0, Reward: 1.0,Reward_sum: 86.0, Done: False
+==========
+t: 86, State: [ 0.06493314  1.78059491 -0.07996833 -2.6947363 ], Action: -10.0, Reward: 1.0,Reward_sum: 87.0, Done: False
+==========
+t: 87, State: [ 0.10054503 -2.31447792 -0.13386306  3.40475698], Action: 10.0, Reward: 1.0,Reward_sum: 88.0, Done: False
+==========
+t: 88, State: [ 0.05425548  1.38840049 -0.06576792 -2.13910843], Action: -10.0, Reward: 1.0,Reward_sum: 89.0, Done: False
+==========
+t: 89, State: [ 0.08202349 -2.70721901 -0.10855008  3.97171733], Action: 10.0, Reward: 1.0,Reward_sum: 90.0, Done: False
+==========
+t: 90, State: [ 0.02787911  0.99679435 -0.02911574 -1.58345229], Action: -10.0, Reward: 1.0,Reward_sum: 91.0, Done: False
+==========
+t: 91, State: [ 0.04781499 -3.10016646 -0.06078478  4.55082546], Action: 10.0, Reward: 1.0,Reward_sum: 92.0, Done: False
+==========
+t: 92, State: [-0.01418834  0.60579215  0.03023173 -1.01570578], Action: -10.0, Reward: 1.0,Reward_sum: 93.0, Done: False
+==========
+t: 93, State: [-2.07249377e-03 -3.49189776e+00  9.91761002e-03  5.13690723e+00], Action: 10.0, Reward: 1.0,Reward_sum: 94.0, Done: False
+==========
+t: 94, State: [-0.07191045  0.21550572  0.11265575 -0.42100877], Action: -10.0, Reward: 1.0,Reward_sum: 95.0, Done: False
+==========
+t: 95, State: [-0.06760033 -3.8798508   0.10423558  5.7161364 ], Action: 10.0, Reward: 1.0,Reward_sum: 96.0, Done: True
+==========
+t: 96, State: [ 0.01418748  0.01122134  0.03860998 -0.04818514], Action: 10.0, Reward: 1.0,Reward_sum: 97.0, Done: False
+==========
+t: 97, State: [ 0.01441191  3.71758125  0.03764627 -5.59223311], Action: -10.0, Reward: 1.0,Reward_sum: 98.0, Done: False
+==========
+t: 98, State: [ 0.08876353 -0.37894618 -0.07419839  0.55926961], Action: 10.0, Reward: 1.0,Reward_sum: 99.0, Done: False
+==========
+t: 99, State: [ 0.08118461  3.32791797 -0.063013   -5.00752212], Action: -10.0, Reward: 1.0,Reward_sum: 100.0, Done: False
+==========
+t: 100, State: [ 0.14774297 -0.76909346 -0.16316344  1.10728468], Action: 10.0, Reward: 1.0,Reward_sum: 101.0, Done: False
+==========
+t: 101, State: [ 0.1323611   2.93317984 -0.14101774 -4.42012432], Action: -10.0, Reward: 1.0,Reward_sum: 102.0, Done: True
+==========
+t: 102, State: [-0.04761433  0.02356842 -0.01175826  0.03980446], Action: 10.0, Reward: 1.0,Reward_sum: 103.0, Done: False
+==========
+t: 103, State: [-0.04714296  3.73101659 -0.01096217 -5.52444021], Action: -10.0, Reward: 1.0,Reward_sum: 104.0, Done: False
+==========
+t: 104, State: [ 0.02747737 -0.36667755 -0.12145097  0.61850888], Action: 10.0, Reward: 1.0,Reward_sum: 105.0, Done: False
+==========
+t: 105, State: [ 0.02014382  3.33833984 -0.10908079 -4.93369873], Action: -10.0, Reward: 1.0,Reward_sum: 106.0, Done: False
+==========
+t: 106, State: [ 0.08691061 -0.75670327 -0.20775477  1.14035194], Action: 10.0, Reward: 1.0,Reward_sum: 107.0, Done: False
+==========
+t: 107, State: [ 0.07177655  2.94173332 -0.18494773 -4.34865035], Action: -10.0, Reward: 1.0,Reward_sum: 108.0, Done: True
+==========
+t: 108, State: [-0.00918174 -0.0058373   0.02102306 -0.00221119], Action: 10.0, Reward: 1.0,Reward_sum: 109.0, Done: False
+==========
+t: 109, State: [-0.00929849  3.7010585   0.02097884 -5.55514586], Action: -10.0, Reward: 1.0,Reward_sum: 110.0, Done: False
+==========
+t: 110, State: [ 0.06472268 -0.39603977 -0.09012408  0.59531654], Action: 10.0, Reward: 1.0,Reward_sum: 111.0, Done: False
+==========
+t: 111, State: [ 0.05680188  3.3103349  -0.07821775 -4.96814301], Action: -10.0, Reward: 1.0,Reward_sum: 112.0, Done: False
+==========
+t: 112, State: [ 0.12300858 -0.78616039 -0.17758061  1.1348401 ], Action: 10.0, Reward: 1.0,Reward_sum: 113.0, Done: False
+==========
+t: 113, State: [ 0.10728537  2.91497757 -0.15488381 -4.38149518], Action: -10.0, Reward: 1.0,Reward_sum: 114.0, Done: True
+==========
+t: 114, State: [ 0.01328214 -0.01300791 -0.02643729 -0.02563747], Action: 10.0, Reward: 1.0,Reward_sum: 115.0, Done: False
+==========
+t: 115, State: [ 0.01302198  3.69449856 -0.02695004 -5.59272548], Action: -10.0, Reward: 1.0,Reward_sum: 116.0, Done: False
+==========
+t: 116, State: [ 0.08691195 -0.40328068 -0.13880455  0.54378898], Action: 10.0, Reward: 1.0,Reward_sum: 117.0, Done: False
+==========
+t: 117, State: [ 0.07884634  3.30077329 -0.12792877 -4.9995318 ], Action: -10.0, Reward: 1.0,Reward_sum: 118.0, Done: True
+==========
+t: 118, State: [ 0.03352978 -0.02977405  0.00769527 -0.0242357 ], Action: -10.0, Reward: 1.0,Reward_sum: 119.0, Done: False
+==========
+t: 119, State: [ 0.0329343  -4.12742762  0.00721056  6.12432506], Action: 10.0, Reward: 1.0,Reward_sum: 120.0, Done: False
+==========
+t: 120, State: [-0.04961426 -0.41996421  0.12969706  0.5653944 ], Action: 10.0, Reward: 1.0,Reward_sum: 121.0, Done: False
+==========
+t: 121, State: [-0.05801354  3.28102414  0.14100495 -4.90143777], Action: -10.0, Reward: 1.0,Reward_sum: 122.0, Done: False
+==========
+t: 122, State: [ 0.00760694 -0.80932705  0.04297619  1.21451375], Action: 10.0, Reward: 1.0,Reward_sum: 123.0, Done: False
+==========
+t: 123, State: [-0.0085796   2.8969357   0.06726647 -4.32711608], Action: -10.0, Reward: 1.0,Reward_sum: 124.0, Done: False
+==========
+t: 124, State: [ 0.04935912 -1.19900518 -0.01927585  1.82266199], Action: 10.0, Reward: 1.0,Reward_sum: 125.0, Done: False
+==========
+t: 125, State: [ 0.02537901  2.50842502  0.01717739 -3.74311695], Action: -10.0, Reward: 1.0,Reward_sum: 126.0, Done: False
+==========
+t: 126, State: [ 0.07554751 -1.58905901 -0.05768495  2.40725227], Action: 10.0, Reward: 1.0,Reward_sum: 127.0, Done: False
+==========
+t: 127, State: [ 0.04376633  2.11785602 -0.00953991 -3.16082159], Action: -10.0, Reward: 1.0,Reward_sum: 128.0, Done: False
+==========
+t: 128, State: [ 0.08612345 -1.97963385 -0.07275634  2.98232884], Action: 10.0, Reward: 1.0,Reward_sum: 129.0, Done: False
+==========
+t: 129, State: [ 0.04653078  1.72665918 -0.01310976 -2.58377429], Action: -10.0, Reward: 1.0,Reward_sum: 130.0, Done: False
+==========
+t: 130, State: [ 0.08106396 -2.37074766 -0.06478525  3.55795367], Action: 10.0, Reward: 1.0,Reward_sum: 131.0, Done: False
+==========
+t: 131, State: [ 0.03364901  1.33555973  0.00637383 -2.00887816], Action: -10.0, Reward: 1.0,Reward_sum: 132.0, Done: False
+==========
+t: 132, State: [ 0.0603602  -2.76205538 -0.03380374  4.13929354], Action: 10.0, Reward: 1.0,Reward_sum: 133.0, Done: False
+==========
+t: 133, State: [ 0.00511909  0.94487135  0.04898213 -1.42785634], Action: -10.0, Reward: 1.0,Reward_sum: 134.0, Done: False
+==========
+t: 134, State: [ 0.02401652 -3.15257484  0.02042501  4.72533631], Action: 10.0, Reward: 1.0,Reward_sum: 135.0, Done: False
+==========
+t: 135, State: [-0.03903498  0.55478115  0.11493173 -0.8285332 ], Action: 10.0, Reward: 1.0,Reward_sum: 136.0, Done: False
+==========
+t: 136, State: [-0.02793935  4.25697864  0.09836107 -6.31147662], Action: -10.0, Reward: 1.0,Reward_sum: 137.0, Done: False
+==========
+t: 137, State: [ 0.05720022  0.16472022 -0.02786846 -0.17388766], Action: -10.0, Reward: 1.0,Reward_sum: 138.0, Done: False
+==========
+t: 138, State: [ 0.06049462 -3.93220935 -0.03134622  5.96092817], Action: 10.0, Reward: 1.0,Reward_sum: 139.0, Done: False
+==========
+t: 139, State: [-0.01814956 -0.22579588  0.08787235  0.39482487], Action: 10.0, Reward: 1.0,Reward_sum: 140.0, Done: False
+==========
+t: 140, State: [-0.02266548  3.47819346  0.09576884 -5.1139213 ], Action: -10.0, Reward: 1.0,Reward_sum: 141.0, Done: False
+==========
+t: 141, State: [ 0.04689839 -0.61555394 -0.00650958  1.02667445], Action: 10.0, Reward: 1.0,Reward_sum: 142.0, Done: False
+==========
+t: 142, State: [ 0.03458731  3.0918383   0.01402391 -4.53620989], Action: -10.0, Reward: 1.0,Reward_sum: 143.0, Done: False
+==========
+t: 143, State: [ 0.09642408 -1.00558329 -0.07670029  1.61344102], Action: 10.0, Reward: 1.0,Reward_sum: 144.0, Done: False
+==========
+t: 144, State: [ 0.07631241  2.70104244 -0.04443147 -3.952679  ], Action: -10.0, Reward: 1.0,Reward_sum: 145.0, Done: False
+==========
+t: 145, State: [ 0.13033326 -1.39596776 -0.12348505  2.17371265], Action: 10.0, Reward: 1.0,Reward_sum: 146.0, Done: False
+==========
+t: 146, State: [ 0.1024139   2.30842233 -0.0800108  -3.37677374], Action: -10.0, Reward: 1.0,Reward_sum: 147.0, Done: False
+==========
+t: 147, State: [ 0.14858235 -1.78697093 -0.14754627  2.72316535], Action: 10.0, Reward: 1.0,Reward_sum: 148.0, Done: False
+==========
+t: 148, State: [ 0.11284293  1.91551292 -0.09308296 -2.81343936], Action: -10.0, Reward: 1.0,Reward_sum: 149.0, Done: False
+==========
+t: 149, State: [ 0.15115319 -2.17885032 -0.14935175  3.2741913 ], Action: 10.0, Reward: 1.0,Reward_sum: 150.0, Done: False
+==========
+t: 150, State: [ 0.10757618  1.52302352 -0.08386793 -2.26055051], Action: -10.0, Reward: 1.0,Reward_sum: 151.0, Done: False
+==========
+t: 151, State: [ 0.13803665 -2.57165545 -0.12907894  3.83525139], Action: 10.0, Reward: 1.0,Reward_sum: 152.0, Done: False
+==========
+t: 152, State: [ 0.08660355  1.13115594 -0.05237391 -1.71060339], Action: -10.0, Reward: 1.0,Reward_sum: 153.0, Done: False
+==========
+t: 153, State: [ 0.10922666 -2.96498336 -0.08658598  4.40978973], Action: 10.0, Reward: 1.0,Reward_sum: 154.0, Done: False
+==========
+t: 154, State: [ 0.049927    0.73990132  0.00160982 -1.15214277], Action: -10.0, Reward: 1.0,Reward_sum: 155.0, Done: False
+==========
+t: 155, State: [ 0.06472502 -3.35767988 -0.02143304  4.99469435], Action: 10.0, Reward: 1.0,Reward_sum: 156.0, Done: False
+==========
+t: 156, State: [-0.00242857  0.34929829  0.07846085 -0.57079661], Action: -10.0, Reward: 1.0,Reward_sum: 157.0, Done: False
+==========
+t: 157, State: [ 4.55739115e-03 -3.74751679e+00  6.70449185e-02  5.57856422e+00], Action: 10.0, Reward: 1.0,Reward_sum: 158.0, Done: False
+==========
+t: 158, State: [-0.07039294 -0.04034179  0.1786162   0.04999136], Action: 10.0, Reward: 1.0,Reward_sum: 159.0, Done: False
+==========
+t: 159, State: [-0.07119978  3.65593095  0.17961603 -5.35397455], Action: -10.0, Reward: 1.0,Reward_sum: 160.0, Done: False
+==========
+t: 160, State: [ 0.00191884 -0.4296136   0.07253654  0.72827575], Action: 10.0, Reward: 1.0,Reward_sum: 161.0, Done: False
+==========
+t: 161, State: [-0.00667343  3.27528049  0.08710205 -4.79314463], Action: -10.0, Reward: 1.0,Reward_sum: 162.0, Done: False
+==========
+t: 162, State: [ 0.05883218 -0.81930624 -0.00876084  1.35102732], Action: 10.0, Reward: 1.0,Reward_sum: 163.0, Done: False
+==========
+t: 163, State: [ 0.04244605  2.88810005  0.01825971 -4.21244436], Action: -10.0, Reward: 1.0,Reward_sum: 164.0, Done: False
+==========
+t: 164, State: [ 0.10020805 -1.20930669 -0.06598918  1.93800924], Action: 10.0, Reward: 1.0,Reward_sum: 165.0, Done: False
+==========
+t: 165, State: [ 0.07602192  2.497533   -0.02722899 -3.62953517], Action: -10.0, Reward: 1.0,Reward_sum: 166.0, Done: False
+==========
+t: 166, State: [ 0.12597258 -1.59976535 -0.0998197   2.50612981], Action: 10.0, Reward: 1.0,Reward_sum: 167.0, Done: False
+==========
+t: 167, State: [ 0.09397727  2.1056706  -0.0496971  -3.05365473], Action: -10.0, Reward: 1.0,Reward_sum: 168.0, Done: False
+==========
+t: 168, State: [ 0.13609068 -1.99089104 -0.1107702   3.06899608], Action: 10.0, Reward: 1.0,Reward_sum: 169.0, Done: False
+==========
+t: 169, State: [ 0.09627286  1.71367349 -0.04939027 -2.48629408], Action: -10.0, Reward: 1.0,Reward_sum: 170.0, Done: False
+==========
+t: 170, State: [ 0.13054633 -2.38274747 -0.09911616  3.63632944], Action: 10.0, Reward: 1.0,Reward_sum: 171.0, Done: False
+==========
+t: 171, State: [ 0.08289138  1.32205083 -0.02638957 -1.92268582], Action: -10.0, Reward: 1.0,Reward_sum: 172.0, Done: False
+==========
+t: 172, State: [ 0.1093324  -2.7750183  -0.06484328  4.21302043], Action: 10.0, Reward: 1.0,Reward_sum: 173.0, Done: False
+==========
+t: 173, State: [ 0.05383203  0.93096546  0.01941712 -1.35332309], Action: -10.0, Reward: 1.0,Reward_sum: 174.0, Done: False
+==========
+t: 174, State: [ 0.07245134 -3.16672619 -0.00764934  4.797764  ], Action: 10.0, Reward: 1.0,Reward_sum: 175.0, Done: False
+==========
+t: 175, State: [ 0.00911682  0.54051292  0.08830594 -0.76518087], Action: -10.0, Reward: 1.0,Reward_sum: 176.0, Done: False
+==========
+t: 176, State: [ 0.01992708 -3.55592626  0.07300233  5.38146384], Action: 10.0, Reward: 1.0,Reward_sum: 177.0, Done: False
+==========
+t: 177, State: [-0.05119145  0.15096539  0.1806316  -0.14262012], Action: 10.0, Reward: 1.0,Reward_sum: 178.0, Done: False
+==========
+t: 178, State: [-0.04817214  3.84702308  0.1777792  -5.54368932], Action: -10.0, Reward: 1.0,Reward_sum: 179.0, Done: False
+==========
+t: 179, State: [ 0.02876832 -0.23838305  0.06690541  0.53982606], Action: 10.0, Reward: 1.0,Reward_sum: 180.0, Done: False
+==========
+t: 180, State: [ 0.02400066  3.4667846   0.07770193 -4.98583536], Action: -10.0, Reward: 1.0,Reward_sum: 181.0, Done: False
+==========
+t: 181, State: [ 0.09333635 -0.62819828 -0.02201477  1.1609268 ], Action: 10.0, Reward: 1.0,Reward_sum: 182.0, Done: False
+==========
+t: 182, State: [ 8.07723869e-02  3.07927401e+00  1.20376345e-03 -4.40540590e+00], Action: -10.0, Reward: 1.0,Reward_sum: 183.0, Done: False
+==========
+t: 183, State: [ 0.14235787 -1.018281   -0.08690435  1.74127608], Action: 10.0, Reward: 1.0,Reward_sum: 184.0, Done: False
+==========
+t: 184, State: [ 0.12199225  2.68797643 -0.05207883 -3.82264774], Action: -10.0, Reward: 1.0,Reward_sum: 185.0, Done: False
+==========
+t: 185, State: [ 0.17575178 -1.40876884 -0.12853179  2.29883439], Action: 10.0, Reward: 1.0,Reward_sum: 186.0, Done: False
+==========
+t: 186, State: [ 0.1475764   2.29525761 -0.0825551  -3.24905877], Action: -10.0, Reward: 1.0,Reward_sum: 187.0, Done: False
+==========
+t: 187, State: [ 0.19348155 -1.79993647 -0.14753628  2.84856797], Action: 10.0, Reward: 1.0,Reward_sum: 188.0, Done: False
+==========
+t: 188, State: [ 0.15748282  1.90244805 -0.09056492 -2.68789462], Action: -10.0, Reward: 1.0,Reward_sum: 189.0, Done: False
+==========
+t: 189, State: [ 0.19553178 -2.1920081  -0.14432281  3.40203006], Action: 10.0, Reward: 1.0,Reward_sum: 190.0, Done: False
+==========
+t: 190, State: [ 0.15169162  1.51012291 -0.07628221 -2.13571656], Action: -10.0, Reward: 1.0,Reward_sum: 191.0, Done: False
+==========
+t: 191, State: [ 0.18189408 -2.58494722 -0.11899654  3.96662024], Action: 10.0, Reward: 1.0,Reward_sum: 192.0, Done: False
+==========
+t: 192, State: [ 0.13019513  1.11841902 -0.03966413 -1.58404775], Action: -10.0, Reward: 1.0,Reward_sum: 193.0, Done: False
+==========
+t: 193, State: [ 0.15256351 -2.97819944 -0.07134509  4.54438865], Action: 10.0, Reward: 1.0,Reward_sum: 194.0, Done: False
+==========
+t: 194, State: [ 0.09299953  0.72732335  0.01954268 -1.02071304], Action: -10.0, Reward: 1.0,Reward_sum: 195.0, Done: False
+==========
+t: 195, State: [ 1.07545993e-01 -3.37038346e+00 -8.71576563e-04  5.13041866e+00], Action: 10.0, Reward: 1.0,Reward_sum: 196.0, Done: False
+==========
+t: 196, State: [ 0.04013832  0.33692352  0.1017368  -0.43079594], Action: 10.0, Reward: 1.0,Reward_sum: 197.0, Done: False
+==========
+t: 197, State: [ 0.04687679  4.04001512  0.09312088 -5.92685279], Action: -10.0, Reward: 1.0,Reward_sum: 198.0, Done: False
+==========
+t: 198, State: [ 0.1276771  -0.05309734 -0.02541618  0.21355305], Action: 10.0, Reward: 1.0,Reward_sum: 199.0, Done: False
+==========
+t: 199, State: [ 0.12661515  3.65440775 -0.02114512 -5.35337999], Action: -10.0, Reward: 1.0,Reward_sum: 200.0, Done: False
+==========
+CartPole-v1 - Steps: 200, Return: 200.0, State: [ 0.12661515  3.65440775 -0.02114512 -5.35337999]
