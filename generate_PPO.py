@@ -14,21 +14,21 @@ os.makedirs(model_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 sb3_algo="PPO"
 TIMESTEPS = 25000
-env_name="Ant"
+env_name="Humanoid"
 # Create environment (you can also try "Ant-v4", "Humanoid-v4", etc.)
 env = gym.make(env_name,exclude_current_positions_from_observation=False,render_mode="human")
 train=True
-load=True
+load=False
 if train==True:
     iterations=0
     model = PPO("MlpPolicy", env, verbose=1)
 elif load:
-    iterations=100
+    iterations=299
     model = PPO.load((f"{model_dir}/{env_name}/{sb3_algo}_{TIMESTEPS * iterations}"))
 # Train PPO agent
 
 
-while iterations<300:
+while iterations<600:
     iterations+=1
     model.learn(total_timesteps=TIMESTEPS)
     model.save(f"{model_dir}/{env_name}/{sb3_algo}_{TIMESTEPS * iterations}")
