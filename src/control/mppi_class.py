@@ -437,6 +437,7 @@ class MPPI:
                 action_seq=jnp.array(action_seq,dtype=jnp.float64)
                 if self.gym_env=="Humanoid":
                     pos_before = mass_center(self.mjx_model,state)
+                pdb.set_trace()
                 state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
                 if self.gym_env=="Humanoid":
                     pos_after = mass_center(self.mjx_model,state)
@@ -542,9 +543,11 @@ class MPPI:
                 alive_bonus=5
                 if state[2] <1 or state[2]>2:
                     alive_bonus=0
-                
+                #pdb.set_trace()
+                quad_impact_cost = 0.5e-6 * np.square(self.mjx_data.cfrc_ext).sum()
+                quad_impact_cost = min(quad_impact_cost, 10)
                 ctrl_cost = 0.1 * np.sum(np.square(action))
-                r = 1.25*forward_reward - ctrl_cost + alive_bonus
+                r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
                 r=r.reshape((1,1))                
                 
                 
@@ -743,9 +746,10 @@ class MPPI:
                 alive_bonus=5
                 if state[2] <1 or state[2]>2:
                     alive_bonus=0
-                
+                quad_impact_cost = 0.5e-6 * np.square(self.mjx_data.cfrc_ext).sum()
+                quad_impact_cost = min(quad_impact_cost, 10)
                 ctrl_cost = 0.1 * np.sum(np.square(action))
-                r = 1.25*forward_reward - ctrl_cost + alive_bonus
+                r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
                 r=r.reshape((1,1))   
            
             #rewards.append(true_cost_fn(state))
