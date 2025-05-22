@@ -67,6 +67,12 @@ def mjx_step(mjx_model, mjx_data, state,action,gym_env):
         # Advance simulation
         mjx_data = mjx.step(mjx_model, mjx_data)
         res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+    elif gym_env=="Humanoid":
+        mjx_data = mjx_data.replace(qpos=state[:24],qvel=state[24:],ctrl=action)
+
+        # Advance simulation
+        mjx_data = mjx.step(mjx_model, mjx_data)
+        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
     
     elif gym_env=="Hopper":
         mjx_data = mjx_data.replace(qpos=state[:6],qvel=state[6:],ctrl=action)
