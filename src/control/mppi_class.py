@@ -266,7 +266,7 @@ class MPPI:
         #pdb.set_trace()
         
         
-        if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d",'Humanoid']:
+        if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
             if self.gym_env in ["Ant"]:
                 state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
             initial_state =  jnp.tile(state,(self._num_samples,1))
@@ -346,7 +346,7 @@ class MPPI:
             self, state, action_seqs
     ):
         
-        if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]: 
+        if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
             initial_state=state
             if self.gym_env in ["Ant"]:
                 initial_state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
@@ -394,7 +394,7 @@ class MPPI:
             env, env_params = gymnax.make(env)
             _, rng_reset = jax.random.split(key)
             env_state = env.reset(rng_reset, env_params)
-        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]:
+        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
             self.mjx_data = mjx.make_data(self.mjx_model)
         else:
             env = gym.make(env)
@@ -430,16 +430,15 @@ class MPPI:
             # _,_, reward, _, _= env.step(
             #     rng_step, env_state, action_seq[0,:], env_params
             # )
-            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]: 
+            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
                 if self.gym_env in ["Ant"]:
                     state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
                 state=jnp.array(state,dtype=jnp.float64)
                 action_seq=jnp.array(action_seq,dtype=jnp.float64)
-                if self.gym_env=="Humanoid":
+                if self.gym_env=="Humanoid-v4":
                     pos_before = mass_center(self.mjx_model,state)
-                pdb.set_trace()
                 state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-                if self.gym_env=="Humanoid":
+                if self.gym_env=="Humanoid-v4":
                     pos_after = mass_center(self.mjx_model,state)
                 if self.gym_env in ["Ant"]:
                     state=state[2:]
@@ -454,7 +453,7 @@ class MPPI:
                     #state=state[1:]
                 elif self.gym_env=="Ant":
                     forward_reward=state[13]
-                elif self.gym_env=="Humanoid":
+                elif self.gym_env=="Humanoid-v4":
                     forward_reward=(pos_after - pos_before) / 0.003
             else:
                 state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
@@ -538,7 +537,7 @@ class MPPI:
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
-            if args.gym_env == "Humanoid":
+            if args.gym_env == "Humanoid-v4":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=5
                 if state[2] <1 or state[2]>2:
@@ -605,7 +604,7 @@ class MPPI:
             env, env_params = gymnax.make(env)
             _, rng_reset = jax.random.split(key)
             env_state = env.reset(rng_reset, env_params)
-        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]:
+        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
             self.mjx_data = mjx.make_data(self.mjx_model)
         else:
             env = gym.make(env)
@@ -636,15 +635,15 @@ class MPPI:
             #     f"State = {state} , Action = {action_seq[0].flatten()} , Total True Cost = {total_cost:.4f} , Cost True = {step_cost:.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
             # pbar.update(1)
 
-            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]: 
+            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
                if self.gym_env in ["Ant"]:
                     state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
                state=jnp.array(state,dtype=jnp.float64)
                action_seq=jnp.array(action_seq,dtype=jnp.float64)
-               if self.gym_env=="Humanoid":
+               if self.gym_env=="Humanoid-v4":
                    pos_before = mass_center(self.mjx_model,state)
                state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-               if self.gym_env=="Humanoid":
+               if self.gym_env=="Humanoid-v4":
                    pos_after = mass_center(self.mjx_model,state)
                if self.gym_env in ["Ant"]:
                   state=state[2:]
@@ -659,7 +658,7 @@ class MPPI:
                    #state=state[1:]
                elif self.gym_env=="Ant":
                    forward_reward=state[15]
-               elif self.gym_env=="Humanoid":
+               elif self.gym_env=="Humanoid-v4":
                    forward_reward=(pos_after - pos_before) / 0.003
             else:
                state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
@@ -741,7 +740,7 @@ class MPPI:
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
-            if args.gym_env == "Humanoid":
+            if args.gym_env == "Humanoid-v4":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=5
                 if state[2] <1 or state[2]>2:

@@ -137,7 +137,7 @@ class GenerateDemo(object):
 
 
     def generate_demo(self,seed=123):
-        if self.env_name in ["MountainCarContinuous-v0","HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]:
+        if self.env_name in ["MountainCarContinuous-v0","HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
             states,actions,rewards,env = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
             
         else:

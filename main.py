@@ -84,7 +84,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Humanoid",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="Humanoid-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
 
@@ -160,7 +160,7 @@ with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as ou
     json.dump(vars(args), outfile)
 
 assets_dir="assets"
-if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]:
+if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
     if args.gym_env=="HalfCheetah-v4":
         env_xml = "half_cheetah.xml"
     elif args.gym_env=="Ant":
@@ -169,8 +169,8 @@ if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid"]:
         env_xml = "hopper.xml"
     elif args.gym_env=="Walker2d":
         env_xml = "walker2d.xml"
-    elif args.gym_env=="Humanoid":
-        env_xml = "Humanoid.xml"
+    elif args.gym_env=="Humanoid-v4":
+        env_xml = "humanoid.xml"
 
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
@@ -228,7 +228,7 @@ for runs in range (args.runs):
             states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
             if args.gym_env=="Ant":
                 states_d=states_d[:,:27]
-            if args.gym_env=="Humanoid":
+            if args.gym_env=="Humanoid-v4":
                 states_d=states_d[:,:47]
            
     
