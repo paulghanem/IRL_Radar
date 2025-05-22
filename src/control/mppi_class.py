@@ -75,7 +75,7 @@ def mass_center(model,state):
     mass = np.expand_dims(model.body_mass, axis=1)  # shape: (nbody, 1)
     
     # data.xpos contains the global positions of the body frames (shape: nbody x 3)
-    xpos = state[:22]  # shape: (nbody, 3)
+    xpos = state[:24]  # shape: (nbody, 3)
 
     # Compute center of mass as the weighted average of body positions
     com = np.sum(mass * xpos, axis=0) / np.sum(mass)
@@ -540,7 +540,7 @@ class MPPI:
             if args.gym_env == "Humanoid":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=5
-                if state[0] <1 or state[0]>2:
+                if state[2] <1 or state[2]>2:
                     alive_bonus=0
                 
                 ctrl_cost = 0.1 * np.sum(np.square(action))
@@ -741,7 +741,7 @@ class MPPI:
             if args.gym_env == "Humanoid":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=5
-                if state[0] <1 or state[0]>2:
+                if state[2] <1 or state[2]>2:
                     alive_bonus=0
                 
                 ctrl_cost = 0.1 * np.sum(np.square(action))
