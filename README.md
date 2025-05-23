@@ -1,11 +1,13 @@
 # Recursive Deep Inverse Reinforcement Learning (RDIRL)
-This repo is a working implementation of Recursive Deep Inverse Reinforcement Learning, Currently, it supports the `CartPole-v1` and `MountainCarContinuous-v0` environments.
+This repo is a working implementation of Recursive Deep Inverse Reinforcement Learning, Currently, it supports the `CartPole-v1`,`MountainCarContinuous-v0` `HalfCheetah-v4`,`Hopper` and `Walker2d`environments.
 
 ## How to run:
 
 ```bash
 $ python main.py --horizon=85 --N_steps=150 --gym_env=MountainCarContinuous-v0 --lr=1e-4 --num_traj=3500 --reward_fn_updates=15 --lambda_=0.001 --rirl_iterations=10 --rgcl                    
 $ python main.py --horizon=50 --N_steps=150 --gym_env=CartPole-v1 --lr=1e-4 --num_traj=2000 --reward_fn_updates=15 --lambda_=0.01 --rirl_iterations=10 --rgcl                          
+$ python main.py --horizon=50 --N_steps=200 --gym_env=HalfCheetah-v4 --lr=1e-4 --num_traj=500 --reward_fn_updates=15 --lambda_=0.01 --rirl_iterations=100 --rgcl                          
+
 ```
 - use flags:  <br />
  --rgcl for RDIRL <br />
@@ -18,9 +20,6 @@ $ python main.py --horizon=50 --N_steps=150 --gym_env=CartPole-v1 --lr=1e-4 --nu
 - [main.py](main.py): Implementation of RDIRL and other benchmarking methods, main file to be ran.
 
 
-## Results:
--[results/plotting/](results/plotting/): resulting reward functions <br />
--[per_episode_reward_IRL_gym.pdf](per_episode_reward_IRL_gym.pdf): resulting plots
 
 
 ## How to install required packages
