@@ -11,8 +11,9 @@ $ python main.py --horizon=50 --N_steps=200 --gym_env=HalfCheetah-v4 --lr=1e-4 -
 ```
 - use flags:  <br />
  --rgcl for RDIRL <br />
- --airl for GAN-GCL <br />
+ --airl for AIRL <br />
  --gail for GAIL <br />
+ --online add online flag for Online adaptation
    no flag for GCL
 ## Description of files:
 - [generating_expert.py](generating_expert.py): Generates an expert on CartPole, by training vanilla policy gradient, and finally stores trained trajecteries as expert samples at [expert_samples](expert_samples).
