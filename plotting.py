@@ -43,7 +43,7 @@ for env in gymenvs:
         episode_length=first_array.shape[0]
         j=3
         for file in files:
-            if env== 'Walker2d' and method in ['gcl','airl','gail'] and j in [7,8,13,14]:
+            if env== 'Walker2d' and method in ['gcl','airl','gail'] :
                     continue
             
             results[method+'_cost']= np.concatenate((results[method+'_cost'],np.load(file).reshape((-1,1))),axis=1)
@@ -52,7 +52,7 @@ for env in gymenvs:
         first_array = np.load(files[0])[-1][-1]*np.ones((episode_length,1))
         results[method + '_expert_cost'] = first_array 
         for file in files:  
-            if env== 'Walker2d' and method in ['gcl','airl','gail'] and j in [7,8,13,14]:
+            if env== 'Walker2d' and method in ['gcl','airl','gail'] :
                     continue
             results[method+'_expert_cost']= np.concatenate(( results[method+'_expert_cost'],np.load(file)[-1][-1]*np.ones((episode_length,1))),axis=1)
     
