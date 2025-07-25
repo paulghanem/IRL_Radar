@@ -8,7 +8,7 @@ from jax.random import multivariate_normal
 
 from src.control.dynamics import kinematics,kinematics_mujoco
 from src.objective_fns.cost_to_go_fns import get_cost
-from cost_jax import get_gradients,get_hessian
+from cost_jax import get_gradients,get_hessian,get_hessian_diag,get_precond,fisher_diag
 
 import os.path as osp
 
@@ -25,9 +25,18 @@ from mujoco import mjx
 
 @jax.jit
 def update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s):
+      
     P_theta = jnp.linalg.inv(jnp.linalg.inv(P_theta + Q_theta) + hessian_d - hessian_s)
     #P_theta = jnp.linalg.inv( hessian_d - hessian_s)
     theta = theta - jnp.matmul(P_theta, gradient_d - gradient_s)
+    return theta,P_theta
+
+@jax.jit
+def update_theta_diag(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s):
+    
+    P_theta = 1/(1/(P_theta + Q_theta) + hessian_d - hessian_s)
+    theta = theta - P_theta*(gradient_d - gradient_s)
+    
     return theta,P_theta
 def load_config(config_fname, seed_id=0, lrate=None):
     """Load training configuration and random seed of experiment."""
@@ -592,9 +601,14 @@ class MPPI:
         theta=jnp.concatenate([p.flatten() for p in flat_params])
         #pdb.set_trace()
         n_theta = len(theta)
-        P_theta = args.P * jnp.identity(n_theta)
+        if args.diagonal:
+            P_theta = args.P * jnp.ones(n_theta)
+            Q_theta = args.Q* jnp.ones(n_theta)
 
-        Q_theta = args.Q* jnp.identity(n_theta)
+        else:   
+            P_theta = args.P * jnp.identity(n_theta)
+    
+            Q_theta = args.Q* jnp.identity(n_theta)
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)
@@ -762,12 +776,26 @@ class MPPI:
 
             gradient_s = get_gradients(state_train, params, state, args.N_steps)
             gradient_d = get_gradients(state_train, params, states_expert[step - 1], args.N_steps)
-            hessian_s = get_hessian(state_train, params, state, args.N_steps)
-            hessian_d = get_hessian(state_train, params, states_expert[step - 1], args.N_steps)
+            if args.diagonal:
+                #hessian_s = get_hessian_diag(state_train, params, state, args.N_steps)
+                #hessian_d = get_hessian_diag(state_train, params, states_expert[step - 1], args.N_steps)
+                hessian_s = fisher_diag(gradient_s)
+                hessian_d = fisher_diag(gradient_d)
+                
+            else:
+                #hessian_s = get_hessian(state_train, params, state, args.N_steps)
+                #hessian_d = get_hessian(state_train, params, states_expert[step - 1], args.N_steps)
+                hessian_s = fisher_diag(gradient_s)
+                hessian_d = fisher_diag(gradient_d)
+            #hessian_s= get_precond(gradient_s,state_train,params,state,args.N_steps)
+            #hessian_d= get_precond(gradient_d,state_train, params, states_expert[step - 1], args.N_steps)
 
         
             #pdb.set_trace()
-            theta,P_theta= update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
+            if args.diagonal:
+                theta,P_theta= update_theta_diag(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
+            else:
+                theta,P_theta= update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
 
             #print(P_theta)
             # params['Dense_0']['bias'] = theta[:len(params['Dense_0']['bias'])]

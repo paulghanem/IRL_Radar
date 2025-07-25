@@ -1,5 +1,3 @@
-
-
 from flax.training import train_state,checkpoints
 import flax 
 import optax
@@ -62,11 +60,11 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
+parser.add_argument("--rirl_iterations",default=35,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
+parser.add_argument("--hidden_dim",default=12,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
-parser.add_argument("--runs",default=1,type=int,help="The number of runs")
+parser.add_argument("--runs",default=10,type=int,help="The number of runs")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
 parser.add_argument('--experiment_name', default="experiment",type=str, help='Name of folder to save temporary images to make GIFs')
@@ -84,14 +82,15 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Humanoid-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
-parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
+parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=True,type=bool,help="online version of bechmarks ")
 
+parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=True,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=10,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=25,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -307,7 +306,7 @@ for runs in range (args.runs):
             trajs = [policy.RGCL(args,params,state_train,D_demo,P_theta,thetas)]
             rewards=trajs[0][-2]
             P_theta=trajs[0][-1]
-            print(P_theta)
+            #print(P_theta)
             total_cost=rewards
         elif args.online:
             trajs = [policy.generate_session(args,state_train,D_demo,thetas)]

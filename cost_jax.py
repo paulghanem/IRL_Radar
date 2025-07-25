@@ -15,6 +15,7 @@ import optax
 from functools import partial
 import pdb
 from jax.tree_util import tree_flatten, tree_unflatten
+from jax.flatten_util import ravel_pytree
 #import tensorflow_datasets as tfds
 
 
@@ -34,6 +35,47 @@ class CostNN(nn.Module):
     x = nn.Dense(self.out_features)(x)
     x = jnp.clip(x**2,min=0,max=5) #
     return x
+
+
+class PositionalEncoding(nn.Module):
+    dim: int
+
+    @nn.compact
+    def __call__(self, x):
+        seq_len = x.shape[1]
+        pos = jnp.arange(seq_len)[..., None]
+        i = jnp.arange(self.dim)[None, ...]
+        angle_rates = 1 / jnp.power(10000, (2 * (i//2)) / self.dim)
+        angle_rads = pos * angle_rates
+        pos_encoding = jnp.where(i % 2 == 0, jnp.sin(angle_rads), jnp.cos(angle_rads))
+        return x + pos_encoding[None, :, :]
+
+# class CostNN(nn.Module):
+#     state_dims: int
+#     hidden_dim: int
+#     num_heads: int = 4
+#     num_layers: int = 2
+#     out_features: int = 1
+
+#     @nn.compact
+#     def __call__(self, x):
+#         # x shape: (batch, seq_len, state_dims)
+#         x = nn.Dense(self.hidden_dim)(x)
+#         x = PositionalEncoding(self.hidden_dim)(x)
+
+#         for _ in range(self.num_layers):
+#             x = nn.SelfAttention(num_heads=self.num_heads, qkv_features=self.hidden_dim)(x)
+#             x = nn.LayerNorm()(x)
+#             x = nn.Dense(self.hidden_dim)(x)
+#             x = nn.relu(x)
+
+#         # Pool across sequence dimension
+#         x = jnp.mean(x, axis=1)  # shape (batch, hidden_dim)
+
+#         x = nn.Dense(self.out_features)(x)
+#         x = jnp.clip(x**2, 0, 5)
+#         return x
+
 
 
 def cost_fn(state_train,params,states,N):
@@ -236,6 +278,62 @@ def get_hessian(state_train,params,state,N_steps):
     hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1),jnp.concatenate(Dense_2_bias_h[0],axis=1),jnp.concatenate(Dense_2_kernel_h[0],axis=1)),axis=0)
     #flat_hessian, tree_def = tree_flatten(d2c_d2_theta)
    # hessian=jnp.concatenate([p.flatten() for p in flat_hessian])
+
+    return hessian
+
+# @jax.jit 
+# def get_hessian_diag(state_train,params,state,N_steps):
+#     d2c_d2_theta=jax.hessian(cost_fn,argnums=1)(state_train,params,state.reshape(1,-1),N_steps)
+#     Dense_0_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['bias'])
+#     Dense_0_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['kernel'])
+#     Dense_1_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['bias'])
+#     Dense_1_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['kernel'])
+#     Dense_2_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['bias'])
+#     Dense_2_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['kernel'])
+    
+#     for j in range(len(Dense_0_bias_h[0])):
+#         Dense_0_bias_h[0][j]=Dense_0_bias_h[0][j].reshape((Dense_0_bias_h[0][j].shape[0],-1))
+#         Dense_1_bias_h[0][j]=Dense_1_bias_h[0][j].reshape((Dense_1_bias_h[0][j].shape[0],-1))
+#         Dense_2_bias_h[0][j]=Dense_2_bias_h[0][j].reshape((Dense_2_bias_h[0][j].shape[0],-1))
+#         Dense_0_kernel_h[0][j]=Dense_0_kernel_h[0][j].reshape((Dense_0_kernel_h[0][j].shape[0]*Dense_0_kernel_h[0][j].shape[1],-1))
+#         Dense_1_kernel_h[0][j]=Dense_1_kernel_h[0][j].reshape((Dense_1_kernel_h[0][j].shape[0]*Dense_1_kernel_h[0][j].shape[1],-1))
+#         Dense_2_kernel_h[0][j]=Dense_2_kernel_h[0][j].reshape((Dense_2_kernel_h[0][j].shape[0]*Dense_2_kernel_h[0][j].shape[1],-1))
+    
+#     hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1),jnp.concatenate(Dense_2_bias_h[0],axis=1),jnp.concatenate(Dense_2_kernel_h[0],axis=1)),axis=0)
+
+#     hessian = jnp.diag(hessian)
+#     return hessian
+
+@jax.jit
+def get_hessian_diag(state_train, params, state, N_steps):
+    # Flatten the parameter PyTree
+    flat_params, unravel_fn = ravel_pytree(params)
+
+    # Define scalar cost as function of flat params
+    def scalar_cost(flat_params):
+        unflat_params = unravel_fn(flat_params)
+        return cost_fn(state_train, unflat_params, state.reshape(1, -1), N_steps)
+
+    # Efficient diagonal Hessian extraction using directional derivatives
+    def diag_hessian(f, x):
+        def fi(i):
+            ei = jnp.zeros_like(x).at[i].set(1.0)
+            # Compute second derivative in the direction ei, then extract i-th component
+            return jax.jvp(jax.grad(f), (x,), (ei,))[1][i]
+        return jax.vmap(fi)(jnp.arange(x.shape[0]))
+
+    # Compute diagonal
+    diag = diag_hessian(scalar_cost, flat_params)
+    return diag  # Shape: [num_params]
+
+@jax.jit
+def fisher_diag(grad):
+    return jax.tree_util.tree_map(lambda g: g**2, grad)
+
+@jax.jit 
+def get_precond(gradients,state_train,params,state,N_steps):
+    gradients=gradients.reshape((-1,1))
+    hessian=gradients@gradients.T
     return hessian
 
 @jax.jit
