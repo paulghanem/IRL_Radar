@@ -777,10 +777,10 @@ class MPPI:
             gradient_s = get_gradients(state_train, params, state, args.N_steps)
             gradient_d = get_gradients(state_train, params, states_expert[step - 1], args.N_steps)
             if args.diagonal:
-                #hessian_s = get_hessian_diag(state_train, params, state, args.N_steps)
-                #hessian_d = get_hessian_diag(state_train, params, states_expert[step - 1], args.N_steps)
-                hessian_s = fisher_diag(gradient_s)
-                hessian_d = fisher_diag(gradient_d)
+                hessian_s = get_hessian_diag(state_train, params, state, args.N_steps)
+                hessian_d = get_hessian_diag(state_train, params, states_expert[step - 1], args.N_steps)
+                #hessian_s = fisher_diag(gradient_s)
+                #hessian_d = fisher_diag(gradient_d)
                 
             else:
                 #hessian_s = get_hessian(state_train, params, state, args.N_steps)
