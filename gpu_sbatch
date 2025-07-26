@@ -2,7 +2,7 @@
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 
-#SBATCH --gres=gpu:h200:1
+#SBATCH --gres=gpu:v100-pcie:1
 #SBATCH --time=8:00:00
 #SBATCH --job-name=gpu_run
 #SBATCH --mem=4GB
