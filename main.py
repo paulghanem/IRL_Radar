@@ -74,6 +74,7 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-1,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
+parser.add_argument('--sigma', default=0.0,type=float, help='noise level')
 
 parser.add_argument("--UB",action=argparse.BooleanOptionalAction,default=False,type=bool,help="Upper bound loss  ")
 parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
@@ -84,9 +85,9 @@ parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
 parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 
-parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=True,type=bool,help="online version of bechmarks ")
+parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
 
-parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=True,type=bool,help="diagonal version of hessians ")
+parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
 parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')

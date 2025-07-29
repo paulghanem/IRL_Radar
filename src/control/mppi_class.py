@@ -22,6 +22,7 @@ import gymnasium as gym
 import pdb
 from cost_jax import apply_model, apply_model_AIRL, update_model
 from mujoco import mjx 
+import random
 
 @jax.jit
 def update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s):
@@ -573,7 +574,8 @@ class MPPI:
 
             if args.online:
                 state_expert,prob_expert, action_expert = D_demo[step,:args.s_dim], D_demo[step,args.s_dim], D_demo[step,args.s_dim+1:]
-    
+                noise = np.random.randn(*np.shape(state_expert)) * args.sigma* np.abs(state_expert)
+                state_expert=noise+state_expert
                 if args.airl:
                     grads, loss = apply_model_AIRL(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
                 
