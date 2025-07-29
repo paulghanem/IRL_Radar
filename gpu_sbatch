@@ -17,4 +17,4 @@ module load cuda
 source /shared/centos7/anaconda3/2022.05/etc/profile.d/conda.sh
 
 conda activate opa-ghanem-style
-python main.py --seed=$SEED --UB  --horizon=50 --N_steps=200 --gym_env=HalfCheetah-v4  --lr=1e-4 --num_traj=500 --reward_fn_updates=15 --lambda_=0.01  --rirl_iterations=100  --Q=1e-4 --P=1e-1 --hidden_dim=16 --online
+python main.py --seed=$SEED --UB  --horizon=50 --N_steps=150 --gym_env=HalfCheetah-v4  --lr=1e-3 --num_traj=2000 --reward_fn_updates=15 --lambda_=0.001  --rirl_iterations=20  --Q=1e-4 --P=1e-1 --hidden_dim=16 --online
