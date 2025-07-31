@@ -119,6 +119,8 @@ elif args.gail:
         method="gail"
 elif args.rgcl:
     method="rgcl"
+    if args.diagonal:
+        method="rgcl-diagonal"
 elif args.UB:
     if args.online:
         method="UB-online"
@@ -134,6 +136,7 @@ else :
         method="gcl-online"
     else:
         method="gcl"
+
       
     
 
