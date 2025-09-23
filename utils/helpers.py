@@ -190,7 +190,8 @@ class GenerateDemo(object):
            
             model=PPO("MlpPolicy", env,verbose=1)
             base = osp.join(self.base,"PPO.zip")
-        model = model.load(base, env)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.load(base, env,device)
        
 
 

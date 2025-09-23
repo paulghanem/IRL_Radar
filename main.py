@@ -235,6 +235,12 @@ for runs in range (args.runs):
             #
             # states_d,actions_d,_ =generate_demo(
             #     env, env_params, model, model_params,max_frames=DEMO_BATCH,seed=args.seed)
+           # fname = f"expert_demo_{args.gym_env}_seed{args.seed}.npz"
+           # data = np.load(fname)
+           # states_d = data["states"]
+           # actions_d = data["actions"]
+           # rewards_demo = data["rewards"]
+            #env=data["env"]
             demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps_expert)
             states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
             print("rewards_demo",rewards_demo)
