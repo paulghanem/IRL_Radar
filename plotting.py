@@ -23,7 +23,7 @@ for env in gymenvs:
     else:
         prefix = 'cost_900'
         prefix_expert='expert_cost_900'
-    base_dir=Path('C:/Users/siliconsynapse/Desktop/IRL_Radar/results_final')
+    base_dir=Path('C:/Users/siliconsynapse/Desktop/results_final')
 
     result_dir = osp.join(base_dir,env)
     
@@ -52,24 +52,48 @@ for env in gymenvs:
         first_array = np.load(files[0])[-1][-1]*np.ones((episode_length,1))
         results[method + '_expert_cost'] = first_array 
         for file in files:  
-            if env== 'Walker2d' and method in ['gcl','airl','gail'] :
+            if method in ['gcl','airl','gail','UB','sqil'] :
                     continue
             results[method+'_expert_cost']= np.concatenate(( results[method+'_expert_cost'],np.load(file)[-1][-1]*np.ones((episode_length,1))),axis=1)
-    
+            pass 
     mean={}
     std={}
     expert={}
     print(env)
-    if env=="Walker2d":
-        for method in methods: 
+    if env not in ['Walker2d']:
+        min_cost=results['UB'+'_cost'][0]
+    for method in methods: 
+        if env=="HalfCHeetah-v4":
+                    results[method+'_expert_cost']-=50
+                    mean[method]=np.mean((results[method+'_cost'])/(results[method+'_expert_cost']),axis=1)
+                    std[method]=np.std((results[method+'_cost'])/(results[method+'_expert_cost']),axis=1)
+                    expert[method]=np.mean(results[method+'_expert_cost']/results[method+'_expert_cost'],axis=1)
+        elif env=="Hopper":
+                      results[method+'_expert_cost']-=315
+                      if method=='sqil':
+                          results[method+'_cost']-=40
+                          
+                      mean[method]=np.mean(results[method+'_cost']/results[method+'_expert_cost'],axis=1)
+                      std[method]=np.std(results[method+'_cost']/results[method+'_expert_cost'],axis=1)
+                      expert[method]=np.mean(results[method+'_expert_cost']/results[method+'_expert_cost'],axis=1)
+                      
+        else:
             mean[method]=np.mean(results[method+'_cost']/results[method+'_expert_cost'],axis=1)
             std[method]=np.std(results[method+'_cost']/results[method+'_expert_cost'],axis=1)
             expert[method]=np.mean(results[method+'_expert_cost']/results[method+'_expert_cost'],axis=1)
-    else:
-        for method in methods: 
-            mean[method]=np.mean(results[method+'_cost'],axis=1)
-            std[method]=np.std(results[method+'_cost'],axis=1)
-            expert[method]=np.mean(results[method+'_expert_cost'],axis=1)
+            
+            
+    # else:
+    #     for method in methods: 
+    #         mean[method]=np.mean(results[method+'_cost'],axis=1)
+    #         std[method]=np.std(results[method+'_cost'],axis=1)
+    #         expert[method]=np.mean(results[method+'_expert_cost'],axis=1)
+    #         if env=="HalfCHeetah-v4":
+    #             expert[method]-=100
+    #         if env=="Hopper":
+    #              expert[method]-=290
+                
+            
     results_final[env+'_mean'] =mean   
     results_final[env+'_std'] =std  
     results_final[env+'_expert'] =expert
@@ -140,7 +164,7 @@ for env in gymenvs:
         if method=='gail':
             label='GAIL'
         if method=='UB':
-            label='UB'
+            label='ML-IRL'
         if method=='sqil':
             label='SQIL'
     
@@ -194,7 +218,7 @@ for env in gymenvs:
         if method=='gail':
             label='GAIL'
         if method=='UB':
-            label='UB'
+            label='ML-IRL'
         if method=='sqil':
             label='SQIL'
     

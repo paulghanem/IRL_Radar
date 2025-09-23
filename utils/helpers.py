@@ -184,9 +184,9 @@ class GenerateDemo(object):
             base = osp.join(self.base,f"{env_name}.zip")
         else:
             if self.env_name =="Ant":
-                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=True, render_mode='rgb_array'),max_steps=max_frames)
+                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=True),max_steps=max_frames)
             else:  
-                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False, render_mode='rgb_array'),max_steps=max_frames)
+                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
            
             model=PPO("MlpPolicy", env,verbose=1)
             base = osp.join(self.base,"PPO.zip")
@@ -208,8 +208,10 @@ class GenerateDemo(object):
 
             state_seq.append(obs.ravel())
             #action = fast_predict(model, obs)
+            with torch.no_grad():
+   
 
-            action, _states = model.predict(obs, deterministic=True)
+                action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, info = vec_env.step(action)
 
 
@@ -218,8 +220,8 @@ class GenerateDemo(object):
             reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)
-            #print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
-            #print(10 * "=")
+            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
+            print(10 * "=")
             t_counter += 1
             if t_counter == max_frames:
                 break
