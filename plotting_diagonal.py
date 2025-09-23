@@ -9,10 +9,10 @@ import pdb
 import os.path as osp
 from pathlib import Path
 
-gymenvs=['HalfCHeetah-v4']
+gymenvs=['CartPole-v1','HalfCHeetah-v4']
 #gymenvs=['CartPole-v1']
 i=0
-fig, ax1 = plt.subplots(1, 1, figsize=(15, 5)) 
+fig, ax1 = plt.subplots(1, 2, figsize=(15, 5)) 
 means_table={}
 std_table={}
 results_final={}
@@ -23,7 +23,7 @@ for env in gymenvs:
     else:
         prefix = 'cost_900'
         prefix_expert='expert_cost_900'
-    base_dir=Path('C:/Users/siliconsynapse/Desktop/IRL_Radar/results')
+    base_dir=Path('C:/Users/siliconsynapse/Desktop/IRL_Radar/results - Copy')
 
     result_dir = osp.join(base_dir,env)
     
@@ -45,6 +45,8 @@ for env in gymenvs:
         for file in files:
             if env== 'Walker2d' and method in ['gcl','airl','gail'] :
                     continue
+            if env== 'CartPole-v1' and method=='rgcl-diagonal' and j>3:
+                continue
                 
             
             
@@ -116,7 +118,7 @@ for env in gymenvs:
 
 
 # Cre79ate figure and first axis
-gymenvs=['HalfCHeetah-v4']
+gymenvs=['CartPole-v1','HalfCHeetah-v4']
 for env in gymenvs:
     mean= results_final[env+'_mean']
     std=results_final[env+'_std']
@@ -148,25 +150,25 @@ for env in gymenvs:
         if method=='sqil':
             label='SQIL'
     
-        ax1.plot( x,mean[method],label=label)
+        ax1[i].plot( x,mean[method],label=label)
         if method=='gail':
-            ax1.plot( x,expert[method],label='Expert')
-        ax1.fill_between(x, mean[method]-std[method],mean[method]+std[method],alpha=0.1)
-        ax1.set_xlabel('Episodes',fontsize=13)
-        ax1.grid(True, which='both', axis='both', linestyle='--', color='gray', alpha=0.5)
+            ax1[i].plot( x,expert[method],label='Expert')
+        ax1[i].fill_between(x, mean[method]-std[method],mean[method]+std[method],alpha=0.1)
+        ax1[i].set_xlabel('Episodes',fontsize=13)
+        ax1[i].grid(True, which='both', axis='both', linestyle='--', color='gray', alpha=0.5)
 
         # Format x-axis dates
         fig.autofmt_xdate()
-    ax1.set_title(env,fontsize=13)
+    ax1[i].set_title(env,fontsize=13)
         #ax1[i].set_xticks([1,2,3,4,5,6,7,8,9,10]) 
     i=i+1
 #plt.xticks([5])
 y_label = fig.supylabel('Reward', fontsize=16, x=0.07) 
 plt.subplots_adjust(wspace=0.25,hspace=.5)
-handles, labels = ax1.get_legend_handles_labels()
+handles, labels = ax1[0].get_legend_handles_labels()
 legend=fig.legend(handles,labels,bbox_to_anchor=(0.5, -0.05),loc='lower center',ncol=7,fontsize=14)
 plt.subplots_adjust(wspace=0.4, hspace=3) 
-plt.savefig('per_episode_reward_IRL_HalfCheetah_diagonal.pdf',bbox_extra_artists=(legend,y_label),bbox_inches='tight')
+plt.savefig('per_episode_reward_IRL_mujoco_diagonal.pdf',bbox_extra_artists=(legend,y_label),bbox_inches='tight')
 plt.show()
 
 

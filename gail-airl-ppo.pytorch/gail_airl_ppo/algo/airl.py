@@ -31,8 +31,8 @@ class AIRL(PPO):
             gamma=gamma,
             hidden_units_r=units_disc_r,
             hidden_units_v=units_disc_v,
-            hidden_activation_r=nn.ReLU(inplace=True),
-            hidden_activation_v=nn.ReLU(inplace=True)
+            hidden_activation_r=nn.ReLU(inplace=False),
+            hidden_activation_v=nn.ReLU(inplace=False)
         ).to(device)
 
         self.learning_steps_disc = 0
@@ -40,7 +40,7 @@ class AIRL(PPO):
         self.batch_size = batch_size
         self.epoch_disc = epoch_disc
 
-    def update(self, writer,step):
+    def update(self, step):
         self.learning_steps += 1
 
         for _ in range(self.epoch_disc):
@@ -63,7 +63,7 @@ class AIRL(PPO):
             # Update discriminator.
             self.update_disc(
                 states, dones, log_pis, next_states, states_exp,
-                dones_exp, log_pis_exp, next_states_exp, writer
+                dones_exp, log_pis_exp, next_states_exp
             )
 
         # We don't use reward signals here,
@@ -77,11 +77,11 @@ class AIRL(PPO):
 
         # Update PPO using estimated rewards.
         self.update_ppo(
-            states, actions, rewards, dones, log_pis, next_states, writer)
+            states, actions, rewards, dones, log_pis, next_states)
 
     def update_disc(self, states, dones, log_pis, next_states,
                     states_exp, dones_exp, log_pis_exp,
-                    next_states_exp, writer):
+                    next_states_exp):
         # Output of discriminator is (-inf, inf), not [0, 1].
         logits_pi = self.disc(states, dones, log_pis, next_states)
         logits_exp = self.disc(
@@ -91,19 +91,19 @@ class AIRL(PPO):
         loss_pi = -F.logsigmoid(-logits_pi).mean()
         loss_exp = -F.logsigmoid(logits_exp).mean()
         loss_disc = loss_pi + loss_exp
-        print(loss_disc)
+        #print(loss_disc)
 
         self.optim_disc.zero_grad()
         loss_disc.backward()
         self.optim_disc.step()
 
         if self.learning_steps_disc % self.epoch_disc == 0:
-            writer.add_scalar(
-                'loss/disc', loss_disc.item(), self.learning_steps)
+            #writer.add_scalar(
+                #'loss/disc', loss_disc.item(), self.learning_steps)
 
             # Discriminator's accuracies.
             with torch.no_grad():
                 acc_pi = (logits_pi < 0).float().mean().item()
                 acc_exp = (logits_exp > 0).float().mean().item()
-            writer.add_scalar('stats/acc_pi', acc_pi, self.learning_steps)
-            writer.add_scalar('stats/acc_exp', acc_exp, self.learning_steps)
+           # writer.add_scalar('stats/acc_pi', acc_pi, self.learning_steps)
+            #writer.add_scalar('stats/acc_exp', acc_exp, self.learning_steps)

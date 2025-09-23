@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import torch
+import pdb
 
 
 class SerializedBuffer:
@@ -58,6 +59,7 @@ class Buffer(SerializedBuffer):
             (buffer_size, *state_shape), dtype=torch.float, device=device)
 
     def append(self, state, action, reward, done, next_state):
+       
         self.states[self._p].copy_(torch.from_numpy(state))
         self.actions[self._p].copy_(torch.from_numpy(action))
         self.rewards[self._p] = float(reward)

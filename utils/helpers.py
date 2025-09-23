@@ -103,6 +103,29 @@ import gymnasium as gym
 from gymnasium import Wrapper
 
 
+import torch
+import numpy as np
+
+def fast_predict(model, obs, device="cpu", deterministic=True):
+    """
+    Faster replacement for SB3's model.predict().
+    - Skips VecEnv wrapping/unwrapping
+    - Skips numpy <-> torch overhead
+    - Returns torch tensor (no .numpy() sync)
+    """
+    policy = model.policy
+    obs = np.array(obs)  # ensure numpy
+    if obs.ndim == 1:    # add batch dimension
+        obs = obs[None, :]
+
+    obs_tensor = torch.as_tensor(obs, device=device, dtype=torch.float32)
+    with torch.no_grad():
+        actions, _, _ = policy(obs_tensor, deterministic=deterministic)
+
+    return actions.squeeze(0)  # remove batch dim
+
+
+
 class CustomTerminationWrapper(Wrapper):
     def __init__(self, env, max_steps=200):
         super().__init__(env)
@@ -183,6 +206,7 @@ class GenerateDemo(object):
         while True:
 
             state_seq.append(obs.ravel())
+            #action = fast_predict(model, obs)
 
             action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, info = vec_env.step(action)
@@ -193,8 +217,8 @@ class GenerateDemo(object):
             reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)
-            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
-            print(10 * "=")
+            #print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
+            #print(10 * "=")
             t_counter += 1
             if t_counter == max_frames:
                 break
@@ -259,8 +283,8 @@ class GenerateDemo(object):
             reward_sum=np.sum(reward_seq)
 
             # print(t_counter, obs, reward, action, done)
-            print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
-            print(10 * "=")
+            #print(f"t: {t_counter}, State: {obs}, Action: {action}, Reward: {reward},Reward_sum: {reward_sum}, Done: {done}")
+            #print(10 * "=")
             t_counter += 1
             if env.name == "MountainCarContinuous-v0":
                 if done:

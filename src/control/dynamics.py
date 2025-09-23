@@ -89,6 +89,35 @@ def mjx_step(mjx_model, mjx_data, state,action,gym_env):
         res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
     return res
 
+@partial(jax.jit, static_argnames=("gym_env"))
+def mjx_step_lax(mjx_model, mjx_data,action,gym_env):
+    """
+    JAX-compatible MJX step function.
+
+    Args:
+        mjx_model (mjx.Model): The MJX-compiled MuJoCo model.
+        mjx_data (mjx.Data): Current simulation data (state).
+        action (jnp.ndarray): Control input to apply.
+
+    Returns:
+        mjx.Data: Updated simulation state.
+    """
+
+    
+    action = jnp.asarray(action, dtype=mjx_data.ctrl.dtype)
+   
+    mjx_data = mjx_data.replace(ctrl=action)
+    #def body(_,d):
+     #   return mjx.step(mjx_model, d)
+
+    def body(d, _):
+        return mjx.step(mjx_model, d), None
+    mjx_data, _ = lax.scan(body, mjx_data, None, length=1)
+    #mjx_data= lax.fori_loop(0, 5, body, mjx_data)
+   
+    forward_vel = mjx_data.qvel[0]
+    obs = jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
+    return mjx_data, obs, forward_vel
 def mountaincar_step(
     state,action
 ):
@@ -242,6 +271,7 @@ def get_step_model(env_name,env):
     if env_name == "MountainCarContinuous-v0":
         return mountaincar_step
     else:
+        #return mjx_step
         return mjx_step
 
 
@@ -291,6 +321,15 @@ def kinematics(state, action, step_fn):
 #     states = scan_out
 #     return states
 
+@partial(jax.jit, static_argnames=("step_fn","gym_env"))
+def kinematics_mujoco_lax(mjx_model,mjx_data,action, step_fn,gym_env):
+    
+    def do_step(data, a):
+        data, obs, fwd = step_fn(mjx_model, data, a, gym_env)
+        return data, (obs, fwd)
+
+    mjx_data, (obs_seq, fwd_seq) = lax.scan(do_step, mjx_data, action)
+    return mjx_data, obs_seq, fwd_seq
 
 @partial(jax.jit, static_argnames=("step_fn","gym_env"))
 def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):

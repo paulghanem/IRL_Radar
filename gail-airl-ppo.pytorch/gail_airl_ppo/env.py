@@ -1,6 +1,6 @@
-import gym
+import gymnasium as gym
 
-gym.logger.set_level(40)
+#gym.logger.set_level(40)
 
 
 def make_env(env_id):

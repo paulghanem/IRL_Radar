@@ -3,14 +3,14 @@ import argparse
 import torch
 
 from gail_airl_ppo.env import make_env
-from gail_airl_ppo.algo import SACExpert
+from gail_airl_ppo.algo import SACExpert,PPOExpert
 from gail_airl_ppo.utils import collect_demo
 
 
 def run(args):
     env = make_env(args.env_id)
 
-    algo = SACExpert(
+    algo = PPOExpert(
         state_shape=env.observation_space.shape,
         action_shape=env.action_space.shape,
         device=torch.device("cuda" if args.cuda else "cpu"),
@@ -35,9 +35,9 @@ def run(args):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
-    p.add_argument('--weight', type=str, default='weights/InvertedPendulum-v2.pth' )
-    p.add_argument('--env_id', type=str, default='InvertedPendulum-v2')
-    p.add_argument('--buffer_size', type=int, default=10**6)
+    p.add_argument('--weight', type=str, default='weights/HalfCheetah-v4.pth' )
+    p.add_argument('--env_id', type=str, default='HalfCheetah-v4')
+    p.add_argument('--buffer_size', type=int, default=20000)
     p.add_argument('--std', type=float, default=0.0)
     p.add_argument('--p_rand', type=float, default=0.0)
     p.add_argument('--cuda', action='store_true')

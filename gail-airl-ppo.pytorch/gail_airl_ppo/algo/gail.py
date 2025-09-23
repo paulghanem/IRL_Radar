@@ -37,7 +37,7 @@ class GAIL(PPO):
         self.batch_size = batch_size
         self.epoch_disc = epoch_disc
 
-    def update(self, writer,step):
+    def update(self, step):
         self.learning_steps += 1
 
         for _ in range(self.epoch_disc):
@@ -49,7 +49,7 @@ class GAIL(PPO):
             states_exp, actions_exp = \
                 self.buffer_exp.sample(self.batch_size)[:2]
             # Update discriminator.
-            self.update_disc(states, actions, states_exp, actions_exp, writer)
+            self.update_disc(states, actions, states_exp, actions_exp)
 
         # We don't use reward signals here,
         states, actions, _, dones, log_pis, next_states = self.buffer.get()
@@ -59,9 +59,9 @@ class GAIL(PPO):
 
         # Update PPO using estimated rewards.
         self.update_ppo(
-            states, actions, rewards, dones, log_pis, next_states, writer)
+            states, actions, rewards, dones, log_pis, next_states)
 
-    def update_disc(self, states, actions, states_exp, actions_exp, writer):
+    def update_disc(self, states, actions, states_exp, actions_exp):
         # Output of discriminator is (-inf, inf), not [0, 1].
         logits_pi = self.disc(states, actions)
         logits_exp = self.disc(states_exp, actions_exp)
@@ -76,12 +76,12 @@ class GAIL(PPO):
         self.optim_disc.step()
 
         if self.learning_steps_disc % self.epoch_disc == 0:
-            writer.add_scalar(
-                'loss/disc', loss_disc.item(), self.learning_steps)
+            #writer.add_scalar(
+             #   'loss/disc', loss_disc.item(), self.learning_steps)
 
             # Discriminator's accuracies.
             with torch.no_grad():
                 acc_pi = (logits_pi < 0).float().mean().item()
                 acc_exp = (logits_exp > 0).float().mean().item()
-            writer.add_scalar('stats/acc_pi', acc_pi, self.learning_steps)
-            writer.add_scalar('stats/acc_exp', acc_exp, self.learning_steps)
+            #writer.add_scalar('stats/acc_pi', acc_pi, self.learning_steps)
+            #writer.add_scalar('stats/acc_exp', acc_exp, self.learning_steps)

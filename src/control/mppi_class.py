@@ -4,7 +4,9 @@ from __future__ import annotations
 from typing import Callable, Tuple, Dict
 import jax
 import jax.numpy as jnp
+import jax.lax as lax
 from jax.random import multivariate_normal
+import functools
 
 from src.control.dynamics import kinematics,kinematics_mujoco
 from src.objective_fns.cost_to_go_fns import get_cost
@@ -12,7 +14,7 @@ from cost_jax import get_gradients,get_hessian,get_hessian_diag,get_precond,fish
 
 import os.path as osp
 
-import numpy as np
+
 import math
 from tqdm.auto import tqdm
 from copy import deepcopy
@@ -82,13 +84,13 @@ def load_config(config_fname, seed_id=0, lrate=None):
 
 def mass_center(model,state):
     # Reshape body masses to (nbody, 1) for broadcasting
-    mass = np.expand_dims(model.body_mass, axis=1)  # shape: (nbody, 1)
+    mass = jnp.expand_dims(model.body_mass, axis=1)  # shape: (nbody, 1)
     
     # data.xpos contains the global positions of the body frames (shape: nbody x 3)
     xpos = state[:24]  # shape: (nbody, 3)
 
     # Compute center of mass as the weighted average of body positions
-    com = np.sum(mass * xpos, axis=0) / np.sum(mass)
+    com = jnp.sum(mass * xpos, axis=0) / jnp.sum(mass)
     
     # Return x-coordinate of the center of mass (you can return full com if needed)
     return com[0]
@@ -164,20 +166,21 @@ class MPPI:
             self.mjx_data = mjx.make_data(self.mjx_model)
 
         # noise distribution
-        self._covariance = np.zeros((
+        self._covariance = jnp.zeros((
             self._horizon,
             self._dim_control,
             self._dim_control,
         ))
-        self._covariance[:, :, :] = np.diag(sigmas ** 2)
-        self._inv_covariance = np.zeros_like(
+        self._covariance = self._covariance.at[:, :, :].set(jnp.diag(sigmas ** 2))
+        self._inv_covariance = jnp.zeros_like(
             self._covariance
         )
 
         self.covariance = jnp.array(self._covariance)
 
         for t in range(1, self._horizon):
-            self._inv_covariance[t] = np.linalg.inv(self._covariance[t])
+            self._inv_covariance = self._inv_covariance.at[t].set(jnp.linalg.inv(self._covariance[t]))
+
 
         self._inv_covariance = jnp.array(self._inv_covariance)
 
@@ -303,11 +306,11 @@ class MPPI:
         #     )
 
         #compute sample costs
-        costs = np.zeros(
+        costs = jnp.zeros(
             (self._num_samples, self._horizon)
         )
 
-        action_costs = np.zeros(
+        action_costs = jnp.zeros(
             (self._num_samples, self._horizon)
         )
 
@@ -350,6 +353,96 @@ class MPPI:
         self._previous_action_seq = optimal_action_seq
 
         return optimal_action_seq, optimal_state_seq
+    
+    def forward_pure(self,state, state_train=None, gail=False,*,key,prev_action_seq):
+        """
+        Pure MPPI forward step.
+        Args:
+            state: jnp.ndarray shape (state_dim,)
+            prev_action_seq: jnp.ndarray shape (H, act_dim)  # previously 'self._previous_action_seq'
+            key: PRNGKey
+        Returns:
+            optimal_action_seq: (H, act_dim)
+            optimal_state_seq:  (H+1, state_dim)
+            new_key: PRNGKey
+            new_prev_action_seq: (H, act_dim)
+        """
+        assert state.shape == (self._dim_state,)
+    
+        mean_action_seq = prev_action_seq  # no clone; keep JAX arrays
+    
+        # random sampling with reparametrization trick
+        action_noises = multivariate_normal(
+            key, mean=self.zero_mean, cov=self._covariance, shape=self._sample_shape
+        )
+        key, _ = jax.random.split(key)
+    
+        # noise injection with exploration
+        threshold = int(self._num_samples * (1.0 - self._exploration))
+        inherited_samples = mean_action_seq + action_noises[:threshold]
+        perturbed_action_seqs = jnp.concatenate(
+            [inherited_samples, action_noises[threshold:]], axis=0
+        )
+    
+        # clamp actions
+        perturbed_action_seqs = jnp.clip(
+            perturbed_action_seqs, self._u_min, self._u_max
+        )
+    
+        # rollout samples in parallel
+        if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+            st = state
+            if self.gym_env in ["Ant"]:
+                st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
+            initial_state = jnp.tile(st, (self._num_samples, 1))
+            state_seq_batch = jax.vmap(
+                kinematics_mujoco, in_axes=(None, None, 0, 0, None, None)
+            )(self.mjx_model, self.mjx_data, initial_state, perturbed_action_seqs, self._dynamics, self.gym_env)
+            initial_state = initial_state.reshape((initial_state.shape[0], 1, initial_state.shape[1]))
+            state_seq_batch = jnp.concatenate((initial_state, state_seq_batch), axis=1)
+            if self.gym_env in ["Ant"]:
+                state_seq_batch = state_seq_batch[:, :, 2:]
+                st = st[2:]
+        else:
+            initial_state = jnp.tile(state, (self._num_samples, 1, 1))
+            state_seq_batch = jax.vmap(kinematics, in_axes=(0, 0, None))(
+                initial_state, perturbed_action_seqs, self._dynamics
+            )
+            state_seq_batch = jnp.squeeze(state_seq_batch, axis=-2)
+            state_seq_batch = jnp.concatenate((initial_state, state_seq_batch), axis=1)
+    
+        # compute sample costs
+        # costs over horizon: (num_samples, horizon)
+        costs = jax.vmap(self._cost_func, in_axes=(1, None))(state_seq_batch[:, :-1, :], state_train)
+        costs = costs[:, :, 0]  # assuming cost_func returns (..., 1)
+        costs = costs.T  # (num_samples, horizon)
+    
+        terminal_costs = self._cost_func(
+            state_seq_batch[:, -1, :], state_train
+        ).ravel()
+    
+        total_costs = jnp.sum(costs, axis=1) + terminal_costs
+    
+        if gail:
+            D = jnp.exp(-total_costs) / (jnp.exp(-total_costs) + 1.0)
+            total_costs = -jnp.log(D)
+    
+        # weights and optimal control
+        weights = jax.nn.softmax(-total_costs / self._lambda, axis=0)
+    
+        optimal_action_seq = jnp.sum(
+            weights.reshape(self._num_samples, 1, 1) * perturbed_action_seqs,
+            axis=0,
+        )
+    
+        expanded_optimal_action_seq = jnp.tile(prev_action_seq, (1, 1, 1))
+        optimal_state_seq = self._states_prediction(state, expanded_optimal_action_seq)
+    
+        # new_prev_action_seq: in many MPPI impls you set it to optimal for warm start
+        new_prev_action_seq = optimal_action_seq
+    
+        return optimal_action_seq, optimal_state_seq, key, new_prev_action_seq
+
 
 
     def _states_prediction(
@@ -367,18 +460,20 @@ class MPPI:
             if self.gym_env in ["Ant"]:
                 state_seqs=state_seqs[:,:,2:]
         else:
-            state_seqs = np.zeros((
+            state_seqs = jnp.zeros((
                 action_seqs.shape[0],
                 self._horizon + 1,
                 self._dim_state,
             ))
-            state_seqs[:, 0, :] = state
+            state_seqs = state_seqs.at[:, 0, :].set(state)
+
         # expanded_optimal_action_seq = action_seq.repeat(1, 1, 1)
        
             for t in range(self._horizon):
-                state_seqs[:, t + 1, :] = self._dynamics(
-                    state_seqs[:, t, :], action_seqs[:, t, :]
-                )
+                state_seqs = state_seqs.at[:, t + 1, :].set(
+    self._dynamics(state_seqs[:, t, :], action_seqs[:, t, :])
+)
+
                 
         return jnp.array(state_seqs)
 
@@ -388,8 +483,97 @@ class MPPI:
         pdf = (2 * math.pi) ** (-1) * (jnp.linalg.det(cov)) ** (-1 / 2) * jnp.exp(
             -1 / 2 * jnp.matmul(jnp.matmul((x - mean).T, jnp.linalg.inv(cov)), (x - mean)))
         return pdf
+    def reward_fn(self,gym_env, state, action,forward_reward, mjx_data):
+        
+        if gym_env == "CartPole-v1":
+            x=state[0]
+            x_threshold=2.4
+            theta_cart=state[2]
+            theta_threshold_radians=12 * 2 * math.pi / 360
+            terminated = bool(
+            x < -x_threshold
+            or x > x_threshold
+            or theta_cart < -theta_threshold_radians
+            or theta_cart > theta_threshold_radians
+            )
 
-    def generate_session(self, args, state_train, D_demo, mpc_method=None, thetas=None):
+            r= jnp.array([0.0])
+            if not terminated:
+                r= jnp.array([1.0])
+        if gym_env == "Pendulum-v1":
+            x=state[0]
+            y=state[1]
+            theta_pend=jnp.atan2(y,x)
+            theta_dot=state[2]
+            r = -(jnp.pow(theta_pend,2) + 0.1 * jnp.pow(theta_dot,2) + 0.001 * jnp.pow(action,2))
+           
+        if gym_env == "MountainCarContinuous-v0":
+            r=-0.1 * jnp.pow(action,2)
+            goal_position = 0.45
+            goal_velocity = 0.0
+            x=state[0]
+            xd=state[1]
+            if goal_position <= x :
+                r+=100 
+        if gym_env == "HalfCheetah-v4":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost
+            r=r.reshape((1,1))
+            
+        if gym_env == "Ant":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if state[1] <0.2 or state[1]>1:
+                alive_bonus=0
+            ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost+alive_bonus
+            r=r.reshape((1,1))
+            
+        if gym_env == "Hopper":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+                alive_bonus=0
+               # break
+            if state[2] < -0.2  or state[2] > 0.2:
+                alive_bonus=0
+               # break 
+            if state[1] < 0.7:
+                alive_bonus=0
+                #break  
+           
+            ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost + alive_bonus
+            r=r.reshape((1,1))
+            
+        if gym_env == "Walker2d":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                alive_bonus=0
+            
+            ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost + alive_bonus
+            r=r.reshape((1,1))
+            
+        if gym_env == "Humanoid-v4":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=5
+            if state[2] <1 or state[2]>2:
+                alive_bonus=0
+            #pdb.set_trace()
+            quad_impact_cost = 0.5e-6 * jnp.square(self.mjx_data.cfrc_ext).sum()
+            quad_impact_cost = min(quad_impact_cost, 10)
+            ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
+            r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
+            r=r.reshape((1,1))     
+            
+        
+        return r
+    
+    
+    def generate_session(self, args, state_train, initial_state,D_demo, mpc_method=None, thetas=None):
         
       
         
@@ -398,7 +582,7 @@ class MPPI:
         key = jax.random.PRNGKey(args.seed)
       
         
-        np.random.seed(args.seed)
+        #jnp.random.seed(args.seed)
         env=args.gym_env     
         if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
             env, env_params = gymnax.make(env)
@@ -414,7 +598,7 @@ class MPPI:
         
 
 
-        state = D_demo[0, :args.s_dim]
+        state = initial_state
 
        
 
@@ -427,7 +611,8 @@ class MPPI:
         #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(0))
         for step in range(1, args.N_steps + 1):
             states.append(state)
-            _, _, rng_step = jax.random.split(key, 3)
+            #_, _, rng_step = jax.random.split(key, 3)
+            #key, rng_step = jax.random.split(key)
 
             action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
 
@@ -507,7 +692,7 @@ class MPPI:
                     r+=100 
             if args.gym_env == "HalfCheetah-v4":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                ctrl_cost = 0.1 * np.sum(np.square(action))
+                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost
                 r=r.reshape((1,1))
                 
@@ -516,14 +701,14 @@ class MPPI:
                 alive_bonus=1
                 if state[1] <0.2 or state[1]>1:
                     alive_bonus=0
-                ctrl_cost = 0.5 * np.sum(np.square(action))
+                ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost+alive_bonus
                 r=r.reshape((1,1))
                 
             if args.gym_env == "Hopper":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=1
-                if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+                if jnp.any(state[2:] < -100) or jnp.any(state[2:] > 100):
                     alive_bonus=0
                    # break
                 if state[2] < -0.2  or state[2] > 0.2:
@@ -533,17 +718,17 @@ class MPPI:
                     alive_bonus=0
                     #break  
                
-                ctrl_cost = 0.001 * np.sum(np.square(action))
+                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
             if args.gym_env == "Walker2d":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=1
-                if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
                     alive_bonus=0
                 
-                ctrl_cost = 0.001 * np.sum(np.square(action))
+                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
@@ -553,9 +738,9 @@ class MPPI:
                 if state[2] <1 or state[2]>2:
                     alive_bonus=0
                 #pdb.set_trace()
-                quad_impact_cost = 0.5e-6 * np.square(self.mjx_data.cfrc_ext).sum()
+                quad_impact_cost = 0.5e-6 * jnp.square(self.mjx_data.cfrc_ext).sum()
                 quad_impact_cost = min(quad_impact_cost, 10)
-                ctrl_cost = 0.1 * np.sum(np.square(action))
+                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
                 r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
                 r=r.reshape((1,1))                
                 
@@ -574,7 +759,7 @@ class MPPI:
 
             if args.online:
                 state_expert,prob_expert, action_expert = D_demo[step,:args.s_dim], D_demo[step,args.s_dim], D_demo[step,args.s_dim+1:]
-                noise = np.random.randn(*np.shape(state_expert)) * args.sigma* np.abs(state_expert)
+                noise = jnp.random.randn(*jnp.shape(state_expert)) * args.sigma* jnp.abs(state_expert)
                 state_expert=noise+state_expert
                 if args.airl:
                     grads, loss = apply_model_AIRL(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
@@ -593,9 +778,106 @@ class MPPI:
             return states, traj_probs, actions,rewards,state_train
         else:
             return states, traj_probs, actions,rewards
-            
+        
+    #@functools.partial(jax.jit, static_argnums=(0, 1))  # self=0, args=1
+    def generate_session_lax(self, args, state_train, D_demo, mpc_method=None, thetas=None):
+        key = jax.random.PRNGKey(args.seed)
+    
+        # Initial state
+        init_state = D_demo[0, :args.s_dim]
+    
+        # Take the *current* previous_action_seq once, outside trace:
+        prev_action_seq0 = self._previous_action_seq  # OK to read outside
+        env=args.gym_env     
+        if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
+            env, env_params = gymnax.make(env)
+            _, rng_reset = jax.random.split(key)
+            env_state = env.reset(rng_reset, env_params)
+        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+            self.mjx_data = mjx.make_data(self.mjx_model)
+        else:
+            env = gym.make(env)
+            env_state = env.reset(seed=args.seed)
+    
+        def rollout_step(carry, t):
+            state, key, prev_action_seq = carry
+    
+            # PURE forward
+            action_seq, state_seq, key, prev_action_seq = self.forward_pure(
+                state=state, state_train=state_train, gail=args.gail,
+                key=key, prev_action_seq=prev_action_seq
+            )
+    
+            # ---- Dynamics update ----
+            forward_reward = 0.0
+    
+            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+                st = state
+                if self.gym_env in ["Ant"]:
+                    st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
+                st = jnp.array(st, dtype=jnp.float64)
+                a0 = jnp.array(action_seq[0, :], dtype=jnp.float64)
+    
+                if self.gym_env == "Humanoid-v4":
+                    pos_before = mass_center(self.mjx_model, st)
+    
+                st = kinematics_mujoco(
+                    self.mjx_model, self.mjx_data, st.flatten(),
+                    a0.reshape((1, -1)), self._dynamics, self.gym_env
+                ).flatten()
+    
+                if self.gym_env == "Humanoid-v4":
+                    pos_after = mass_center(self.mjx_model, st)
+                    forward_reward = (pos_after - pos_before) / 0.003
+                elif self.gym_env == "HalfCheetah-v4":
+                    forward_reward = st[9]
+                elif self.gym_env == "Hopper":
+                    forward_reward = st[6]
+                elif self.gym_env == "Walker2d":
+                    forward_reward = st[9]
+                elif self.gym_env == "Ant":
+                    forward_reward = st[13]
+    
+                if self.gym_env in ["Ant"]:
+                    st = st[2:]
+                state = st
+            else:
+                state = self._dynamics(state, action_seq[0, :])
+    
+            state = state.ravel()
+            action = action_seq[0, :]
+    
+            prob = jnp.array([1])
+            r = self.reward_fn(self.gym_env, state, action, forward_reward, self.mjx_data)
+    
+            new_carry = (state, key, prev_action_seq)
+            outputs = (state, prob, action, r)
+            return new_carry, outputs
+        rollout_step_jit = jax.jit(rollout_step, static_argnums=(0,))
+        (final_carry, traj) = lax.scan(
+            rollout_step,
+            (init_state, key, prev_action_seq0),
+            jnp.arange(args.N_steps)
+        )
+        (final_state, final_key, final_prev_action_seq), (states, traj_probs, actions, rewards) = final_carry, traj
+    
+        # It is safe to mutate class attributes AFTER the scan
+        self._previous_action_seq = final_prev_action_seq
+        self.reset()
+        rewards=jnp.sum(rewards)
+        states, traj_probs, actions, rewards = (
+            states.tolist(),
+            traj_probs.tolist(),
+            actions.tolist(),
+            rewards.tolist()
+        )
 
-    def RGCL(self, args, params, state_train, D_demo,P_theta, thetas=None):
+        return states, traj_probs, actions, rewards
+
+    
+                      
+
+    def RGCL(self, args, params, state_train,initial_state, D_demo,P_theta, thetas=None):
 
         # theta = jnp.concatenate((params['Dense_0']['bias'].flatten(), params['Dense_0']['kernel'].flatten(),
         #                          params['Dense_1']['bias'].flatten(), params['Dense_1']['kernel'].flatten()))
@@ -614,7 +896,7 @@ class MPPI:
         states, traj_probs, actions, FIMs = [], [], [], []
 
         key = jax.random.PRNGKey(args.seed)
-        np.random.seed(args.seed)
+        #jnp.random.seed(args.seed)
         env=args.gym_env     
         if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
             env, env_params = gymnax.make(env)
@@ -628,7 +910,8 @@ class MPPI:
 
 
 
-        state = D_demo[0, :args.s_dim]
+        state = initial_state
+        
 
         true_cost_fn = get_cost(args.gym_env)
 
@@ -715,7 +998,7 @@ class MPPI:
                     r+=100 
             if args.gym_env == "HalfCheetah-v4":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                ctrl_cost = 0.1 * np.sum(np.square(action))
+                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost
                 r=r.reshape((1,1))
                 
@@ -724,7 +1007,7 @@ class MPPI:
                 alive_bonus=1
                 if state[1] <0.2 or state[1]>1:
                     alive_bonus=0
-                ctrl_cost = 0.5 * np.sum(np.square(action))
+                ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost+alive_bonus
                 r=r.reshape((1,1))
                 
@@ -742,17 +1025,17 @@ class MPPI:
                     alive_bonus=0
                     #break  
                
-                ctrl_cost = 0.001 * np.sum(np.square(action))
+                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
             if args.gym_env == "Walker2d":
                 #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
                 alive_bonus=1
-                if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
                     alive_bonus=0
                 
-                ctrl_cost = 0.001 * np.sum(np.square(action))
+                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
                 r = forward_reward - ctrl_cost + alive_bonus
                 r=r.reshape((1,1))
                 
@@ -761,9 +1044,9 @@ class MPPI:
                 alive_bonus=5
                 if state[2] <1 or state[2]>2:
                     alive_bonus=0
-                quad_impact_cost = 0.5e-6 * np.square(self.mjx_data.cfrc_ext).sum()
+                quad_impact_cost = 0.5e-6 * jnp.square(self.mjx_data.cfrc_ext).sum()
                 quad_impact_cost = min(quad_impact_cost, 10)
-                ctrl_cost = 0.1 * np.sum(np.square(action))
+                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
                 r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
                 r=r.reshape((1,1))   
            
@@ -830,3 +1113,212 @@ class MPPI:
 
         return states, traj_probs, actions,rewards,P_theta
 
+def generate_session_ppo(self, args, state_train, D_demo, mpc_method=None, thetas=None):
+    
+  
+    
+    states, traj_probs, actions,logps = [], [], [],[]
+
+    key = jax.random.PRNGKey(args.seed)
+  
+    
+    jnp.random.seed(args.seed)
+    env=args.gym_env     
+    if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
+        env, env_params = gymnax.make(env)
+        _, rng_reset = jax.random.split(key)
+        env_state = env.reset(rng_reset, env_params)
+    elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+        self.mjx_data = mjx.make_data(self.mjx_model)
+    else:
+        env = gym.make(env)
+        env_state = env.reset(seed=args.seed)
+        
+   
+    
+
+
+    state = D_demo[0, :args.s_dim]
+
+   
+
+    #rewards = [true_cost_fn(state)]
+    rewards=0
+
+    pbar = tqdm(total=args.N_steps, desc="Starting")
+
+  
+    #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(0))
+    for step in range(1, args.N_steps + 1):
+        states.append(state)
+        _, _, rng_step = jax.random.split(key, 3)
+         # ---- PPO Policy Action Sampling ----
+        action, logp = self.policy.apply_fn({'params': self.policy.params}, state[None, :], key)
+        action_seq = jnp.squeeze(action, axis=0)
+        logp = jnp.squeeze(logp, axis=0)
+        logps.append(logp)
+
+        #action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
+
+    
+      
+        
+        # env_state.theta=state[0]
+        # env_state.theta_dot=state[1]
+        # env_state.last_u=state[2]
+        # _,_, reward, _, _= env.step(
+        #     rng_step, env_state, action_seq[0,:], env_params
+        # )
+        if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
+            if self.gym_env in ["Ant"]:
+                state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
+            state=jnp.array(state,dtype=jnp.float64)
+            action_seq=jnp.array(action_seq,dtype=jnp.float64)
+            if self.gym_env=="Humanoid-v4":
+                pos_before = mass_center(self.mjx_model,state)
+            state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
+            if self.gym_env=="Humanoid-v4":
+                pos_after = mass_center(self.mjx_model,state)
+            if self.gym_env in ["Ant"]:
+                state=state[2:]
+            #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
+            if self.gym_env =="HalfCheetah-v4":
+                #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
+                forward_reward=state[9]
+            if self.gym_env=="Hopper":
+                forward_reward=state[6]
+            if self.gym_env=="Walker2d":
+                forward_reward=state[9]
+                #state=state[1:]
+            elif self.gym_env=="Ant":
+                forward_reward=state[13]
+            elif self.gym_env=="Humanoid-v4":
+                forward_reward=(pos_after - pos_before) / 0.003
+        else:
+            state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
+        state = state.ravel()
+        action=action_seq[0,:]
+        
+        prob = jnp.array([1])
+
+        traj_probs.append(prob.flatten())
+        actions.append(action_seq[0].flatten())
+       
+        if args.gym_env == "CartPole-v1":
+            x=state[0]
+            x_threshold=2.4
+            theta_cart=state[2]
+            theta_threshold_radians=12 * 2 * math.pi / 360
+            terminated = bool(
+            x < -x_threshold
+            or x > x_threshold
+            or theta_cart < -theta_threshold_radians
+            or theta_cart > theta_threshold_radians
+            )
+
+            r= jnp.array([0.0])
+            if not terminated:
+                r= jnp.array([1.0])
+        if args.gym_env == "Pendulum-v1":
+            x=state[0]
+            y=state[1]
+            theta_pend=jnp.atan2(y,x)
+            theta_dot=state[2]
+            r = -(jnp.pow(theta_pend,2) + 0.1 * jnp.pow(theta_dot,2) + 0.001 * jnp.pow(action_seq[0,:],2))
+           
+        if args.gym_env == "MountainCarContinuous-v0":
+            r=-0.1 * jnp.pow(action_seq[0,:],2)
+            goal_position = 0.45
+            goal_velocity = 0.0
+            x=state[0]
+            xd=state[1]
+            if goal_position <= x :
+                r+=100 
+        if args.gym_env == "HalfCheetah-v4":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost
+            r=r.reshape((1,1))
+            
+        if args.gym_env == "Ant":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if state[1] <0.2 or state[1]>1:
+                alive_bonus=0
+            ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost+alive_bonus
+            r=r.reshape((1,1))
+            
+        if args.gym_env == "Hopper":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+                alive_bonus=0
+               # break
+            if state[2] < -0.2  or state[2] > 0.2:
+                alive_bonus=0
+               # break 
+            if state[1] < 0.7:
+                alive_bonus=0
+                #break  
+           
+            ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost + alive_bonus
+            r=r.reshape((1,1))
+            
+        if args.gym_env == "Walker2d":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=1
+            if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+                alive_bonus=0
+            
+            ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+            r = forward_reward - ctrl_cost + alive_bonus
+            r=r.reshape((1,1))
+            
+        if args.gym_env == "Humanoid-v4":
+            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
+            alive_bonus=5
+            if state[2] <1 or state[2]>2:
+                alive_bonus=0
+            #pdb.set_trace()
+            quad_impact_cost = 0.5e-6 * jnp.square(self.mjx_data.cfrc_ext).sum()
+            quad_impact_cost = min(quad_impact_cost, 10)
+            ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
+            r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
+            r=r.reshape((1,1))                
+            
+            
+        #rewards.append(true_cost_fn(state))
+        rewards=rewards+r[0]
+        #pdb.set_trace()
+        pbar.set_description(
+            f"  Total True Reward = {rewards.item():.4f} ,Reward True = {r[0].item():.4f}")
+            #f"Reward True = {r[0].item():.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
+        pbar.update(1)
+        # probs_fun = jax.vmap(self.predict_probs, (0, None, 0))
+        # prob = self.predict_probs(action_seq[0],
+        #                           self.covariance[0],
+        #                           ction_seq)
+
+        if args.online:
+            state_expert,prob_expert, action_expert = D_demo[step,:args.s_dim], D_demo[step,args.s_dim], D_demo[step,args.s_dim+1:]
+            noise = jnp.random.randn(*jnp.shape(state_expert)) * args.sigma* jnp.abs(state_expert)
+            state_expert=noise+state_expert
+            if args.airl:
+                grads, loss = apply_model_AIRL(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
+            
+            else:
+                grads, loss = apply_model(state_train, state, action,state_expert,action_expert,prob,prob_expert,args.UB)
+
+            state_train = update_model(state_train, grads)
+    #pdb.set_trace()
+    #rewards = jnp.array(rewards)
+    pbar.close()
+
+    self.reset()
+
+    if args.online:
+        return states, traj_probs, actions,rewards,state_train
+    else:
+        return states, traj_probs, actions,rewards,logps

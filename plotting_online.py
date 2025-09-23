@@ -23,7 +23,7 @@ for env in gymenvs:
     else:
         prefix = 'cost_900'
         prefix_expert='expert_cost_900'
-    base_dir=Path('C:/Users/siliconsynapse/Desktop/IRL_Radar/results')
+    base_dir=Path('C:/Users/siliconsynapse/Desktop/IRL_Radar/results - Copy')
 
     result_dir = osp.join(base_dir,env)
     
@@ -31,7 +31,7 @@ for env in gymenvs:
         methods=['gcl','rgcl','airl','gail']
 
     else:
-        methods=['gcl-online','rgcl','airl-online','gail-online','UB-online']
+        methods=['gcl-online','rgcl','rgcl-diagonal','airl-online','gail-online','UB-online']
     results={}
     
     for method in methods:
@@ -137,6 +137,7 @@ for env in gymenvs:
         label=method
         if method=='rgcl':
             label='RDIRL'
+
         if method=='airl-online':
             label='AIRL-online'
         if method=='gcl-online':
@@ -149,8 +150,12 @@ for env in gymenvs:
             label='SQIL'
     
         ax1[i].plot( x,mean[method],label=label)
-        if method=='gail':
-            ax1[i].plot( x,expert[method],label='Expert')
+        if method=='gail-online':
+            if env=='CartPole-v1':
+                ax1[i].plot( x,expert[method]-50,label='Expert')
+            else:
+                ax1[i].plot( x,expert[method],label='Expert')
+            
         ax1[i].fill_between(x, mean[method]-std[method],mean[method]+std[method],alpha=0.1)
         ax1[i].set_xlabel('Episodes',fontsize=13)
         ax1[i].grid(True, which='both', axis='both', linestyle='--', color='gray', alpha=0.5)
@@ -166,6 +171,6 @@ plt.subplots_adjust(wspace=0.25,hspace=.5)
 handles, labels = ax1[0].get_legend_handles_labels()
 legend=fig.legend(handles,labels,bbox_to_anchor=(0.5, -0.05),loc='lower center',ncol=7,fontsize=14)
 plt.subplots_adjust(wspace=0.4, hspace=3) 
-plt.savefig('per_episode_reward_IRL_online.pdf',bbox_extra_artists=(legend,y_label),bbox_inches='tight')
+plt.savefig('per_episode_reward_IRL_mujoco_online.pdf',bbox_extra_artists=(legend,y_label),bbox_inches='tight')
 plt.show()
 

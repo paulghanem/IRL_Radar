@@ -46,4 +46,4 @@ class StateDependentPolicy(nn.Module):
 
     def sample(self, states):
         means, log_stds = self.net(states).chunk(2, dim=-1)
-        return reparameterize(means, log_stds.clamp_(-20, 2))
+        return  reparameterize(means, log_stds.clamp(-20, 2))

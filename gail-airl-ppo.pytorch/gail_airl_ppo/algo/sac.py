@@ -10,7 +10,8 @@ from gail_airl_ppo.network import (
     StateDependentPolicy, TwinnedStateActionFunction
 )
 
-
+import pdb
+torch.autograd.set_detect_anomaly(True)
 class SAC(Algorithm):
 
     def __init__(self, state_shape, action_shape, device, seed, gamma=0.99,
@@ -32,7 +33,7 @@ class SAC(Algorithm):
             state_shape=state_shape,
             action_shape=action_shape,
             hidden_units=units_actor,
-            hidden_activation=nn.ReLU(inplace=True)
+            hidden_activation=nn.ReLU(inplace=False)
         ).to(device)
 
         # Critic.
@@ -40,13 +41,13 @@ class SAC(Algorithm):
             state_shape=state_shape,
             action_shape=action_shape,
             hidden_units=units_critic,
-            hidden_activation=nn.ReLU(inplace=True)
+            hidden_activation=nn.ReLU(inplace=False)
         ).to(device)
         self.critic_target = TwinnedStateActionFunction(
             state_shape=state_shape,
             action_shape=action_shape,
             hidden_units=units_critic,
-            hidden_activation=nn.ReLU(inplace=True)
+            hidden_activation=nn.ReLU(inplace=False)
         ).to(device).eval()
 
         soft_update(self.critic_target, self.critic, 1.0)
@@ -78,14 +79,16 @@ class SAC(Algorithm):
         else:
             action = self.explore(state)[0]
 
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, terminated, truncated, _ = env.step(action)
+        done = terminated or truncated
         mask = False if t == env._max_episode_steps else done
-
+        #pdb.set_trace()
+        
         self.buffer.append(state, action, reward, mask, next_state)
 
         if done:
             t = 0
-            next_state = env.reset()
+            next_state,_ = env.reset()
 
         return next_state, t
 

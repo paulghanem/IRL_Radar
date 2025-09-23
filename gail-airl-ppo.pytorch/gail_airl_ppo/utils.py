@@ -22,7 +22,7 @@ def add_random_noise(action, std):
 
 
 def collect_demo(env, algo, buffer_size, device, std, p_rand, seed=0):
-    env.seed(seed)
+    obs,info=env.reset()
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -37,7 +37,7 @@ def collect_demo(env, algo, buffer_size, device, std, p_rand, seed=0):
     total_return = 0.0
     num_episodes = 0
 
-    state = env.reset()
+    state,_ = env.reset()
     t = 0
     episode_return = 0.0
 
@@ -50,7 +50,9 @@ def collect_demo(env, algo, buffer_size, device, std, p_rand, seed=0):
             action = algo.exploit(state)
             action = add_random_noise(action, std)
 
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, terminated, truncated, _ = env.step(action)
+        done = terminated or truncated
+      
         mask = False if t == env._max_episode_steps else done
         buffer.append(state, action, reward, mask, next_state)
         episode_return += reward
@@ -58,11 +60,13 @@ def collect_demo(env, algo, buffer_size, device, std, p_rand, seed=0):
         if done:
             num_episodes += 1
             total_return += episode_return
-            state = env.reset()
+            state,_ = env.reset()
             t = 0
             episode_return = 0.0
 
         state = next_state
-
+    if num_episodes==0:
+        num_episodes=1
+    
     print(f'Mean return of the expert is {total_return / num_episodes}')
     return buffer

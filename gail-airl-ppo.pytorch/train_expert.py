@@ -4,7 +4,7 @@ from datetime import datetime
 import torch
 
 from gail_airl_ppo.env import make_env
-from gail_airl_ppo.algo import SAC
+from gail_airl_ppo.algo import SAC,PPO
 from gail_airl_ppo.trainer import Trainer
 
 
@@ -12,7 +12,7 @@ def run(args):
     env = make_env(args.env_id)
     env_test = make_env(args.env_id)
 
-    algo = SAC(
+    algo = PPO(
         state_shape=env.observation_space.shape,
         action_shape=env.action_space.shape,
         device=torch.device("cuda" if args.cuda else "cpu"),
@@ -21,7 +21,7 @@ def run(args):
 
     time = datetime.now().strftime("%Y%m%d-%H%M")
     log_dir = os.path.join(
-        'logs', args.env_id, 'sac', f'seed{args.seed}-{time}')
+        'logs', args.env_id, 'ppo', f'seed{args.seed}-{time}')
 
     trainer = Trainer(
         env=env,
@@ -37,9 +37,9 @@ def run(args):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
-    p.add_argument('--num_steps', type=int, default=10**5)
-    p.add_argument('--eval_interval', type=int, default=10**4)
-    p.add_argument('--env_id', type=str, default='InvertedPendulum-v2')
+    p.add_argument('--num_steps', type=int, default=7500000)
+    p.add_argument('--eval_interval', type=int, default=25000)
+    p.add_argument('--env_id', type=str, default='HalfCheetah-v4')
     p.add_argument('--cuda', action='store_true')
     p.add_argument('--seed', type=int, default=0)
     args = p.parse_args()
