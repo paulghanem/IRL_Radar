@@ -1,5 +1,0 @@
-2025-07-28 22:36:29.153498: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-E0000 00:00:1753756589.175898  411497 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-E0000 00:00:1753756589.182604  411497 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-Starting:   0%|          | 0/150 [00:00<?, ?it/s]slurmstepd: error: *** JOB 1257088 ON c2206 CANCELLED AT 2025-07-28T22:37:19 ***
