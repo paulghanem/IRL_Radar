@@ -60,7 +60,6 @@ gast==0.6.0
 glfw==2.8.0
 google-pasta==0.2.0
 grpcio==1.69.0
-gym==0.19.0
 gym-notices==0.0.8
 gymnasium==1.0.0
 gymnax==0.0.8
@@ -119,7 +118,7 @@ nbconvert==7.16.5
 nbformat==5.10.4
 nest-asyncio==1.6.0
 networkx==3.4.2
-numpy==2.2.4
+
 numpydoc==1.8.0
 opt_einsum==3.4.0
 optax==0.2.4
@@ -197,7 +196,6 @@ sphinxcontrib-htmlhelp==2.1.0
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
-spyder==6.0.3
 spyder-kernels==3.0.2
 stable_baselines3==2.4.1
 stack-data==0.6.3

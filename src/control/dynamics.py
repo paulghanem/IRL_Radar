@@ -331,16 +331,44 @@ def kinematics_mujoco_lax(mjx_model,mjx_data,action, step_fn,gym_env):
     mjx_data, (obs_seq, fwd_seq) = lax.scan(do_step, mjx_data, action)
     return mjx_data, obs_seq, fwd_seq
 
-@partial(jax.jit, static_argnames=("step_fn","gym_env"))
-def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):
+# @partial(jax.jit, static_argnames=("step_fn","gym_env"))
+# def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):
+#     """Rollout a jitted gymnax episode with lax.scan."""
+
+#     def policy_step(state, tmp):
+#         """lax.scan compatible step transition in jax env."""
+
+#         action = tmp
+#         next_state = step_fn(mjx_model,mjx_data,state,action,gym_env)
+
+#         carry = next_state
+#         return carry, carry
+
+#     # Scan over episode step loop
+#     _, scan_out = jax.lax.scan(
+#         policy_step,
+#         state,
+#         action,
+#     )
+#     # Return masked sum of rewards accumulated by agent in episode
+#     states = scan_out
+#     return states
+
+
+@partial(jax.jit, static_argnames=("step_fn", "gym_env", "frame_skip"))
+def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env,frame_skip=1):
     """Rollout a jitted gymnax episode with lax.scan."""
 
     def policy_step(state, tmp):
         """lax.scan compatible step transition in jax env."""
-
         action = tmp
-        next_state = step_fn(mjx_model,mjx_data,state,action,gym_env)
+        def substep_fn(subcarry, _):
+            next_state = step_fn(mjx_model, mjx_data, subcarry, action, gym_env)
+            
+            return next_state, None
 
+        next_state, _ = jax.lax.scan(substep_fn, state, xs=None, length=frame_skip)
+        
         carry = next_state
         return carry, carry
 
@@ -353,4 +381,3 @@ def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):
     # Return masked sum of rewards accumulated by agent in episode
     states = scan_out
     return states
-

@@ -16,6 +16,7 @@ fig, ax1 = plt.subplots(1, 4, figsize=(15, 5))
 means_table={}
 std_table={}
 results_final={}
+results_trained={}
 for env in gymenvs:
     if env=='CartPole-v1'or env=='MountainCarContinuous-v0':
         prefix = 'cost_200'
@@ -97,6 +98,8 @@ for env in gymenvs:
     results_final[env+'_mean'] =mean   
     results_final[env+'_std'] =std  
     results_final[env+'_expert'] =expert
+   
+    
     # epoch_time_GCL=np.load('epoch_time_GCL.npy')
     # FIM_expert_GCL=np.load('FIM_expert_GCL.npy')
     # FIM_true_GCL=np.load('FIM_true_GCL.npy')
@@ -132,7 +135,7 @@ for env in gymenvs:
     
 #pdb.set_trace()
     for method in methods:
-        means_table[method+'_'+env]=np.mean(mean[method])
+        means_table[method+'_'+env]=mean[method]
         std_table[method+'_'+env]=np.mean(std[method])
 
 
@@ -178,6 +181,7 @@ for env in gymenvs:
         # Format x-axis dates
         fig.autofmt_xdate()
     ax1[i].set_title(env,fontsize=13)
+    
         #ax1[i].set_xticks([1,2,3,4,5,6,7,8,9,10]) 
     i=i+1
 #plt.xticks([5])

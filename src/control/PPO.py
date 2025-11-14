@@ -18,6 +18,7 @@ import gymnasium as gym
 from mujoco import mjx 
 from tqdm.auto import tqdm
 from src.control.dynamics import kinematics,kinematics_mujoco,kinematics_mujoco_lax
+from src.control.buffer import  RolloutBuffer
 import math
 import pdb
 
@@ -43,13 +44,11 @@ class policy_model(nn.Module):
         x = nn.tanh(x)
         x = nn.Dense(64)(x)
         x = nn.tanh(x)
-        out = nn.Dense(2 * self.action_dim)(x)   # both μ and logσ
-        mu, log_std = jnp.split(out, 2, axis=-1)
+        mu = nn.Dense(self.action_dim)(x)   # both μ and logσ
+        log_std = self.param("log_std", nn.initializers.zeros, (1, self.action_dim))
 
-        # Clip log_std for numerical stability
-        log_std = jnp.clip(log_std, -5, 2)  
-        std = jnp.exp(log_std)
-        return mu, std
+
+        return mu, log_std
     
 class critic_model(nn.Module):
    
@@ -65,8 +64,10 @@ class critic_model(nn.Module):
         return mu
 
 class PPOPolicy():
-    def __init__(self,action_dim,mjx_model, dynamics,policy_model,policy_net,args,value_fn=None):
+    def __init__(self,state_dim,action_dim,mjx_model, dynamics,policy_model,policy_net,args,rollout_length=2048, mix_buffer=20,value_fn=None):
         self.action_dim= action_dim
+        self.state_dim=state_dim
+        self.rollout_length=rollout_length
         self.args = args
         self.gym_env = args.gym_env
         self._dynamics = dynamics # set if needed
@@ -77,6 +78,18 @@ class PPOPolicy():
         self.policy_net=policy_net
         self.value_fn=value_fn
         
+        self.max_steps=1000
+        
+        # Rollout buffer.
+        self.buffer = RolloutBuffer.create(
+            buffer_size=rollout_length,
+            state_shape=(self.state_dim,),      # add parentheses
+            action_shape=(self.action_dim,),    # add parentheses
+            mix=mix_buffer
+        )
+        
+        
+        
     def reset(self):
         """
         Reset the previous action sequence.
@@ -86,15 +99,59 @@ class PPOPolicy():
                 1, self.action_dim
             )
         )
+        
+    def reset_mjx_state(self, mjx_model, key=None, noise_scale=0.01):
+        """
+        Recreate a fresh mjx.Data object from a given mjx.Model.
+        Optionally add small random noise to qpos/qvel for exploration.
     
-    def step(self, x, rng):
-       mu, std = self.policy_net.apply({'params': self.policy_model.params}, x)
-       noise = jax.random.normal(rng, mu.shape)
-       action = mu + std * noise
-       logp = -0.5 * (((action - mu) / std) ** 2 + 2 * jnp.log(std) + jnp.log(2 * jnp.pi))
-       logp = jnp.sum(logp, axis=-1)
-       return action, logp
+        Args:
+            mjx_model: Compiled MJX model.
+            key: Optional PRNGKey for randomized initialization.
+            noise_scale: Stddev of Gaussian noise added to qpos/qvel.
+    
+        Returns:
+            mjx.Data: Freshly reset simulation state.
+        """
+        # Create a new mjx.Data object
+        data = mjx.make_data(mjx_model)
+    
+        # Base zero initialization
+        qpos0 = jnp.zeros_like(data.qpos)
+        qvel0 = jnp.zeros_like(data.qvel)
+    
+        # If a random key is provided, add Gaussian noise to qpos/qvel
+        if key is not None:
+            key_qpos, key_qvel = jax.random.split(key)
+            qpos0 = qpos0 + noise_scale * jax.random.normal(key_qpos, shape=qpos0.shape)
+            qvel0 = qvel0 + noise_scale * jax.random.normal(key_qvel, shape=qvel0.shape)
+    
+        # Replace state fields
+        data = data.replace(qpos=qpos0, qvel=qvel0)
+    
+        # Recompute derived quantities
+        mjx.forward(mjx_model, data)
+    
+        return data
+
+
+      
+    def calculate_log_pi(self,log_stds, noises, actions):
+        gaussian_log_probs = jnp.sum(-0.5 * jnp.power(noises, 2) - log_stds, axis=-1) - 0.5 * math.log(2 * math.pi) * log_stds.shape[-1]
+
+        return gaussian_log_probs - jnp.sum( jnp.log(1 - jnp.power(actions, 2) + 1e-6), axis=-1)
+
+    def atanh(self,x):
+       return 0.5 * (jnp.log(1 + x + 1e-6) - jnp.log(1 - x + 1e-6))
    
+    def evaluate_lop_pi(self,means, log_stds, actions):
+        noises = (self.atanh(actions) - means) / (jnp.exp(log_stds) + 1e-8)
+        return self.calculate_log_pi(log_stds, noises, actions)
+    
+    def evaluate_log_pi(self, states, actions,params):
+        mu, log_std = self.policy_net.apply({'params': params}, states)
+     
+        return self.evaluate_lop_pi(mu, log_std, actions)
     
     def reward_fn(self,gym_env, state, action,forward_reward, mjx_data):
         
@@ -187,300 +244,103 @@ class PPOPolicy():
             
         
 
-    def generate_session_lax(self, args, D_demo, mpc_method=None, thetas=None):
+    def generate_session_lax(self, args, D_demo, frame_skip=1,dt=0.01,mpc_method=None, thetas=None):
+        #self.mjx_data = self.reset_mjx_state(self.mjx_model)
+   
         key = jax.random.PRNGKey(args.seed)
     
         # Initial state
         init_state = D_demo[0, :args.s_dim]
+        reset_data = self.reset_mjx_state(self.mjx_model,key=key)
+       
     
         def rollout_step(carry, t):
-            state, key = carry
+            state, key,buffer,mjx_data = carry
     
             # RNG split
             key, subkey = jax.random.split(key)
     
             # ---- PPO Policy Action Sampling ----
-            mu, std = self.policy_net.apply({'params': self.policy_model.params}, state[None, :])
+            mu, log_std = self.policy_net.apply({'params': self.policy_model.params}, state[None, :])
             noise = jax.random.normal(subkey, mu.shape)
-            u = mu + std * noise
+            u = mu + jnp.exp(log_std) * noise
             action=jnp.tanh(u)
-            # Log prob of u under Gaussian
-            logp_u = -0.5 * (((u - mu) / std) ** 2 + 2 * jnp.log(std) + jnp.log(2 * jnp.pi))
-            logp_u = jnp.sum(logp_u, axis=-1)
+            logp=self.calculate_log_pi(log_std, noise, action)
             
-            # Correction for tanh squashing
-            logp = logp_u - jnp.sum(jnp.log(1 - action**2 + 1e-6), axis=-1)
-            
-            state=kinematics_mujoco(self.mjx_model,self.mjx_data,state,action,self._dynamics,self.gym_env)
-
-    
+            #state=kinematics_mujoco(self.mjx_model,self.mjx_data,state,action,self._dynamics,self.gym_env)
+            state=jnp.array(state,dtype=jnp.float64)
+            action=jnp.array(action,dtype=jnp.float64)
+            next_state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action.reshape((1,-1)),self._dynamics,self.gym_env,frame_skip=frame_skip).flatten()
+          
+           
             # ---- Dynamics update ----
             if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
                 if self.gym_env in ["Ant"]:
-                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
-                state=jnp.array(state,dtype=jnp.float64)
-                action=jnp.array(action,dtype=jnp.float64)
-                if self.gym_env=="Humanoid-v4":
-                    pos_before = mass_center(self.mjx_model,state)
-                state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action.reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-                if self.gym_env=="Humanoid-v4":
-                    pos_after = mass_center(self.mjx_model,state)
-                if self.gym_env in ["Ant"]:
-                    state=state[2:]
+                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),next_state))
+                
+                # if self.gym_env=="Humanoid-v4":
+                #     pos_before = mass_center(self.mjx_model,state)
+                # if self.gym_env=="Humanoid-v4":
+                #     pos_after = mass_center(self.mjx_model,state)
+                # if self.gym_env in ["Ant"]:
+                #     state=state[2:]
                 #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
                 if self.gym_env =="HalfCheetah-v4":
                     #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
-                    forward_reward=state[9]
+                    forward_reward=(next_state[0]-state[0])/(frame_skip*dt)
                     
                 if self.gym_env=="Hopper":
-                    forward_reward=state[6]
+                    forward_reward=next_state[6]
                 if self.gym_env=="Walker2d":
-                    forward_reward=state[9]
+                    forward_reward=next_state[9]
                     #state=state[1:]
                 elif self.gym_env=="Ant":
-                    forward_reward=state[13]
-                elif self.gym_env=="Humanoid-v4":
-                    forward_reward=(pos_after - pos_before) / 0.003
+                    forward_reward=next_state[13]
+                # elif self.gym_env=="Humanoid-v4":
+                #     forward_reward=(pos_after - pos_before) / 0.003
             else:
-                state = self._dynamics(state, action)
-    
-            # then reward calc...
-            r = self.reward_fn(self.gym_env, state, action, forward_reward if "forward_reward" in locals() else None, self.mjx_data)
-        
-            carry = (state, key)
-            outputs = (state, action[0], r, logp)
-            return carry, outputs
-            
-        # Run scan for evaluation_interval steps
-        (final_state, _), traj = lax.scan(
-            rollout_step,
-            (init_state, key),
-            jnp.arange(args.evaluation_interval)
-        )
-    
-        states, actions, rewards, logps = traj
-    
-        # reset
-        self.reset()
-        return states, jnp.ones((rewards.shape[0],1)), actions, rewards.flatten(), logps.flatten()
+                state = self._dynamics(next_state, action)
+                
+            done = lax.select(t == self.max_steps, True,False)
 
-    
-    
-    def generate_session(self, args, D_demo, mpc_method=None, thetas=None):
-        
-      
-        
-        states, traj_probs, actions,logps = [], [], [],[]
-
-        key = jax.random.PRNGKey(args.seed)
-      
-        
-        np.random.seed(args.seed)
-        env=args.gym_env     
-        if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
-            env, env_params = gymnax.make(env)
-            _, rng_reset = jax.random.split(key)
-            env_state = env.reset(rng_reset, env_params)
-        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
-            self.mjx_data = mjx.make_data(self.mjx_model)
-        else:
-            env = gym.make(env)
-            env_state = env.reset(seed=args.seed)
-            
-       
-        
-
-
-        state = D_demo[0, :args.s_dim]
-
-       
-
-        #rewards = [true_cost_fn(state)]
-        rewards = jnp.zeros((args.evaluation_interval,), dtype=jnp.float32)
-        total_rewards=0.0
-
-        pbar = tqdm(total=args.evaluation_interval, desc="Starting")
-
-      
-        #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(0))
-        for step in range(1, args.evaluation_interval + 1):
-            states.append(state)
-            _, _, rng_step = jax.random.split(key, 3)
-             # ---- PPO Policy Action Sampling ----
-            action, logp = self.step( state[None, :], key)
-            action=jnp.tanh(action)
-            action_seq = action
-            logp = jnp.squeeze(logp, axis=0)
-            logps.append(logp)
-            xposbefore = self.mjx_data.qpos[0]
-            self.mjx_data,state,forward_reward=kinematics_mujoco_lax(self.mjx_model,self.mjx_data,action_seq,self._dynamics,self.gym_env)
-            xposafter = self.mjx_data.qpos[0]
-            
-            #action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
-
-        
-            
-            
-            # env_state.theta=state[0]
-            # env_state.theta_dot=state[1]
-            # env_state.last_u=state[2]
-            # _,_, reward, _, _= env.step(
-            #     rng_step, env_state, action_seq[0,:], env_params
-            # )
-            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
-                if self.gym_env in ["Ant"]:
-                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
-                state=jnp.array(state,dtype=jnp.float64)
-                action_seq=jnp.array(action_seq,dtype=jnp.float64)
-                if self.gym_env=="Humanoid-v4":
-                    pos_before = mass_center(self.mjx_model,state)
-                #state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-                if self.gym_env=="Humanoid-v4":
-                    pos_after = mass_center(self.mjx_model,state)
-                if self.gym_env in ["Ant"]:
-                    state=state[2:]
-                #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
-                if self.gym_env =="HalfCheetah-v4":
-                    #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
-                    #forward_reward=state[9]
-                   # print(forward_reward,self.mjx_data.qvel[0])
-                    #print("qpos[0]:", self.mjx_data.qpos[0],
-      #"qvel[0]:", self.mjx_data.qvel[0])
-                  forward_vel = (xposafter - xposbefore) / (self.mjx_model.opt.timestep)
-                  ctrl_cost = 0.1 * np.square(action).sum()
-                      
-                  reward = forward_vel - ctrl_cost
-                  print(forward_reward,forward_vel)
-                  #forward_reward=forward_vel
-                  
-                if self.gym_env=="Hopper":
-                    forward_reward=state[6]
-                if self.gym_env=="Walker2d":
-                    forward_reward=state[9]
-                    #state=state[1:]
-                elif self.gym_env=="Ant":
-                    forward_reward=state[13]
-                elif self.gym_env=="Humanoid-v4":
-                    forward_reward=(pos_after - pos_before) / 0.003
-            else:
-                state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
-            state = state.ravel()
-            action=action_seq[0,:]
-            
-            prob = jnp.array([1])
-
-            traj_probs.append(prob.flatten())
-            actions.append(action_seq[0].flatten())
+            r = self.reward_fn(self.gym_env, next_state, action, forward_reward, self.mjx_data)
+            buffer=buffer.append(state, action.flatten(), r.flatten(), done, logp.flatten(), next_state)
            
-            if args.gym_env == "CartPole-v1":
-                x=state[0]
-                x_threshold=2.4
-                theta_cart=state[2]
-                theta_threshold_radians=12 * 2 * math.pi / 360
-                terminated = bool(
-                x < -x_threshold
-                or x > x_threshold
-                or theta_cart < -theta_threshold_radians
-                or theta_cart > theta_threshold_radians
-                )
-
-                r= jnp.array([0.0])
-                if not terminated:
-                    r= jnp.array([1.0])
-            if args.gym_env == "Pendulum-v1":
-                x=state[0]
-                y=state[1]
-                theta_pend=jnp.atan2(y,x)
-                theta_dot=state[2]
-                r = -(jnp.pow(theta_pend,2) + 0.1 * jnp.pow(theta_dot,2) + 0.001 * jnp.pow(action_seq[0,:],2))
-               
-            if args.gym_env == "MountainCarContinuous-v0":
-                r=-0.1 * jnp.pow(action_seq[0,:],2)
-                goal_position = 0.45
-                goal_velocity = 0.0
-                x=state[0]
-                xd=state[1]
-                if goal_position <= x :
-                    r+=100 
-            if args.gym_env == "HalfCheetah-v4":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                ctrl_cost =  0.1 * np.square(action).sum()
-                r = forward_reward - ctrl_cost
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Ant":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if state[1] <0.2 or state[1]>1:
-                    alive_bonus=0
-                ctrl_cost = 0.5 * np.sum(np.square(action))
-                r = forward_reward - ctrl_cost+alive_bonus
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Hopper":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
-                    alive_bonus=0
-                   # break
-                if state[2] < -0.2  or state[2] > 0.2:
-                    alive_bonus=0
-                   # break 
-                if state[1] < 0.7:
-                    alive_bonus=0
-                    #break  
-               
-                ctrl_cost = 0.001 * np.sum(np.square(action))
-                r = forward_reward - ctrl_cost + alive_bonus
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Walker2d":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
-                    alive_bonus=0
-                
-                ctrl_cost = 0.001 * np.sum(np.square(action))
-                r = forward_reward - ctrl_cost + alive_bonus
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Humanoid-v4":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=5
-                if state[2] <1 or state[2]>2:
-                    alive_bonus=0
-                #pdb.set_trace()
-                quad_impact_cost = 0.5e-6 * np.square(self.mjx_data.cfrc_ext).sum()
-                quad_impact_cost = min(quad_impact_cost, 10)
-                ctrl_cost = 0.1 * np.sum(np.square(action))
-                r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
-                r=r.reshape((1,1))                
-                
-                
-            #rewards.append(true_cost_fn(state))
-            r_scalar = float(np.array(r).reshape(-1)[0])  
-            rewards = rewards.at[step-1].set(r_scalar)
-            total_rewards+=r_scalar
-            #pdb.set_trace()
-            pbar.set_description(
-                f"  Total True Reward = {total_rewards:.4f} ,Reward True = {r[0].item():.4f}")
-                #f"Reward True = {r[0].item():.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
-            pbar.update(1)
-            # probs_fun = jax.vmap(self.predict_probs, (0, None, 0))
-            # prob = self.predict_probs(action_seq[0],
-            #                           self.covariance[0],
-            #                           ction_seq)
-
+            mjx_data = jax.tree_util.tree_map(
+                lambda x, y: jnp.where(done, x, y), reset_data, mjx_data
+            )
             
+            next_state = jax.tree_util.tree_map(
+                lambda x, y: jnp.where(done, x, y), jnp.concat([mjx_data.qpos,mjx_data.qvel]), next_state
+            )
+                
+            
+           
+
+            # then reward calc...
+           
+            carry = (next_state, key,buffer,mjx_data)
+            outputs = (state,next_state, action[0], r, logp,done)
+            return carry, outputs
         #pdb.set_trace()
-        #rewards = jnp.array(rewards)
-        pbar.close()
-
-        self.reset()
-
+        # Run scan for evaluation_interval steps
+        (final_state, _,final_buffer,mjx_data), traj = lax.scan(
+            rollout_step,
+            (init_state, key,self.buffer,self.mjx_data),
+            jnp.arange(self.rollout_length)
+        )
+        self.buffer=final_buffer
+        self.mjx_data=mjx_data
         
-        return states, traj_probs, actions,rewards,logps
-
+        
+      
+        #states, next_states,actions, rewards, log_ps,dones =traj
+        #states, next_states,actions, rewards, log_ps,dones =self.buffer.get()
+        # self.buffer.append(states, actions, rewards, dones, log_ps, next_states)
+    
+        # # reset
+        # self.reset()
+        return 
    
     def update_ppo(self, states: jnp.ndarray,
                    actions: jnp.ndarray,
@@ -491,15 +351,16 @@ class PPOPolicy():
                    gamma: float = 0.995,
                    lam: float = 0.97,
                    clip_eps: float = 0.2,
-                   vf_coef: float = 0.5,
+                   vf_coef: float = 1,
                    ent_coef: float = 0.000,
                    num_epochs: int = 10,
-                   batch_size: int = 2048):
+                   batch_size: int = 64):
 
         n_samples = states.shape[0]
 
         def get_advantages(rewards, values, next_values, dones):
             deltas = rewards + gamma * (1.0 - dones) * next_values - values
+            
             adv = []
             gae = 0.0
             for delta, done in zip(deltas[::-1], dones[::-1]):
@@ -517,12 +378,13 @@ class PPOPolicy():
             next_values = jnp.zeros_like(rewards)
 
         advantages = get_advantages(rewards, values, next_values, dones)
+       
         returns = advantages + values
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
         def get_minibatches():
             idxs = jnp.arange(n_samples)
-            idxs = jax.random.permutation(jax.random.PRNGKey(0), idxs)
+            #idxs = jax.random.permutation(jax.random.PRNGKey(0), idxs)
             for start in range(0, n_samples, batch_size):
                 if start +batch_size >= n_samples:
                     idxs[start:]
@@ -536,32 +398,21 @@ class PPOPolicy():
             adv = advantages[minibatch_idxs]
             #ret = returns[minibatch_idxs]
 
-            mu, std = self.policy_net.apply({'params': params}, s)
-            #dist = mu + std * jax.random.normal(jax.random.PRNGKey(0), mu.shape)
-            #logp = -0.5 * (((a - mu) / std) ** 2 + 2 * jnp.log(std) + jnp.log(2 * jnp.pi))
-            #logp = jnp.sum(logp, axis=-1)
-            # Invert tanh: recover pre-tanh u from squashed action a
-            u = jnp.arctanh(jnp.clip(a, -0.999999, 0.999999))  # avoid NaN near ±1
-        
-            # Gaussian log prob of u
-            logp_u = -0.5 * (((u - mu) / std) ** 2 +
-                             2 * jnp.log(std) +
-                             jnp.log(2 * jnp.pi))
-            logp_u = jnp.sum(logp_u, axis=-1)
-        
-            # Change-of-variables correction (Jacobian of tanh)
-            logp = logp_u - jnp.sum(jnp.log(1 - a**2 + 1e-6), axis=-1)
+            mu, log_std = self.policy_net.apply({'params': params}, s)
 
+            logp = self.evaluate_log_pi(s, a,params)
+            
             ratio = jnp.exp(logp - old_logp)
             clipped = jnp.clip(ratio, 1 - clip_eps, 1 + clip_eps)
             loss_pi = -jnp.mean(jnp.minimum(ratio * adv, clipped * adv))
             if self.gym_env in ["CartPole-v1"]:
                 entropy = -jnp.mean(logp)
             else:
-                entropy_per_sample = jnp.sum(jnp.log(std) + 0.5 * jnp.log(2 * jnp.pi * jnp.e), axis=-1)
+                entropy_per_sample = jnp.sum(log_std + 0.5 * jnp.log(2 * jnp.pi * jnp.e), axis=-1)
                 entropy = jnp.mean(entropy_per_sample)
            
             loss = loss_pi - ent_coef * entropy
+            #print(loss)
 
             
 
@@ -576,11 +427,14 @@ class PPOPolicy():
             loss = vf_coef * vf_loss
 
             return loss
-
+        mb = jnp.arange(n_samples)
         for _ in range(num_epochs):
-            for mb in get_minibatches():
-                actor_grads = jax.grad(actor_loss_fn)(self.policy_model.params, mb)
-                self.policy_model = self.policy_model.apply_gradients(grads=actor_grads)
-                if self.value_fn:
-                    critic_grads = jax.grad(critic_loss_fn)(self.value_fn.params, mb)
-                    self.value_fn = self.value_fn.apply_gradients(grads=critic_grads)
+            #pdb.set_trace()
+
+            actor_grads = jax.grad(actor_loss_fn)(self.policy_model.params, mb)
+            self.policy_model = self.policy_model.apply_gradients(grads=actor_grads)
+            if self.value_fn:
+                critic_grads = jax.grad(critic_loss_fn)(self.value_fn.params, mb)
+                self.value_fn = self.value_fn.apply_gradients(grads=critic_grads)
+                
+        

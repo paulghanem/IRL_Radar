@@ -12,7 +12,7 @@ import jax.numpy as jnp
 import jax
 from jax import vmap,jit
 import time 
-
+import sys
 
 import gymnax
 import gymnasium as gym
@@ -35,6 +35,9 @@ from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 from utils.helpers import GenerateDemo
 
 import gymnax
+# Redirect NumPy 2.x paths to NumPy 1.x
+#sys.modules["numpy._core"] = np.core
+#sys.modules["numpy._core.numeric"] = np.core.numeric
 
 print(jax.devices())
 # CONVERTS TRAJ LIST TO STEP LIST
@@ -63,8 +66,8 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=100000,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=2000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps_expert",default=100,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=20,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=1,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
@@ -88,7 +91,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="HalfCheetah-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -380,7 +383,7 @@ for runs in range (args.runs):
                     #sample_trajs = demo_trajs + sample_trajs
                     D_samp=np.array([])
                     D_samp = preprocess_traj(trajs, D_samp)
-                    print(steps,f"rewards: {rewards:.4f} ")
+                   # print(steps,f"rewards: {rewards:.4f} ")
             
             #D_samp = D_demo
             
