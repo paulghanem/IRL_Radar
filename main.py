@@ -58,7 +58,7 @@ def preprocess_traj(traj_list, step_list, is_Demo = False):
 #torch.autograd.set_detect_anomaly(True)
 # SEEDS
 
-
+jax.config.update("jax_enable_x64", True)
 # ENV SETUP
 
 parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -66,10 +66,10 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=100,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=20,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=1,type=int,help="The number of epoch updates")
-parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
+parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
+parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=10,type=int,help="The number of runs")
@@ -81,7 +81,7 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-2,type=float, help='rgcl initial covariance')
-parser.add_argument('--Q', default=1e-5,type=float, help='rgcl learning rate')
+parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
 parser.add_argument('--sigma', default=0.0,type=float, help='noise level')
 
 parser.add_argument("--UB",action=argparse.BooleanOptionalAction,default=False,type=bool,help="Upper bound loss  ")
@@ -91,7 +91,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="MountainCarContinuous-v0",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -99,8 +99,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=85,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=3500,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -343,112 +343,117 @@ for runs in range (args.runs):
                 P_theta = args.P * jnp.identity(n_theta)
         steps=0 
         initial_state=D_demo[0,:args.s_dim]
-        while steps<args.N_steps_expert:
-        
-            if args.rgcl:
-                
-                trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],P_theta,thetas)]
-                rewards=trajs[0][-2]
-                P_theta=trajs[0][-1]
-                #print(P_theta)
-                total_cost=rewards
-            elif args.online:
-                trajs = [policy.generate_session(args,state_train,initial_state,thetas)]
-                rewards=trajs[0][-2]
-                state_train=trajs[0][-1]
-                total_cost=rewards
-            else:
-                
-                if args.PPO:
-                    trajs = [policy.generate_session(args,D_demo)]
-                    rewards=trajs[0][-2]
-                    total_cost=rewards
-                    sample_trajs = [trajs[0][:-2]] #+ sample_trajs
-                    log_probs_old=trajs[0][-1]
-                    #sample_trajs = demo_trajs + sample_trajs
-                    D_samp=np.array([])
-                    D_samp = preprocess_traj(trajs, D_samp)
-                    
-                else:
-                    start = time.time()
-                    trajs = [policy.generate_session(args,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],thetas)]
-                    end = time.time()
+       
     
-                    print(f"Execution time: {end - start:.4f} seconds")
-                    
-                    
-                    rewards=trajs[0][-1]
-                    total_cost=rewards
-                    sample_trajs = [trajs[0][:-1]] #+ sample_trajs
-                    #sample_trajs = demo_trajs + sample_trajs
-                    D_samp=np.array([])
-                    D_samp = preprocess_traj(trajs, D_samp)
-                   # print(steps,f"rewards: {rewards:.4f} ")
+        if args.rgcl:
             
-            #D_samp = D_demo
+            trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],P_theta,thetas)]
+            rewards=trajs[0][-2]
+            P_theta=trajs[0][-1]
+            #print(P_theta)
+            total_cost=rewards
+        elif args.online:
+            trajs = [policy.generate_session(args,state_train,initial_state,thetas)]
+            rewards=trajs[0][-2]
+            state_train=trajs[0][-1]
+            total_cost=rewards
+        else:
             
-            steps+=args.N_steps
-            initial_state=D_demo[steps,:args.s_dim]
-            # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
-            if not args.rgcl and not args.online:
-                loss_rew = []
-                for _ in range(REWARD_FUNCTION_UPDATE):
-                    selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
-                    #selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
-                    selected_demo=D_demo[steps-args.N_steps:steps]
-        
-                    #D_s_samp = D_samp[selected_samp]
-                    #D_s_demo = D_demo[selected_demo]
-                    D_s_samp = D_samp
-                    D_s_demo = D_demo
-                    #D̂ samp ← D̂ demo ∪ D̂ samp
-                    #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
-        
-                    states, probs, actions = D_s_samp[:,:args.s_dim], D_s_samp[:,args.s_dim], D_s_samp[:,args.s_dim+1:]
-                    states_expert,probs_experts, actions_expert = D_s_demo[:,:args.s_dim], D_s_demo[:,args.s_dim], D_s_demo[:,args.s_dim+1:]
-        
-                    # Reducing from float64 to float32 for making computaton faster
-                    #states = torch.tensor(states, dtype=torch.float32)
-                    #probs = torch.tensor(probs, dtype=torch.float32)
-                    #actions = torch.tensor(actions, dtype=torch.float32)
-                    #states_expert = torch.tensor(states_expert, dtype=torch.float32)
-                    #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
-                    if args.airl:
-                        grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
-                    
-                    elif args.sqil:
-                         grads, loss_IOC = apply_model_SQIL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
-                    
-                    else :
-                        grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
-        
-                    state_train = update_model(state_train, grads)
-        
-        
-        
-                    loss_rew.append(loss_IOC)
-                    next_states = jnp.vstack([states[1:], states[-1:]]) 
-                    if args.PPO:
-                        policy.update_ppo(
-                        states=states,
-                        actions=actions,
-                        rewards=rewards,
-                        dones=dones,
-                        log_probs_old=log_probs_old,
-                        next_states=next_states,
-                        batch_size=args.N_steps,
-                        value_fn=None  # or your critic if available
-                        )
+            if args.PPO:
+                trajs = [policy.generate_session(args,D_demo)]
+                rewards=trajs[0][-2]
+                total_cost=rewards
+                sample_trajs = [trajs[0][:-2]] #+ sample_trajs
+                log_probs_old=trajs[0][-1]
+                #sample_trajs = demo_trajs + sample_trajs
+                D_samp=np.array([])
+                D_samp = preprocess_traj(trajs, D_samp)
                 
+            else:
+                start = time.time()
+                #trajs = [policy.generate_session(args,state_train,initial_state,D_demo,thetas)]
+                trajs=[policy.generate_session_lax(args,state_train,D_demo)]
+                end = time.time()
                 
-                # mean_costs.append(np.mean(sum_of_cost_list))
-                mean_loss_rew.append(np.mean(loss_rew))
+
                
-                            
-                    
+                
+                
+                rewards=trajs[0][-1]
+               
+                print(f"Execution time: {end - start:.4f} seconds,Total True Reward = {rewards:.4f}")
+                
+                total_cost=rewards
+                sample_trajs = [trajs[0][:-1]] #+ sample_trajs
+                #sample_trajs = demo_trajs + sample_trajs
+                D_samp=np.array([])
+                D_samp = preprocess_traj(trajs, D_samp)
+               # print(steps,f"rewards: {rewards:.4f} ")
+        
+        #D_samp = D_demo
+        
+        
+        initial_state=D_demo[steps,:args.s_dim]
+        # UPDATING REWARD FUNCTION (TAKES IN D_samp, D_demo)
+        if not args.rgcl and not args.online:
+            loss_rew = []
+            for _ in range(REWARD_FUNCTION_UPDATE):
+                selected_samp = np.random.choice(len(D_samp), DEMO_BATCH)
+                #selected_demo = np.random.choice(len(D_demo), DEMO_BATCH)
+                selected_demo=D_demo[steps-args.N_steps:steps]
+    
+                #D_s_samp = D_samp[selected_samp]
+                #D_s_demo = D_demo[selected_demo]
+                D_s_samp = D_samp
+                D_s_demo = D_demo
+                #D̂ samp ← D̂ demo ∪ D̂ samp
+                #D_s_samp = jnp.concatenate((D_s_demo, D_s_samp), axis = 0)
+    
+                states, probs, actions = D_s_samp[:,:args.s_dim], D_s_samp[:,args.s_dim], D_s_samp[:,args.s_dim+1:]
+                states_expert,probs_experts, actions_expert = D_s_demo[:,:args.s_dim], D_s_demo[:,args.s_dim], D_s_demo[:,args.s_dim+1:]
+    
+                # Reducing from float64 to float32 for making computaton faster
+                #states = torch.tensor(states, dtype=torch.float32)
+                #probs = torch.tensor(probs, dtype=torch.float32)
+                #actions = torch.tensor(actions, dtype=torch.float32)
+                #states_expert = torch.tensor(states_expert, dtype=torch.float32)
+                #actions_expert = torch.tensor(actions_expert, dtype=torch.float32)
+                if args.airl:
+                    grads, loss_IOC = apply_model_AIRL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
+                
+                elif args.sqil:
+                     grads, loss_IOC = apply_model_SQIL(state_train, states, actions,states_expert,actions_expert,probs,probs_experts)
+                
+                else :
+                    grads, loss_IOC = apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,args.UB)
+    
+                state_train = update_model(state_train, grads)
+    
+    
+    
+                loss_rew.append(loss_IOC)
+                next_states = jnp.vstack([states[1:], states[-1:]]) 
+                if args.PPO:
+                    policy.update_ppo(
+                    states=states,
+                    actions=actions,
+                    rewards=rewards,
+                    dones=dones,
+                    log_probs_old=log_probs_old,
+                    next_states=next_states,
+                    batch_size=args.N_steps,
+                    value_fn=None  # or your critic if available
+                    )
             
-            epoch_cost.append(total_cost)
-            expert_cost.append(rewards_demo)
+            
+            # mean_costs.append(np.mean(sum_of_cost_list))
+            mean_loss_rew.append(np.mean(loss_rew))
+           
+                        
+                
+        
+        epoch_cost.append(total_cost)
+        expert_cost.append(rewards_demo)
            
             # if np.remainder(i,10)==0:
             #     save_dir = f"{epoch_cost_dir}/{method}"
