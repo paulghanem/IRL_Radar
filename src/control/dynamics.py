@@ -53,71 +53,15 @@ def mjx_step(mjx_model, mjx_data, state,action,gym_env):
         mjx.Data: Updated simulation state.
     """
 
+    mjx_data = mjx_data.replace(qpos=state[:mjx_model.nq],qvel=state[mjx_model.nq:],ctrl=action)
+
+    # Advance simulation
+    mjx_data = mjx.step(mjx_model, mjx_data)
+    res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
     
-    if gym_env=="HalfCheetah-v4":
-        # Apply control to mjx_data
-        mjx_data = mjx_data.replace(qpos=state[:9],qvel=state[9:],ctrl=action)
-
-        # Advance simulation
-        mjx_data = mjx.step(mjx_model, mjx_data)
-        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
-    elif gym_env=="Ant":
-        mjx_data = mjx_data.replace(qpos=state[:15],qvel=state[15:],ctrl=action)
-
-        # Advance simulation
-        mjx_data = mjx.step(mjx_model, mjx_data)
-        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
-    elif gym_env=="Humanoid-v4":
-        mjx_data = mjx_data.replace(qpos=state[:24],qvel=state[24:],ctrl=action)
-
-        # Advance simulation
-        mjx_data = mjx.step(mjx_model, mjx_data)
-        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
-    
-    elif gym_env=="Hopper":
-        mjx_data = mjx_data.replace(qpos=state[:6],qvel=state[6:],ctrl=action)
-
-        # Advance simulation
-        mjx_data = mjx.step(mjx_model, mjx_data)
-        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
-        
-    elif gym_env=="Walker2d":
-        mjx_data = mjx_data.replace(qpos=state[:9],qvel=state[9:],ctrl=action)
-
-        # Advance simulation
-        mjx_data = mjx.step(mjx_model, mjx_data)
-        res=jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
     return res
 
-@partial(jax.jit, static_argnames=("gym_env"))
-def mjx_step_lax(mjx_model, mjx_data,action,gym_env):
-    """
-    JAX-compatible MJX step function.
 
-    Args:
-        mjx_model (mjx.Model): The MJX-compiled MuJoCo model.
-        mjx_data (mjx.Data): Current simulation data (state).
-        action (jnp.ndarray): Control input to apply.
-
-    Returns:
-        mjx.Data: Updated simulation state.
-    """
-
-    
-    action = jnp.asarray(action, dtype=mjx_data.ctrl.dtype)
-   
-    mjx_data = mjx_data.replace(ctrl=action)
-    #def body(_,d):
-     #   return mjx.step(mjx_model, d)
-
-    def body(d, _):
-        return mjx.step(mjx_model, d), None
-    mjx_data, _ = lax.scan(body, mjx_data, None, length=1)
-    #mjx_data= lax.fori_loop(0, 5, body, mjx_data)
-   
-    forward_vel = mjx_data.qvel[0]
-    obs = jnp.concatenate([mjx_data.qpos, mjx_data.qvel])
-    return mjx_data, obs, forward_vel
 def mountaincar_step(
     state,action
 ):
@@ -298,61 +242,7 @@ def kinematics(state, action, step_fn):
     states = scan_out
     return states
 
-# @partial(jax.jit, static_argnames=("step_fn",))
-# def kinematics_mujoco(mjx_model,mjx_data,action, step_fn):
-#     """Rollout a jitted gymnax episode with lax.scan."""
 
-#     def policy_step(mjx_data, tmp):
-#         """lax.scan compatible step transition in jax env."""
-
-#         action = tmp
-#         next_data = step_fn(mjx_model,mjx_data,action)
-
-#         carry = next_data
-#         return carry, carry
-
-#     # Scan over episode step loop
-#     _, scan_out = jax.lax.scan(
-#         policy_step,
-#         mjx_data,
-#         action,
-#     )
-#     # Return masked sum of rewards accumulated by agent in episode
-#     states = scan_out
-#     return states
-
-@partial(jax.jit, static_argnames=("step_fn","gym_env"))
-def kinematics_mujoco_lax(mjx_model,mjx_data,action, step_fn,gym_env):
-    
-    def do_step(data, a):
-        data, obs, fwd = step_fn(mjx_model, data, a, gym_env)
-        return data, (obs, fwd)
-
-    mjx_data, (obs_seq, fwd_seq) = lax.scan(do_step, mjx_data, action)
-    return mjx_data, obs_seq, fwd_seq
-
-# @partial(jax.jit, static_argnames=("step_fn","gym_env"))
-# def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env):
-#     """Rollout a jitted gymnax episode with lax.scan."""
-
-#     def policy_step(state, tmp):
-#         """lax.scan compatible step transition in jax env."""
-
-#         action = tmp
-#         next_state = step_fn(mjx_model,mjx_data,state,action,gym_env)
-
-#         carry = next_state
-#         return carry, carry
-
-#     # Scan over episode step loop
-#     _, scan_out = jax.lax.scan(
-#         policy_step,
-#         state,
-#         action,
-#     )
-#     # Return masked sum of rewards accumulated by agent in episode
-#     states = scan_out
-#     return states
 
 
 @partial(jax.jit, static_argnames=("step_fn", "gym_env", "frame_skip"))

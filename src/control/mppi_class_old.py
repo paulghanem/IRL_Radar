@@ -1075,5 +1075,5 @@ class MPPI:
         self.reset()
     
 
-        return states, traj_probs, actions,rewards,P_theta
+        return states, traj_probs, actions,rewards,P_theta,params
 

@@ -13,7 +13,7 @@ from src.objective_fns.cost_to_go_fns import get_cost
 from cost_jax import get_gradients,get_hessian,get_hessian_diag,get_precond,fisher_diag
 
 import os.path as osp
-
+from functools import partial
 
 import math
 from tqdm.auto import tqdm
@@ -602,243 +602,114 @@ class MPPI:
         
 
         return states, traj_probs, actions, rewards
-
     
-                      
-
-    def RGCL(self, args, params, state_train,initial_state, D_demo,P_theta, thetas=None):
-
-        # theta = jnp.concatenate((params['Dense_0']['bias'].flatten(), params['Dense_0']['kernel'].flatten(),
-        #                          params['Dense_1']['bias'].flatten(), params['Dense_1']['kernel'].flatten()))
+    def RGCL_lax(self, args, params, state_train, initial_state, D_demo, P_theta_in, thetas=None):
+        """
+        LAX-scan version of RGCL.
+        Performs full Hessian updates inside the scan.
+        Produces identical updates to the Python loop version.
+        """
+    
+        # ---- Flatten parameters into theta ----
         flat_params, treedef = jax.tree_util.tree_flatten(params)
-        theta=jnp.concatenate([p.flatten() for p in flat_params])
-        #pdb.set_trace()
-        n_theta = len(theta)
+        theta0 = jnp.concatenate([p.reshape(-1) for p in flat_params])
+        n_theta = theta0.size
+        key= jax.random.PRNGKey(args.seed)
+    
+        # ---- Initialize P_theta and Q_theta ----
         if args.diagonal:
-            P_theta = args.P * jnp.ones(n_theta)
-            Q_theta = args.Q* jnp.ones(n_theta)
-
-        else:   
-            P_theta = args.P * jnp.identity(n_theta)
-    
-            Q_theta = args.Q* jnp.identity(n_theta)
-        states, traj_probs, actions, FIMs = [], [], [], []
-
-        key = jax.random.PRNGKey(args.seed)
-        #jnp.random.seed(args.seed)
-        env=args.gym_env     
-        if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
-            env, env_params = gymnax.make(env)
-            _, rng_reset = jax.random.split(key)
-            env_state = env.reset(rng_reset, env_params)
-        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
-            self.mjx_data = mjx.make_data(self.mjx_model)
+            raise ValueError("Diagonal version not implemented here. Full version only.")
         else:
-            env = gym.make(env)
-            env_state = env.reset(seed=args.seed)
-
-
-
-        state = initial_state
-        
-
-        true_cost_fn = get_cost(args.gym_env)
-
-        #rewards = [true_cost_fn(state)]
-        rewards=0
-
-        pbar = tqdm(total=args.N_steps, desc="Starting")
-
-        states_expert, actions_expert = D_demo[:, :state.shape[0]], D_demo[:, state.shape[0]:]
-        # total_cost = 0
-        n_layers=len(params)
-
-        for step in range(1, args.N_steps + 1):
-            states.append(state)
-
-            action_seq, state_seq = self.forward(state=state,state_train=state_train, gail=args.gail)
-            # step_cost = true_cost_fn(state)
-            # total_cost += step_cost
-            # pbar.set_description(
-            #     f"State = {state} , Action = {action_seq[0].flatten()} , Total True Cost = {total_cost:.4f} , Cost True = {step_cost:.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
-            # pbar.update(1)
-
-            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]: 
-               if self.gym_env in ["Ant"]:
-                    state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
-               state=jnp.array(state,dtype=jnp.float64)
-               action_seq=jnp.array(action_seq,dtype=jnp.float64)
-               if self.gym_env=="Humanoid-v4":
-                   pos_before = mass_center(self.mjx_model,state)
-               state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action_seq[0,:].reshape((1,-1)),self._dynamics,self.gym_env).flatten()
-               if self.gym_env=="Humanoid-v4":
-                   pos_after = mass_center(self.mjx_model,state)
-               if self.gym_env in ["Ant"]:
-                  state=state[2:]
-               #state=self._dynamics(self.mjx_model,self.mjx_data,state.flatten(), action_seq[0,:].flatten())
-               if self.gym_env =="HalfCheetah-v4":
-                   #self.mjx_data = self.mjx_data.replace(qpos=self.mjx_data.qpos.at[0].set(state[0]))
-                   forward_reward=state[9]
-               if self.gym_env=="Hopper":
-                   forward_reward=state[6]
-               if self.gym_env=="Walker2d":
-                   forward_reward=state[9]
-                   #state=state[1:]
-               elif self.gym_env=="Ant":
-                   forward_reward=state[15]
-               elif self.gym_env=="Humanoid-v4":
-                   forward_reward=(pos_after - pos_before) / 0.003
-            else:
-               state = self._dynamics(state, action_seq[0,:])  # , reward, terminated, truncated, info = env.step(action_seq_np[0, :])
-           
-            state = state.ravel()
-            action=action_seq[0,:]
-           
-            if args.gym_env == "CartPole-v1":
-                x=state[0]
-                x_threshold=2.4
-                theta_cart=state[2]
-                theta_threshold_radians=12 * 2 * math.pi / 360
-                terminated = bool(
-                x < -x_threshold
-                or x > x_threshold
-                or theta_cart < -theta_threshold_radians
-                or theta_cart > theta_threshold_radians
-                )
-                r= jnp.array([0.0])
-                if not terminated:
-                    r= jnp.array([1.0])
-              
-                   
-            if args.gym_env == "Pendulum-v1":
-                x=state[0]
-                y=state[1]
-                theta_pend=jnp.atan2(y,x)
-                theta_dot=state[2]
-                r = -(jnp.pow(theta_pend,2) + 0.1 * jnp.pow(theta_dot,2) + 0.001 * jnp.pow(action_seq[0,:],2))
-               
-            if args.gym_env == "MountainCarContinuous-v0":
-                r=-0.1 * jnp.pow(action_seq[0,:],2)
-                goal_position = 0.45
-                goal_velocity = 0.0
-                x=state[0]
-                xd=state[1]
-                if goal_position <= x :
-                    r+=100 
-            if args.gym_env == "HalfCheetah-v4":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
-                r = forward_reward - ctrl_cost
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Ant":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if state[1] <0.2 or state[1]>1:
-                    alive_bonus=0
-                ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
-                r = forward_reward - ctrl_cost+alive_bonus
-                r=r.reshape((1,1))
-                
-                            
-            if args.gym_env == "Hopper":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
-                    alive_bonus=0
-                   # break
-                if state[2] < -0.2  or state[2] > 0.2:
-                    alive_bonus=0
-                   # break 
-                if state[1] < 0.7:
-                    alive_bonus=0
-                    #break  
-               
-                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
-                r = forward_reward - ctrl_cost + alive_bonus
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Walker2d":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=1
-                if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
-                    alive_bonus=0
-                
-                ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
-                r = forward_reward - ctrl_cost + alive_bonus
-                r=r.reshape((1,1))
-                
-            if args.gym_env == "Humanoid-v4":
-                #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-                alive_bonus=5
-                if state[2] <1 or state[2]>2:
-                    alive_bonus=0
-                quad_impact_cost = 0.5e-6 * jnp.square(self.mjx_data.cfrc_ext).sum()
-                quad_impact_cost = min(quad_impact_cost, 10)
-                ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
-                r = 1.25*forward_reward - ctrl_cost -quad_impact_cost + alive_bonus
-                r=r.reshape((1,1))   
-           
-            #rewards.append(true_cost_fn(state))
-            #pdb.set_trace()
-            rewards=rewards+r[0]
-           
-            pbar.set_description(
-                f"  Total True Reward = {rewards.item():.4f} ,Reward True = {r[0].item():.4f}")
-                #f"Reward True = {r[0].item():.4f} ,  Cost Estimated = {state_train.apply_fn({'params': state_train.params}, state.reshape(1, -1)).ravel().item():.4f}")
-            pbar.update(1)
-
-            gradient_s = get_gradients(state_train, params, state, args.N_steps)
-            gradient_d = get_gradients(state_train, params, states_expert[step - 1], args.N_steps)
-            if args.diagonal:
-                hessian_s = get_hessian_diag(state_train, params, state, args.N_steps)
-                hessian_d = get_hessian_diag(state_train, params, states_expert[step - 1], args.N_steps)
-                #hessian_s = fisher_diag(gradient_s)
-                #hessian_d = fisher_diag(gradient_d)
-                
-            else:
-                #hessian_s = get_hessian(state_train, params, state, args.N_steps)
-                #hessian_d = get_hessian(state_train, params, states_expert[step - 1], args.N_steps)
-                hessian_s = fisher_diag(gradient_s)
-                hessian_d = fisher_diag(gradient_d)
-            #hessian_s= get_precond(gradient_s,state_train,params,state,args.N_steps)
-            #hessian_d= get_precond(gradient_d,state_train, params, states_expert[step - 1], args.N_steps)
-
-        
-            #pdb.set_trace()
-            if args.diagonal:
-                theta,P_theta= update_theta_diag(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
-            else:
-                theta,P_theta= update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s)
-
-            #print(P_theta)
-            # params['Dense_0']['bias'] = theta[:len(params['Dense_0']['bias'])]
-            # params['Dense_0']['kernel'] = theta[len(params['Dense_0']['bias']):len(params['Dense_0']['bias']) +
-            #                                                                    params['Dense_0']['kernel'].shape[0] *
-            #                                                                    params['Dense_0']['kernel'].shape[
-            #                                                                        1]].reshape(
-            #     params['Dense_0']['kernel'].shape)
-                                                                                       
-            # params['Dense_1']['bias'] = theta[len(params['Dense_0']['bias']) + params['Dense_0']['kernel'].shape[0] *
-            #                                   params['Dense_0']['kernel'].shape[1]:len(params['Dense_0']['bias']) +
-            #                                                                        params['Dense_0']['kernel'].shape[
-            #                                                                            0] *
-            #                                                                        params['Dense_0']['kernel'].shape[
-            #                                                                            1] + len(
-            #     params['Dense_1']['bias'])]
-            # params['Dense_1']['kernel'] = theta[len(params['Dense_0']['bias']) + params['Dense_0']['kernel'].shape[0] *
-            #                                     params['Dense_0']['kernel'].shape[1] + len(
-            #     params['Dense_1']['bias']):].reshape(-1, 1)
-            counter=0
-            for i in range (n_layers):
-                for j in ['bias','kernel']:
-                    params['Dense_'+str(i)][j]=theta[counter:counter+len(params['Dense_'+str(i)][j].flatten())].reshape(params['Dense_'+str(i)][j].shape)
-                    counter+=len(params['Dense_'+str(i)][j].flatten())
-                    
-        #rewards = np.array(rewards)
-        pbar.close()
-        self.reset()
+            P0 = args.P * jnp.eye(n_theta)
+            Q  = args.Q * jnp.eye(n_theta)
     
+        # ---- Expert data ----
+        expert_states  = D_demo[:, :args.s_dim]
+        expert_actions = D_demo[:, args.s_dim:args.s_dim + args.a_dim]
+    
+        # ---- Initial state ----
+        init_state = initial_state
+    
+        # ----------- SCAN BODY -----------
+        def scan_step(carry, t):
+            state, theta, P,prev_action_seq, key = carry
+           
+            # ---- Unflatten theta → params ----
+            p_list = []
+            idx = 0
+            for p in flat_params:
+                size = p.size
+                p_list.append(theta[idx:idx+size].reshape(p.shape))
+                idx += size
+            local_params = jax.tree_util.tree_unflatten(treedef, p_list)
+            
+            state_train_local=state_train.replace(params=local_params)
+            # ---- MPPI policy + dynamics ----
+            # no mutation: pure version
+            action_seq, _, new_key, new_prev_action_seq  = self.forward_pure(
+                state=state,
+                state_train=state_train_local,
+                gail=args.gail,
+                key= key,   # deterministic per-step noise
+                prev_action_seq=prev_action_seq
+            )
+            action = action_seq[0]
+    
+            # ---- Environment transition ----
+            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+                next_state = kinematics_mujoco(
+                    self.mjx_model, self.mjx_data, state, action.reshape(1,-1),
+                    self._dynamics, self.gym_env
+                ).reshape(-1)
+            else:
+                next_state = self._dynamics(state, action).reshape(-1)
+            forward_reward=0
+            reward = self.reward_fn(self.gym_env, next_state, action, forward_reward, self.mjx_data)
+    
+            # ---- Compute gradients ----
+            g_s = get_gradients(state_train_local, local_params, next_state, args.N_steps)
+            g_d = get_gradients(state_train_local, local_params, expert_states[t], args.N_steps)
+    
+            # ---- Full Hessians ----
+            H_s = get_hessian(state_train_local, local_params, next_state, args.N_steps)
+            H_d = get_hessian(state_train_local, local_params, expert_states[t], args.N_steps)
+    
+            # ---- Kalman-style update (EXACT rule you want) ----
+            # P ← inv(inv(P + Q) + H_d - H_s)
+            P_new = jnp.linalg.inv(jnp.linalg.inv(P + Q) + (H_d - H_s))
+    
+            # theta ← theta − P (g_d − g_s)
+            theta_new = theta - P_new @ (g_d - g_s)
+            traj_prob=1
+            theta_new = theta_new.astype(jnp.float32)
+            
+            return (next_state, theta_new, P_new,new_prev_action_seq,new_key), (state, traj_prob,action,reward,P_new)
+        
+        # ----------- EXECUTE SCAN -----------
+        (final_state, final_theta, final_P,_,_),(states, traj_probs, actions, rewards,P_theta) = lax.scan(
+            scan_step,
+            (init_state, theta0, P0,self._previous_action_seq,key),
+            jnp.arange(args.N_steps)
+        )
+    
+        # ----------- Unflatten final theta back into params -----------
+        idx = 0
+        new_param_list = []
+       
+        for p in flat_params:
+            size = p.size
+            new_param_list.append(final_theta[idx:idx+size].reshape(p.shape))
+            idx += size
+        new_params = jax.tree_util.tree_unflatten(treedef, new_param_list)
+        params=new_params
+        rewards=jnp.sum(rewards)
+        states, traj_probs, actions, rewards = (
+            states.tolist(),
+            traj_probs.tolist(),
+            actions.tolist(),
+            rewards.tolist()
+        )
+        
+        return states, traj_probs, actions, rewards,P_theta,params 
 
-        return states, traj_probs, actions,rewards,P_theta
 

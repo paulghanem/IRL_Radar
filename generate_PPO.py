@@ -9,15 +9,15 @@ import gymnasium as gym
 from stable_baselines3 import PPO,SAC
 
 model_dir = "expert_agents"
-log_dir = "logs_humanoid_standup"
+log_dir = "logs_Ant-v4"
 os.makedirs(model_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 sb3_algo="PPO"
-TIMESTEPS = 200
-env_name="MountainCarContinuous-v0"
+TIMESTEPS = 10000
+env_name="Ant-v4"
 # Create environment (you can also try "Ant-v4", "Humanoid-v4", etc.)
-#env = gym.make(env_name,exclude_current_positions_from_observation=False,render_mode="human")
-env = gym.make(env_name,render_mode="human")
+env = gym.make(env_name,exclude_current_positions_from_observation=False,use_contact_forces=False,render_mode="human")
+#env = gym.make(env_name,render_mode="human")
 #env = gym.make(env_name, render_mode="rgb_array", lap_complete_percent=0.95, domain_randomize=False, continuous=True)
 
 
@@ -34,7 +34,7 @@ elif load:
 # Train PPO agent
 
 
-while iterations<300:
+while iterations<1000:
     iterations+=1
     model.learn(total_timesteps=TIMESTEPS,reset_num_timesteps=False)
     #model.save(f"{model_dir}/{env_name}/{sb3_algo}_{TIMESTEPS * iterations}")

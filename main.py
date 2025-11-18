@@ -58,8 +58,7 @@ def preprocess_traj(traj_list, step_list, is_Demo = False):
 #torch.autograd.set_detect_anomaly(True)
 # SEEDS
 
-jax.config.update("jax_enable_x64", True)
-# ENV SETUP
+
 
 parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -91,7 +90,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="MountainCarContinuous-v0",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -99,8 +98,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=85,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=3500,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -247,10 +246,10 @@ for runs in range (args.runs):
             demo_generator = GenerateDemo(args.gym_env,max_frames=args.N_steps_expert)
             states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
             print("rewards_demo",rewards_demo)
-            if args.gym_env=="Ant":
-                states_d=states_d[:,:27]
-            if args.gym_env=="Humanoid-v4":
-                states_d=states_d[:,:47]
+            # if args.gym_env=="Ant":
+            #     states_d=states_d[:,:27]
+            # if args.gym_env=="Humanoid-v4":
+            #     states_d=states_d[:,:47]
            
     
             args.DEMO_BATCH = min(DEMO_BATCH,states_d.shape[0])
@@ -346,12 +345,18 @@ for runs in range (args.runs):
        
     
         if args.rgcl:
-            
-            trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],P_theta,thetas)]
-            rewards=trajs[0][-2]
-            P_theta=trajs[0][-1]
+            start = time.time()
+            #trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],P_theta,thetas)]
+            trajs = [policy.RGCL_lax(args,params,state_train,initial_state,D_demo,P_theta,thetas)]
+            end = time.time()
+            rewards=trajs[0][-3]
+            P_theta=trajs[0][-2]
+            params=trajs[0][-1]
             #print(P_theta)
             total_cost=rewards
+            #pdb.set_trace()
+            print(f"Execution time: {end - start:.4f} seconds,Total True Reward = {rewards:.4f}")
+            
         elif args.online:
             trajs = [policy.generate_session(args,state_train,initial_state,thetas)]
             rewards=trajs[0][-2]
@@ -470,43 +475,5 @@ for runs in range (args.runs):
 
 
 
-#os.makedirs(epoch_cost_dir,exist_ok=True)
-# Save the array
-#np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
-#np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
-
-# just for cartpole...
-
-# visualization_irl = [policy.generate_session(args,state_train,D_demo,mpc_method,thetas)]
-# states_mppi_irl = [get_state(state=state,action=action,time=i,env_name=args.gym_env) for i,(state,action) in enumerate(zip(visualization_irl[0][0],visualization_irl[0][1]))]
-# costs_mppi_irl = [get_cost(args.gym_env)(state) for state in visualization_irl[0][0]]
-
-# from utils.helpers import load_config
-# policy_method_agent = "es" if args.gym_env == "MountainCarContinuous-v0" else "ppo"
-# base = osp.join("expert_agents",args.gym_env, policy_method_agent)
-# configs = load_config(base + ".yaml")
-
-# env, env_params = gymnax.make(
-#     configs.train_config.env_name,
-#     **configs.train_config.env_kwargs,
-# )
-
-# vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
-# vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
-
-# print("Simulation completed. Check the 'results' folder for the recorded episodes.")
-
-
-# vis = Visualizer(env, env_params, states_mppi_irl, np.array(costs_mppi_irl))
-# vis.animate(osp.join("results",f"{args.gym_env}-mppi-irl.gif"))
-
-
-# config = {'dimensions': np.array([5, 3])}
-# ckpt_single = {'model_single': state_train, 'config': config, 'data': [D_samp]}
-# checkpoints.save_checkpoint(ckpt_dir='/tmp/flax_ckpt/flax-checkpointing',
-#                             target=ckpt_single,
-#                             step=0,
-#                             overwrite=True,
-#                             keep=2)
 
 
