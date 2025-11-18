@@ -350,7 +350,7 @@ for runs in range (args.runs):
             trajs = [policy.RGCL_lax(args,params,state_train,initial_state,D_demo,P_theta,thetas)]
             end = time.time()
             rewards=trajs[0][-3]
-            P_theta=trajs[0][-2]
+            #P_theta=trajs[0][-2]
             params=trajs[0][-1]
             #print(P_theta)
             total_cost=rewards
