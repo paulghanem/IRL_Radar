@@ -17,7 +17,7 @@ import gymnax
 import gymnasium as gym
 from mujoco import mjx 
 from tqdm.auto import tqdm
-from src.control.dynamics import kinematics,kinematics_mujoco,kinematics_mujoco_lax
+from src.control.dynamics import kinematics,kinematics_mujoco
 from src.control.buffer import  RolloutBuffer
 import math
 import pdb
