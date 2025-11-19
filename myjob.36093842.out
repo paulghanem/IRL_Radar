@@ -1,0 +1,3263 @@
+Running on node: w006
+CUDA_VISIBLE_DEVICES = 0
+[CudaDevice(id=0)]
+Using AIRL:  False
+Using GAIL:  False
+Using RGCL:  False
+Experiment State @  2025-11-19 11:08:34.823959-05:00
+Experiment Saved @  results/experiment_126
+Experiment Settings Saved @  results/experiment_126
+126
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+t: 0, State: [[-0.5993946  -0.00062985]], Action: [[-0.79255545]], Reward: [-0.06281441],Reward_sum: -0.06281441450119019, Done: [False]
+==========
+t: 1, State: [[-0.60062045 -0.00122584]], Action: [[-0.7730441]], Reward: [-0.05975972],Reward_sum: -0.12257413566112518, Done: [False]
+==========
+t: 2, State: [[-0.6024024  -0.00178194]], Action: [[-0.7524245]], Reward: [-0.05661426],Reward_sum: -0.17918840050697327, Done: [False]
+==========
+t: 3, State: [[-0.60469526 -0.00229288]], Action: [[-0.7309893]], Reward: [-0.05343453],Reward_sum: -0.2326229363679886, Done: [False]
+==========
+t: 4, State: [[-0.60744953 -0.00275428]], Action: [[-0.7090937]], Reward: [-0.05028139],Reward_sum: -0.28290432691574097, Done: [False]
+==========
+t: 5, State: [[-0.6106123  -0.00316273]], Action: [[-0.6871409]], Reward: [-0.04721626],Reward_sum: -0.33012059330940247, Done: [False]
+==========
+t: 6, State: [[-0.6141281  -0.00351585]], Action: [[-0.66555965]], Reward: [-0.04429697],Reward_sum: -0.3744175434112549, Done: [False]
+==========
+t: 7, State: [[-0.6179405  -0.00381237]], Action: [[-0.64478177]], Reward: [-0.04157435],Reward_sum: -0.415991872549057, Done: [False]
+==========
+t: 8, State: [[-0.6219925  -0.00405204]], Action: [[-0.6252166]], Reward: [-0.03908958],Reward_sum: -0.4550814628601074, Done: [False]
+==========
+t: 9, State: [[-0.62622815 -0.0042356 ]], Action: [[-0.6072281]], Reward: [-0.0368726],Reward_sum: -0.4919540584087372, Done: [False]
+==========
+t: 10, State: [[-0.6305928  -0.00436466]], Action: [[-0.5911212]], Reward: [-0.03494243],Reward_sum: -0.5268964767456055, Done: [False]
+==========
+t: 11, State: [[-0.6350114  -0.00441854]], Action: [[-0.5617516]], Reward: [-0.03155649],Reward_sum: -0.5584529638290405, Done: [False]
+==========
+t: 12, State: [[-0.63940376 -0.00439238]], Action: [[-0.5293055]], Reward: [-0.02801643],Reward_sum: -0.5864694118499756, Done: [False]
+==========
+t: 13, State: [[-0.6436801  -0.00427631]], Action: [[-0.49006385]], Reward: [-0.02401626],Reward_sum: -0.6104856729507446, Done: [False]
+==========
+t: 14, State: [[-0.6477249  -0.00404481]], Action: [[-0.43317604]], Reward: [-0.01876415],Reward_sum: -0.6292498111724854, Done: [False]
+==========
+t: 15, State: [[-0.65140593 -0.00368102]], Action: [[-0.36385477]], Reward: [-0.01323903],Reward_sum: -0.6424888372421265, Done: [False]
+==========
+t: 16, State: [[-0.65458727 -0.00318133]], Action: [[-0.2903688]], Reward: [-0.0084314],Reward_sum: -0.6509202122688293, Done: [False]
+==========
+t: 17, State: [[-0.6571246 -0.0025373]], Action: [[-0.2088654]], Reward: [-0.00436248],Reward_sum: -0.6552826762199402, Done: [False]
+==========
+t: 18, State: [[-0.6587985  -0.00167393]], Action: [[-0.07433343]], Reward: [-0.00055255],Reward_sum: -0.6558352112770081, Done: [False]
+==========
+t: 19, State: [[-6.5930367e-01 -5.0512818e-04]], Action: [[0.1215843]], Reward: [-0.00147827],Reward_sum: -0.6573134660720825, Done: [False]
+==========
+t: 20, State: [[-0.65833324  0.00097044]], Action: [[0.32377362]], Reward: [-0.01048294],Reward_sum: -0.6677963733673096, Done: [False]
+==========
+t: 21, State: [[-0.6556208   0.00271244]], Action: [[0.5058564]], Reward: [-0.02558907],Reward_sum: -0.6933854222297668, Done: [False]
+==========
+t: 22, State: [[-0.6509725   0.00464834]], Action: [[0.64761496]], Reward: [-0.04194051],Reward_sum: -0.7353259325027466, Done: [False]
+==========
+t: 23, State: [[-0.6439351   0.00703739]], Action: [[0.9712187]], Reward: [-0.09432658],Reward_sum: -0.8296526670455933, Done: [False]
+==========
+t: 24, State: [[-0.63451546  0.00941961]], Action: [[0.99944806]], Reward: [-0.09988964],Reward_sum: -0.9295423030853271, Done: [False]
+==========
+t: 25, State: [[-0.62277925  0.01173619]], Action: [[0.9999838]], Reward: [-0.09999676],Reward_sum: -1.0295391082763672, Done: [False]
+==========
+t: 26, State: [[-0.6088101   0.01396912]], Action: [[0.9999993]], Reward: [-0.09999986],Reward_sum: -1.1295390129089355, Done: [False]
+==========
+t: 27, State: [[-0.5927089   0.01610127]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.2295390367507935, Done: [False]
+==========
+t: 28, State: [[-0.574593    0.01811589]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.3295390605926514, Done: [False]
+==========
+t: 29, State: [[-0.5545962   0.01999685]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.4295390844345093, Done: [False]
+==========
+t: 30, State: [[-0.5328672  0.021729 ]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.5295391082763672, Done: [False]
+==========
+t: 31, State: [[-0.5095687  0.0232985]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.6295390129089355, Done: [False]
+==========
+t: 32, State: [[-0.48487538  0.02469331]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.7295390367507935, Done: [False]
+==========
+t: 33, State: [[-0.45897186  0.02590353]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.8295390605926514, Done: [False]
+==========
+t: 34, State: [[-0.43205     0.02692186]], Action: [[1.]], Reward: [-0.1],Reward_sum: -1.9295390844345093, Done: [False]
+==========
+t: 35, State: [[-0.40430614  0.02774385]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.029539108276367, Done: [False]
+==========
+t: 36, State: [[-0.37593803  0.02836813]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.1295390129089355, Done: [False]
+==========
+t: 37, State: [[-0.3471415   0.02879654]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.229538917541504, Done: [False]
+==========
+t: 38, State: [[-0.31810746  0.02903406]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.3295388221740723, Done: [False]
+==========
+t: 39, State: [[-0.2890188   0.02908866]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.4295389652252197, Done: [False]
+==========
+t: 40, State: [[-0.26004782  0.02897097]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.529538869857788, Done: [False]
+==========
+t: 41, State: [[-0.23135388  0.02869394]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.6295387744903564, Done: [False]
+==========
+t: 42, State: [[-0.20308158  0.02827231]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.729538679122925, Done: [False]
+==========
+t: 43, State: [[-0.17535947  0.02772211]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.829538583755493, Done: [False]
+==========
+t: 44, State: [[-0.14829932  0.02706015]], Action: [[1.]], Reward: [-0.1],Reward_sum: -2.9295384883880615, Done: [False]
+==========
+t: 45, State: [[-0.12199581  0.02630351]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.02953839302063, Done: [False]
+==========
+t: 46, State: [[-0.09652673  0.02546908]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.1295382976531982, Done: [False]
+==========
+t: 47, State: [[-0.07195355  0.02457317]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.229538917541504, Done: [False]
+==========
+t: 48, State: [[-0.04832236  0.02363119]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.3295388221740723, Done: [False]
+==========
+t: 49, State: [[-0.02566494  0.02265742]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.4295387268066406, Done: [False]
+==========
+t: 50, State: [[-0.00400012  0.02166482]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.529538631439209, Done: [False]
+==========
+t: 51, State: [[0.01666489 0.020665  ]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.6295385360717773, Done: [False]
+==========
+t: 52, State: [[0.03633302 0.01966813]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.7295384407043457, Done: [False]
+==========
+t: 53, State: [[0.05501598 0.01868296]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.829538345336914, Done: [False]
+==========
+t: 54, State: [[0.07273292 0.01771694]], Action: [[1.]], Reward: [-0.1],Reward_sum: -3.9295382499694824, Done: [False]
+==========
+t: 55, State: [[0.08950913 0.01677622]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.029539108276367, Done: [False]
+==========
+t: 56, State: [[0.10537494 0.01586581]], Action: [[0.99999976]], Reward: [-0.09999995],Reward_sum: -4.1295390129089355, Done: [False]
+==========
+t: 57, State: [[0.12036463 0.01498969]], Action: [[0.99999976]], Reward: [-0.09999995],Reward_sum: -4.229538917541504, Done: [False]
+==========
+t: 58, State: [[0.13451554 0.01415091]], Action: [[0.9999999]], Reward: [-0.09999998],Reward_sum: -4.329538822174072, Done: [False]
+==========
+t: 59, State: [[0.14786726 0.01335173]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.429538726806641, Done: [False]
+==========
+t: 60, State: [[0.16046096 0.0125937 ]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.529538631439209, Done: [False]
+==========
+t: 61, State: [[0.17233877 0.01187781]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.629538536071777, Done: [False]
+==========
+t: 62, State: [[0.18354334 0.01120456]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.729538440704346, Done: [False]
+==========
+t: 63, State: [[0.19411741 0.01057408]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.829538822174072, Done: [False]
+==========
+t: 64, State: [[0.20410356 0.00998615]], Action: [[1.]], Reward: [-0.1],Reward_sum: -4.929538726806641, Done: [False]
+==========
+t: 65, State: [[0.2135439  0.00944034]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.029538631439209, Done: [False]
+==========
+t: 66, State: [[0.22247995 0.00893605]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.129538536071777, Done: [False]
+==========
+t: 67, State: [[0.23095249 0.00847253]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.229538440704346, Done: [False]
+==========
+t: 68, State: [[0.23900145 0.00804897]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.329538345336914, Done: [False]
+==========
+t: 69, State: [[0.24666597 0.00766452]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.429538249969482, Done: [False]
+==========
+t: 70, State: [[0.2539843  0.00731835]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.529538154602051, Done: [False]
+==========
+t: 71, State: [[0.26099393 0.00700962]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.6295390129089355, Done: [False]
+==========
+t: 72, State: [[0.26773152 0.00673759]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.729538917541504, Done: [False]
+==========
+t: 73, State: [[0.27423307 0.00650156]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.829538822174072, Done: [False]
+==========
+t: 74, State: [[0.28053403 0.00630095]], Action: [[1.]], Reward: [-0.1],Reward_sum: -5.929538726806641, Done: [False]
+==========
+t: 75, State: [[0.2866693  0.00613528]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.029538631439209, Done: [False]
+==========
+t: 76, State: [[0.2926735 0.0060042]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.129538536071777, Done: [False]
+==========
+t: 77, State: [[0.298581   0.00590751]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.229538440704346, Done: [False]
+==========
+t: 78, State: [[0.30442616 0.00584516]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.329538345336914, Done: [False]
+==========
+t: 79, State: [[0.31024343 0.00581728]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.429539203643799, Done: [False]
+==========
+t: 80, State: [[0.31606758 0.00582416]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.529539108276367, Done: [False]
+==========
+t: 81, State: [[0.32193387 0.00586629]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.6295390129089355, Done: [False]
+==========
+t: 82, State: [[0.32787827 0.0059444 ]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.729538917541504, Done: [False]
+==========
+t: 83, State: [[0.33393767 0.0060594 ]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.829538822174072, Done: [False]
+==========
+t: 84, State: [[0.34015015 0.00621246]], Action: [[1.]], Reward: [-0.1],Reward_sum: -6.929538726806641, Done: [False]
+==========
+t: 85, State: [[0.34655514 0.00640501]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.029538631439209, Done: [False]
+==========
+t: 86, State: [[0.35319388 0.00663873]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.129538536071777, Done: [False]
+==========
+t: 87, State: [[0.3601095  0.00691564]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.229539394378662, Done: [False]
+==========
+t: 88, State: [[0.36734754 0.00723804]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.3295392990112305, Done: [False]
+==========
+t: 89, State: [[0.37495613 0.00760861]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.429539203643799, Done: [False]
+==========
+t: 90, State: [[0.3829865  0.00803037]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.529539108276367, Done: [False]
+==========
+t: 91, State: [[0.39149326 0.00850678]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.6295390129089355, Done: [False]
+==========
+t: 92, State: [[0.400535   0.00904172]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.729538917541504, Done: [False]
+==========
+t: 93, State: [[0.41017455 0.00963957]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.829538822174072, Done: [False]
+==========
+t: 94, State: [[0.42047974 0.01030521]], Action: [[1.]], Reward: [-0.1],Reward_sum: -7.929538726806641, Done: [False]
+==========
+t: 95, State: [[0.43152383 0.01104409]], Action: [[1.]], Reward: [-0.1],Reward_sum: -8.029539108276367, Done: [False]
+==========
+t: 96, State: [[0.4433861  0.01186228]], Action: [[1.]], Reward: [-0.1],Reward_sum: -8.129539489746094, Done: [False]
+==========
+t: 97, State: [[0.4561526  0.01276647]], Action: [[1.]], Reward: [99.9],Reward_sum: 91.77046203613281, Done: [False]
+==========
+t: 98, State: [[0.46991664 0.01376407]], Action: [[1.]], Reward: [99.9],Reward_sum: 191.67047119140625, Done: [False]
+==========
+t: 99, State: [[0.48477983 0.01486319]], Action: [[1.]], Reward: [99.9],Reward_sum: 291.5704650878906, Done: [False]
+==========
+t: 100, State: [[0.5008525  0.01607271]], Action: [[1.]], Reward: [99.9],Reward_sum: 391.470458984375, Done: [False]
+==========
+t: 101, State: [[0.51825476 0.01740224]], Action: [[1.]], Reward: [99.9],Reward_sum: 491.3704528808594, Done: [False]
+==========
+t: 102, State: [[0.53711694 0.01886216]], Action: [[1.]], Reward: [99.9],Reward_sum: 591.2704467773438, Done: [False]
+==========
+t: 103, State: [[0.5575805  0.02046352]], Action: [[1.]], Reward: [99.9],Reward_sum: 691.17041015625, Done: [False]
+==========
+t: 104, State: [[0.5797984  0.02221794]], Action: [[1.]], Reward: [99.9],Reward_sum: 791.0704345703125, Done: [False]
+==========
+t: 105, State: [[0.6        0.02413745]], Action: [[1.]], Reward: [99.9],Reward_sum: 890.970458984375, Done: [False]
+==========
+t: 106, State: [[0.6        0.02620545]], Action: [[1.]], Reward: [99.9],Reward_sum: 990.8704833984375, Done: [False]
+==========
+t: 107, State: [[0.6        0.02827346]], Action: [[1.]], Reward: [99.9],Reward_sum: 1090.7705078125, Done: [False]
+==========
+t: 108, State: [[0.6        0.03034146]], Action: [[1.]], Reward: [99.9],Reward_sum: 1190.6705322265625, Done: [False]
+==========
+t: 109, State: [[0.6        0.03240947]], Action: [[1.]], Reward: [99.9],Reward_sum: 1290.570556640625, Done: [False]
+==========
+t: 110, State: [[0.6        0.03447747]], Action: [[1.]], Reward: [99.9],Reward_sum: 1390.4705810546875, Done: [False]
+==========
+t: 111, State: [[0.6        0.03654548]], Action: [[1.]], Reward: [99.9],Reward_sum: 1490.3704833984375, Done: [False]
+==========
+t: 112, State: [[0.6        0.03861348]], Action: [[1.]], Reward: [99.9],Reward_sum: 1590.2705078125, Done: [False]
+==========
+t: 113, State: [[0.6        0.04068149]], Action: [[1.]], Reward: [99.9],Reward_sum: 1690.1705322265625, Done: [False]
+==========
+t: 114, State: [[0.6        0.04274949]], Action: [[1.]], Reward: [99.9],Reward_sum: 1790.070556640625, Done: [False]
+==========
+t: 115, State: [[0.6       0.0448175]], Action: [[1.]], Reward: [99.9],Reward_sum: 1889.9705810546875, Done: [False]
+==========
+t: 116, State: [[0.6        0.04688551]], Action: [[1.]], Reward: [99.9],Reward_sum: 1989.87060546875, Done: [False]
+==========
+t: 117, State: [[0.6        0.04895351]], Action: [[1.]], Reward: [99.9],Reward_sum: 2089.7705078125, Done: [False]
+==========
+t: 118, State: [[0.6        0.05102152]], Action: [[1.]], Reward: [99.9],Reward_sum: 2189.67041015625, Done: [False]
+==========
+t: 119, State: [[0.6        0.05308952]], Action: [[1.]], Reward: [99.9],Reward_sum: 2289.5703125, Done: [False]
+==========
+t: 120, State: [[0.6        0.05515753]], Action: [[1.]], Reward: [99.9],Reward_sum: 2389.47021484375, Done: [False]
+==========
+t: 121, State: [[0.6        0.05722553]], Action: [[1.]], Reward: [99.9],Reward_sum: 2489.3701171875, Done: [False]
+==========
+t: 122, State: [[0.6        0.05929354]], Action: [[1.]], Reward: [99.9],Reward_sum: 2589.27001953125, Done: [False]
+==========
+t: 123, State: [[0.6        0.06136154]], Action: [[1.]], Reward: [99.9],Reward_sum: 2689.169921875, Done: [False]
+==========
+t: 124, State: [[0.6        0.06342955]], Action: [[1.]], Reward: [99.9],Reward_sum: 2789.06982421875, Done: [False]
+==========
+t: 125, State: [[0.6        0.06549755]], Action: [[1.]], Reward: [99.9],Reward_sum: 2888.9697265625, Done: [False]
+==========
+t: 126, State: [[0.6        0.06756556]], Action: [[1.]], Reward: [99.9],Reward_sum: 2988.86962890625, Done: [False]
+==========
+t: 127, State: [[0.6        0.06963357]], Action: [[1.]], Reward: [99.9],Reward_sum: 3088.7705078125, Done: [False]
+==========
+t: 128, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3188.67041015625, Done: [False]
+==========
+t: 129, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3288.5703125, Done: [False]
+==========
+t: 130, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3388.47021484375, Done: [False]
+==========
+t: 131, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3488.3701171875, Done: [False]
+==========
+t: 132, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3588.27001953125, Done: [False]
+==========
+t: 133, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3688.169921875, Done: [False]
+==========
+t: 134, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3788.06982421875, Done: [False]
+==========
+t: 135, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3887.97021484375, Done: [False]
+==========
+t: 136, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 3987.8701171875, Done: [False]
+==========
+t: 137, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4087.77001953125, Done: [False]
+==========
+t: 138, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4187.669921875, Done: [False]
+==========
+t: 139, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4287.56982421875, Done: [False]
+==========
+t: 140, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4387.4697265625, Done: [False]
+==========
+t: 141, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4487.36962890625, Done: [False]
+==========
+t: 142, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4587.26953125, Done: [False]
+==========
+t: 143, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4687.17041015625, Done: [False]
+==========
+t: 144, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4787.0703125, Done: [False]
+==========
+t: 145, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4886.97021484375, Done: [False]
+==========
+t: 146, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 4986.8701171875, Done: [False]
+==========
+t: 147, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5086.77001953125, Done: [False]
+==========
+t: 148, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5186.669921875, Done: [False]
+==========
+t: 149, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5286.56982421875, Done: [False]
+==========
+t: 150, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5386.4697265625, Done: [False]
+==========
+t: 151, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5486.37060546875, Done: [False]
+==========
+t: 152, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5586.2705078125, Done: [False]
+==========
+t: 153, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5686.17041015625, Done: [False]
+==========
+t: 154, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5786.0703125, Done: [False]
+==========
+t: 155, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5885.97021484375, Done: [False]
+==========
+t: 156, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 5985.8701171875, Done: [False]
+==========
+t: 157, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6085.77001953125, Done: [False]
+==========
+t: 158, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6185.669921875, Done: [False]
+==========
+t: 159, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6285.5703125, Done: [False]
+==========
+t: 160, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6385.47021484375, Done: [False]
+==========
+t: 161, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6485.3701171875, Done: [False]
+==========
+t: 162, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6585.27001953125, Done: [False]
+==========
+t: 163, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6685.169921875, Done: [False]
+==========
+t: 164, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6785.06982421875, Done: [False]
+==========
+t: 165, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6884.9697265625, Done: [False]
+==========
+t: 166, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 6984.86962890625, Done: [False]
+==========
+t: 167, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7084.7705078125, Done: [False]
+==========
+t: 168, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7184.67041015625, Done: [False]
+==========
+t: 169, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7284.5703125, Done: [False]
+==========
+t: 170, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7384.47021484375, Done: [False]
+==========
+t: 171, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7484.3701171875, Done: [False]
+==========
+t: 172, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7584.27001953125, Done: [False]
+==========
+t: 173, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7684.169921875, Done: [False]
+==========
+t: 174, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7784.06982421875, Done: [False]
+==========
+t: 175, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7883.97119140625, Done: [False]
+==========
+t: 176, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 7983.87109375, Done: [False]
+==========
+t: 177, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8083.77099609375, Done: [False]
+==========
+t: 178, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8183.6708984375, Done: [False]
+==========
+t: 179, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8283.5712890625, Done: [False]
+==========
+t: 180, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8383.4716796875, Done: [False]
+==========
+t: 181, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8483.3720703125, Done: [False]
+==========
+t: 182, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8583.2724609375, Done: [False]
+==========
+t: 183, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8683.1708984375, Done: [False]
+==========
+t: 184, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8783.0712890625, Done: [False]
+==========
+t: 185, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8882.9716796875, Done: [False]
+==========
+t: 186, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 8982.8720703125, Done: [False]
+==========
+t: 187, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9082.7724609375, Done: [False]
+==========
+t: 188, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9182.6728515625, Done: [False]
+==========
+t: 189, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9282.5732421875, Done: [False]
+==========
+t: 190, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9382.4736328125, Done: [False]
+==========
+t: 191, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9482.37109375, Done: [False]
+==========
+t: 192, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9582.271484375, Done: [False]
+==========
+t: 193, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9682.171875, Done: [False]
+==========
+t: 194, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9782.072265625, Done: [False]
+==========
+t: 195, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9881.97265625, Done: [False]
+==========
+t: 196, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 9981.873046875, Done: [False]
+==========
+t: 197, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10081.7734375, Done: [False]
+==========
+t: 198, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10181.673828125, Done: [False]
+==========
+t: 199, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10281.572265625, Done: [False]
+==========
+t: 200, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10381.47265625, Done: [False]
+==========
+t: 201, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10481.373046875, Done: [False]
+==========
+t: 202, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10581.2734375, Done: [False]
+==========
+t: 203, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10681.173828125, Done: [False]
+==========
+t: 204, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10781.07421875, Done: [False]
+==========
+t: 205, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10880.974609375, Done: [False]
+==========
+t: 206, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 10980.875, Done: [False]
+==========
+t: 207, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11080.771484375, Done: [False]
+==========
+t: 208, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11180.671875, Done: [False]
+==========
+t: 209, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11280.572265625, Done: [False]
+==========
+t: 210, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11380.47265625, Done: [False]
+==========
+t: 211, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11480.373046875, Done: [False]
+==========
+t: 212, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11580.2734375, Done: [False]
+==========
+t: 213, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11680.173828125, Done: [False]
+==========
+t: 214, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11780.07421875, Done: [False]
+==========
+t: 215, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11879.97265625, Done: [False]
+==========
+t: 216, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 11979.873046875, Done: [False]
+==========
+t: 217, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12079.7734375, Done: [False]
+==========
+t: 218, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12179.673828125, Done: [False]
+==========
+t: 219, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12279.57421875, Done: [False]
+==========
+t: 220, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12379.474609375, Done: [False]
+==========
+t: 221, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12479.375, Done: [False]
+==========
+t: 222, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12579.275390625, Done: [False]
+==========
+t: 223, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12679.171875, Done: [False]
+==========
+t: 224, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12779.072265625, Done: [False]
+==========
+t: 225, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12878.97265625, Done: [False]
+==========
+t: 226, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 12978.873046875, Done: [False]
+==========
+t: 227, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13078.7734375, Done: [False]
+==========
+t: 228, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13178.673828125, Done: [False]
+==========
+t: 229, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13278.57421875, Done: [False]
+==========
+t: 230, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13378.474609375, Done: [False]
+==========
+t: 231, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13478.3720703125, Done: [False]
+==========
+t: 232, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13578.2724609375, Done: [False]
+==========
+t: 233, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13678.1728515625, Done: [False]
+==========
+t: 234, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13778.0732421875, Done: [False]
+==========
+t: 235, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13877.9736328125, Done: [False]
+==========
+t: 236, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 13977.8740234375, Done: [False]
+==========
+t: 237, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14077.7744140625, Done: [False]
+==========
+t: 238, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14177.6748046875, Done: [False]
+==========
+t: 239, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14277.572265625, Done: [False]
+==========
+t: 240, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14377.47265625, Done: [False]
+==========
+t: 241, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14477.373046875, Done: [False]
+==========
+t: 242, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14577.2734375, Done: [False]
+==========
+t: 243, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14677.173828125, Done: [False]
+==========
+t: 244, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14777.07421875, Done: [False]
+==========
+t: 245, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14876.974609375, Done: [False]
+==========
+t: 246, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 14976.875, Done: [False]
+==========
+t: 247, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15076.7724609375, Done: [False]
+==========
+t: 248, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15176.671875, Done: [False]
+==========
+t: 249, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15276.5712890625, Done: [False]
+==========
+t: 250, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15376.470703125, Done: [False]
+==========
+t: 251, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15476.37109375, Done: [False]
+==========
+t: 252, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15576.271484375, Done: [False]
+==========
+t: 253, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15676.1708984375, Done: [False]
+==========
+t: 254, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15776.0703125, Done: [False]
+==========
+t: 255, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15875.97265625, Done: [False]
+==========
+t: 256, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 15975.8720703125, Done: [False]
+==========
+t: 257, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16075.771484375, Done: [False]
+==========
+t: 258, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16175.6708984375, Done: [False]
+==========
+t: 259, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16275.5712890625, Done: [False]
+==========
+t: 260, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16375.4716796875, Done: [False]
+==========
+t: 261, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16475.37109375, Done: [False]
+==========
+t: 262, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16575.26953125, Done: [False]
+==========
+t: 263, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16675.171875, Done: [False]
+==========
+t: 264, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16775.0703125, Done: [False]
+==========
+t: 265, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16874.97265625, Done: [False]
+==========
+t: 266, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 16974.87109375, Done: [False]
+==========
+t: 267, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17074.771484375, Done: [False]
+==========
+t: 268, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17174.671875, Done: [False]
+==========
+t: 269, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17274.5703125, Done: [False]
+==========
+t: 270, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17374.47265625, Done: [False]
+==========
+t: 271, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17474.37109375, Done: [False]
+==========
+t: 272, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17574.271484375, Done: [False]
+==========
+t: 273, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17674.171875, Done: [False]
+==========
+t: 274, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17774.072265625, Done: [False]
+==========
+t: 275, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17873.970703125, Done: [False]
+==========
+t: 276, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 17973.87109375, Done: [False]
+==========
+t: 277, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18073.771484375, Done: [False]
+==========
+t: 278, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18173.671875, Done: [False]
+==========
+t: 279, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18273.572265625, Done: [False]
+==========
+t: 280, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18373.47265625, Done: [False]
+==========
+t: 281, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18473.37109375, Done: [False]
+==========
+t: 282, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18573.271484375, Done: [False]
+==========
+t: 283, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18673.171875, Done: [False]
+==========
+t: 284, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18773.072265625, Done: [False]
+==========
+t: 285, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18872.970703125, Done: [False]
+==========
+t: 286, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 18972.87109375, Done: [False]
+==========
+t: 287, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19072.771484375, Done: [False]
+==========
+t: 288, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19172.671875, Done: [False]
+==========
+t: 289, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19272.572265625, Done: [False]
+==========
+t: 290, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19372.470703125, Done: [False]
+==========
+t: 291, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19472.37109375, Done: [False]
+==========
+t: 292, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19572.271484375, Done: [False]
+==========
+t: 293, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19672.171875, Done: [False]
+==========
+t: 294, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19772.0703125, Done: [False]
+==========
+t: 295, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19871.97265625, Done: [False]
+==========
+t: 296, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 19971.87109375, Done: [False]
+==========
+t: 297, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20071.771484375, Done: [False]
+==========
+t: 298, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20171.671875, Done: [False]
+==========
+t: 299, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20271.572265625, Done: [False]
+==========
+t: 300, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20371.47265625, Done: [False]
+==========
+t: 301, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20471.373046875, Done: [False]
+==========
+t: 302, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20571.2734375, Done: [False]
+==========
+t: 303, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20671.171875, Done: [False]
+==========
+t: 304, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20771.072265625, Done: [False]
+==========
+t: 305, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20870.97265625, Done: [False]
+==========
+t: 306, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 20970.873046875, Done: [False]
+==========
+t: 307, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21070.7734375, Done: [False]
+==========
+t: 308, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21170.673828125, Done: [False]
+==========
+t: 309, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21270.57421875, Done: [False]
+==========
+t: 310, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21370.474609375, Done: [False]
+==========
+t: 311, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21470.373046875, Done: [False]
+==========
+t: 312, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21570.2734375, Done: [False]
+==========
+t: 313, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21670.171875, Done: [False]
+==========
+t: 314, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21770.072265625, Done: [False]
+==========
+t: 315, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21869.97265625, Done: [False]
+==========
+t: 316, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 21969.875, Done: [False]
+==========
+t: 317, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22069.7734375, Done: [False]
+==========
+t: 318, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22169.67578125, Done: [False]
+==========
+t: 319, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22269.572265625, Done: [False]
+==========
+t: 320, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22369.47265625, Done: [False]
+==========
+t: 321, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22469.37109375, Done: [False]
+==========
+t: 322, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22569.2734375, Done: [False]
+==========
+t: 323, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22669.171875, Done: [False]
+==========
+t: 324, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22769.07421875, Done: [False]
+==========
+t: 325, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22868.97265625, Done: [False]
+==========
+t: 326, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 22968.875, Done: [False]
+==========
+t: 327, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23068.7734375, Done: [False]
+==========
+t: 328, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23168.671875, Done: [False]
+==========
+t: 329, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23268.57421875, Done: [False]
+==========
+t: 330, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23368.47265625, Done: [False]
+==========
+t: 331, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23468.375, Done: [False]
+==========
+t: 332, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23568.2734375, Done: [False]
+==========
+t: 333, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23668.17578125, Done: [False]
+==========
+t: 334, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23768.07421875, Done: [False]
+==========
+t: 335, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23867.97265625, Done: [False]
+==========
+t: 336, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 23967.87109375, Done: [False]
+==========
+t: 337, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24067.7734375, Done: [False]
+==========
+t: 338, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24167.671875, Done: [False]
+==========
+t: 339, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24267.57421875, Done: [False]
+==========
+t: 340, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24367.47265625, Done: [False]
+==========
+t: 341, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24467.375, Done: [False]
+==========
+t: 342, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24567.2734375, Done: [False]
+==========
+t: 343, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24667.171875, Done: [False]
+==========
+t: 344, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24767.07421875, Done: [False]
+==========
+t: 345, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24866.97265625, Done: [False]
+==========
+t: 346, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 24966.875, Done: [False]
+==========
+t: 347, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25066.7734375, Done: [False]
+==========
+t: 348, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25166.67578125, Done: [False]
+==========
+t: 349, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25266.57421875, Done: [False]
+==========
+t: 350, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25366.4765625, Done: [False]
+==========
+t: 351, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25466.373046875, Done: [False]
+==========
+t: 352, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25566.2734375, Done: [False]
+==========
+t: 353, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25666.173828125, Done: [False]
+==========
+t: 354, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25766.07421875, Done: [False]
+==========
+t: 355, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25865.974609375, Done: [False]
+==========
+t: 356, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 25965.875, Done: [False]
+==========
+t: 357, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26065.775390625, Done: [False]
+==========
+t: 358, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26165.67578125, Done: [False]
+==========
+t: 359, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26265.572265625, Done: [False]
+==========
+t: 360, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26365.474609375, Done: [False]
+==========
+t: 361, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26465.373046875, Done: [False]
+==========
+t: 362, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26565.275390625, Done: [False]
+==========
+t: 363, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26665.173828125, Done: [False]
+==========
+t: 364, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26765.076171875, Done: [False]
+==========
+t: 365, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26864.974609375, Done: [False]
+==========
+t: 366, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 26964.876953125, Done: [False]
+==========
+t: 367, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27064.7734375, Done: [False]
+==========
+t: 368, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27164.67578125, Done: [False]
+==========
+t: 369, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27264.57421875, Done: [False]
+==========
+t: 370, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27364.4765625, Done: [False]
+==========
+t: 371, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27464.375, Done: [False]
+==========
+t: 372, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27564.27734375, Done: [False]
+==========
+t: 373, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27664.17578125, Done: [False]
+==========
+t: 374, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27764.078125, Done: [False]
+==========
+t: 375, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27863.97265625, Done: [False]
+==========
+t: 376, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 27963.875, Done: [False]
+==========
+t: 377, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28063.7734375, Done: [False]
+==========
+t: 378, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28163.67578125, Done: [False]
+==========
+t: 379, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28263.57421875, Done: [False]
+==========
+t: 380, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28363.4765625, Done: [False]
+==========
+t: 381, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28463.375, Done: [False]
+==========
+t: 382, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28563.27734375, Done: [False]
+==========
+t: 383, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28663.173828125, Done: [False]
+==========
+t: 384, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28763.07421875, Done: [False]
+==========
+t: 385, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28862.974609375, Done: [False]
+==========
+t: 386, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 28962.875, Done: [False]
+==========
+t: 387, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29062.775390625, Done: [False]
+==========
+t: 388, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29162.67578125, Done: [False]
+==========
+t: 389, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29262.576171875, Done: [False]
+==========
+t: 390, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29362.4765625, Done: [False]
+==========
+t: 391, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29462.375, Done: [False]
+==========
+t: 392, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29562.2734375, Done: [False]
+==========
+t: 393, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29662.17578125, Done: [False]
+==========
+t: 394, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29762.07421875, Done: [False]
+==========
+t: 395, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29861.9765625, Done: [False]
+==========
+t: 396, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 29961.875, Done: [False]
+==========
+t: 397, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30061.77734375, Done: [False]
+==========
+t: 398, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30161.67578125, Done: [False]
+==========
+t: 399, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30261.576171875, Done: [False]
+==========
+t: 400, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30361.474609375, Done: [False]
+==========
+t: 401, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30461.376953125, Done: [False]
+==========
+t: 402, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30561.275390625, Done: [False]
+==========
+t: 403, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30661.177734375, Done: [False]
+==========
+t: 404, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30761.076171875, Done: [False]
+==========
+t: 405, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30860.978515625, Done: [False]
+==========
+t: 406, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 30960.876953125, Done: [False]
+==========
+t: 407, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31060.775390625, Done: [False]
+==========
+t: 408, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31160.67578125, Done: [False]
+==========
+t: 409, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31260.576171875, Done: [False]
+==========
+t: 410, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31360.4765625, Done: [False]
+==========
+t: 411, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31460.376953125, Done: [False]
+==========
+t: 412, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31560.27734375, Done: [False]
+==========
+t: 413, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31660.177734375, Done: [False]
+==========
+t: 414, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31760.078125, Done: [False]
+==========
+t: 415, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31859.974609375, Done: [False]
+==========
+t: 416, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 31959.875, Done: [False]
+==========
+t: 417, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32059.775390625, Done: [False]
+==========
+t: 418, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32159.67578125, Done: [False]
+==========
+t: 419, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32259.576171875, Done: [False]
+==========
+t: 420, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32359.4765625, Done: [False]
+==========
+t: 421, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32459.376953125, Done: [False]
+==========
+t: 422, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32559.27734375, Done: [False]
+==========
+t: 423, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32659.173828125, Done: [False]
+==========
+t: 424, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32759.076171875, Done: [False]
+==========
+t: 425, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32858.9765625, Done: [False]
+==========
+t: 426, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 32958.875, Done: [False]
+==========
+t: 427, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33058.7734375, Done: [False]
+==========
+t: 428, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33158.6796875, Done: [False]
+==========
+t: 429, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33258.578125, Done: [False]
+==========
+t: 430, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33358.4765625, Done: [False]
+==========
+t: 431, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33458.375, Done: [False]
+==========
+t: 432, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33558.27734375, Done: [False]
+==========
+t: 433, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33658.17578125, Done: [False]
+==========
+t: 434, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33758.078125, Done: [False]
+==========
+t: 435, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33857.9765625, Done: [False]
+==========
+t: 436, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 33957.87890625, Done: [False]
+==========
+t: 437, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34057.77734375, Done: [False]
+==========
+t: 438, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34157.6796875, Done: [False]
+==========
+t: 439, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34257.578125, Done: [False]
+==========
+t: 440, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34357.4765625, Done: [False]
+==========
+t: 441, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34457.375, Done: [False]
+==========
+t: 442, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34557.27734375, Done: [False]
+==========
+t: 443, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34657.1796875, Done: [False]
+==========
+t: 444, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34757.078125, Done: [False]
+==========
+t: 445, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34856.9765625, Done: [False]
+==========
+t: 446, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 34956.87890625, Done: [False]
+==========
+t: 447, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35056.7734375, Done: [False]
+==========
+t: 448, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35156.67578125, Done: [False]
+==========
+t: 449, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35256.578125, Done: [False]
+==========
+t: 450, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35356.4765625, Done: [False]
+==========
+t: 451, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35456.375, Done: [False]
+==========
+t: 452, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35556.27734375, Done: [False]
+==========
+t: 453, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35656.1796875, Done: [False]
+==========
+t: 454, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35756.078125, Done: [False]
+==========
+t: 455, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35855.9765625, Done: [False]
+==========
+t: 456, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 35955.875, Done: [False]
+==========
+t: 457, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36055.77734375, Done: [False]
+==========
+t: 458, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36155.67578125, Done: [False]
+==========
+t: 459, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36255.578125, Done: [False]
+==========
+t: 460, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36355.4765625, Done: [False]
+==========
+t: 461, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36455.37890625, Done: [False]
+==========
+t: 462, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36555.27734375, Done: [False]
+==========
+t: 463, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36655.17578125, Done: [False]
+==========
+t: 464, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36755.07421875, Done: [False]
+==========
+t: 465, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36854.9765625, Done: [False]
+==========
+t: 466, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 36954.875, Done: [False]
+==========
+t: 467, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37054.77734375, Done: [False]
+==========
+t: 468, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37154.67578125, Done: [False]
+==========
+t: 469, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37254.578125, Done: [False]
+==========
+t: 470, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37354.4765625, Done: [False]
+==========
+t: 471, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37454.375, Done: [False]
+==========
+t: 472, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37554.27734375, Done: [False]
+==========
+t: 473, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37654.17578125, Done: [False]
+==========
+t: 474, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37754.078125, Done: [False]
+==========
+t: 475, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37853.9765625, Done: [False]
+==========
+t: 476, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 37953.87890625, Done: [False]
+==========
+t: 477, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38053.77734375, Done: [False]
+==========
+t: 478, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38153.6796875, Done: [False]
+==========
+t: 479, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38253.578125, Done: [False]
+==========
+t: 480, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38353.4765625, Done: [False]
+==========
+t: 481, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38453.375, Done: [False]
+==========
+t: 482, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38553.27734375, Done: [False]
+==========
+t: 483, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38653.1796875, Done: [False]
+==========
+t: 484, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38753.078125, Done: [False]
+==========
+t: 485, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38852.9765625, Done: [False]
+==========
+t: 486, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 38952.87890625, Done: [False]
+==========
+t: 487, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39052.7734375, Done: [False]
+==========
+t: 488, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39152.67578125, Done: [False]
+==========
+t: 489, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39252.578125, Done: [False]
+==========
+t: 490, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39352.4765625, Done: [False]
+==========
+t: 491, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39452.375, Done: [False]
+==========
+t: 492, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39552.2734375, Done: [False]
+==========
+t: 493, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39652.171875, Done: [False]
+==========
+t: 494, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39752.07421875, Done: [False]
+==========
+t: 495, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39851.9765625, Done: [False]
+==========
+t: 496, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 39951.875, Done: [False]
+==========
+t: 497, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40051.77734375, Done: [False]
+==========
+t: 498, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40151.67578125, Done: [False]
+==========
+t: 499, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40251.57421875, Done: [False]
+==========
+t: 500, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40351.4765625, Done: [False]
+==========
+t: 501, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40451.375, Done: [False]
+==========
+t: 502, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40551.2734375, Done: [False]
+==========
+t: 503, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40651.17578125, Done: [False]
+==========
+t: 504, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40751.078125, Done: [False]
+==========
+t: 505, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40850.9765625, Done: [False]
+==========
+t: 506, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 40950.875, Done: [False]
+==========
+t: 507, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41050.77734375, Done: [False]
+==========
+t: 508, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41150.67578125, Done: [False]
+==========
+t: 509, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41250.57421875, Done: [False]
+==========
+t: 510, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41350.4765625, Done: [False]
+==========
+t: 511, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41450.375, Done: [False]
+==========
+t: 512, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41550.27734375, Done: [False]
+==========
+t: 513, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41650.17578125, Done: [False]
+==========
+t: 514, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41750.07421875, Done: [False]
+==========
+t: 515, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41849.9765625, Done: [False]
+==========
+t: 516, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 41949.875, Done: [False]
+==========
+t: 517, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42049.7734375, Done: [False]
+==========
+t: 518, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42149.67578125, Done: [False]
+==========
+t: 519, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42249.578125, Done: [False]
+==========
+t: 520, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42349.4765625, Done: [False]
+==========
+t: 521, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42449.375, Done: [False]
+==========
+t: 522, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42549.27734375, Done: [False]
+==========
+t: 523, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42649.17578125, Done: [False]
+==========
+t: 524, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42749.07421875, Done: [False]
+==========
+t: 525, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42848.9765625, Done: [False]
+==========
+t: 526, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 42948.875, Done: [False]
+==========
+t: 527, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43048.7734375, Done: [False]
+==========
+t: 528, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43148.67578125, Done: [False]
+==========
+t: 529, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43248.57421875, Done: [False]
+==========
+t: 530, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43348.4765625, Done: [False]
+==========
+t: 531, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43448.375, Done: [False]
+==========
+t: 532, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43548.2734375, Done: [False]
+==========
+t: 533, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43648.17578125, Done: [False]
+==========
+t: 534, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43748.07421875, Done: [False]
+==========
+t: 535, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43847.9765625, Done: [False]
+==========
+t: 536, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 43947.875, Done: [False]
+==========
+t: 537, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44047.7734375, Done: [False]
+==========
+t: 538, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44147.67578125, Done: [False]
+==========
+t: 539, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44247.57421875, Done: [False]
+==========
+t: 540, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44347.47265625, Done: [False]
+==========
+t: 541, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44447.375, Done: [False]
+==========
+t: 542, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44547.2734375, Done: [False]
+==========
+t: 543, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44647.171875, Done: [False]
+==========
+t: 544, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44747.07421875, Done: [False]
+==========
+t: 545, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44846.97265625, Done: [False]
+==========
+t: 546, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 44946.875, Done: [False]
+==========
+t: 547, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45046.7734375, Done: [False]
+==========
+t: 548, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45146.671875, Done: [False]
+==========
+t: 549, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45246.57421875, Done: [False]
+==========
+t: 550, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45346.47265625, Done: [False]
+==========
+t: 551, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45446.375, Done: [False]
+==========
+t: 552, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45546.2734375, Done: [False]
+==========
+t: 553, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45646.171875, Done: [False]
+==========
+t: 554, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45746.07421875, Done: [False]
+==========
+t: 555, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45845.97265625, Done: [False]
+==========
+t: 556, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 45945.875, Done: [False]
+==========
+t: 557, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46045.7734375, Done: [False]
+==========
+t: 558, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46145.671875, Done: [False]
+==========
+t: 559, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46245.578125, Done: [False]
+==========
+t: 560, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46345.4765625, Done: [False]
+==========
+t: 561, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46445.375, Done: [False]
+==========
+t: 562, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46545.2734375, Done: [False]
+==========
+t: 563, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46645.171875, Done: [False]
+==========
+t: 564, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46745.078125, Done: [False]
+==========
+t: 565, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46844.9765625, Done: [False]
+==========
+t: 566, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 46944.875, Done: [False]
+==========
+t: 567, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47044.7734375, Done: [False]
+==========
+t: 568, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47144.67578125, Done: [False]
+==========
+t: 569, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47244.578125, Done: [False]
+==========
+t: 570, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47344.4765625, Done: [False]
+==========
+t: 571, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47444.375, Done: [False]
+==========
+t: 572, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47544.2734375, Done: [False]
+==========
+t: 573, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47644.171875, Done: [False]
+==========
+t: 574, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47744.07421875, Done: [False]
+==========
+t: 575, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47843.9765625, Done: [False]
+==========
+t: 576, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 47943.875, Done: [False]
+==========
+t: 577, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48043.7734375, Done: [False]
+==========
+t: 578, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48143.671875, Done: [False]
+==========
+t: 579, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48243.57421875, Done: [False]
+==========
+t: 580, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48343.4765625, Done: [False]
+==========
+t: 581, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48443.375, Done: [False]
+==========
+t: 582, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48543.2734375, Done: [False]
+==========
+t: 583, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48643.171875, Done: [False]
+==========
+t: 584, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48743.07421875, Done: [False]
+==========
+t: 585, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48842.9765625, Done: [False]
+==========
+t: 586, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 48942.875, Done: [False]
+==========
+t: 587, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49042.7734375, Done: [False]
+==========
+t: 588, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49142.67578125, Done: [False]
+==========
+t: 589, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49242.578125, Done: [False]
+==========
+t: 590, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49342.4765625, Done: [False]
+==========
+t: 591, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49442.375, Done: [False]
+==========
+t: 592, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49542.2734375, Done: [False]
+==========
+t: 593, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49642.17578125, Done: [False]
+==========
+t: 594, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49742.078125, Done: [False]
+==========
+t: 595, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49841.9765625, Done: [False]
+==========
+t: 596, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 49941.875, Done: [False]
+==========
+t: 597, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50041.77734375, Done: [False]
+==========
+t: 598, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50141.6796875, Done: [False]
+==========
+t: 599, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50241.578125, Done: [False]
+==========
+t: 600, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50341.4765625, Done: [False]
+==========
+t: 601, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50441.375, Done: [False]
+==========
+t: 602, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50541.27734375, Done: [False]
+==========
+t: 603, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50641.17578125, Done: [False]
+==========
+t: 604, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50741.078125, Done: [False]
+==========
+t: 605, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50840.9765625, Done: [False]
+==========
+t: 606, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 50940.87890625, Done: [False]
+==========
+t: 607, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51040.7734375, Done: [False]
+==========
+t: 608, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51140.67578125, Done: [False]
+==========
+t: 609, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51240.57421875, Done: [False]
+==========
+t: 610, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51340.4765625, Done: [False]
+==========
+t: 611, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51440.375, Done: [False]
+==========
+t: 612, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51540.27734375, Done: [False]
+==========
+t: 613, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51640.17578125, Done: [False]
+==========
+t: 614, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51740.078125, Done: [False]
+==========
+t: 615, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51839.9765625, Done: [False]
+==========
+t: 616, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 51939.875, Done: [False]
+==========
+t: 617, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52039.7734375, Done: [False]
+==========
+t: 618, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52139.67578125, Done: [False]
+==========
+t: 619, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52239.578125, Done: [False]
+==========
+t: 620, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52339.4765625, Done: [False]
+==========
+t: 621, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52439.375, Done: [False]
+==========
+t: 622, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52539.27734375, Done: [False]
+==========
+t: 623, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52639.1796875, Done: [False]
+==========
+t: 624, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52739.078125, Done: [False]
+==========
+t: 625, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52838.9765625, Done: [False]
+==========
+t: 626, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 52938.875, Done: [False]
+==========
+t: 627, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53038.77734375, Done: [False]
+==========
+t: 628, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53138.6796875, Done: [False]
+==========
+t: 629, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53238.578125, Done: [False]
+==========
+t: 630, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53338.4765625, Done: [False]
+==========
+t: 631, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53438.375, Done: [False]
+==========
+t: 632, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53538.27734375, Done: [False]
+==========
+t: 633, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53638.1796875, Done: [False]
+==========
+t: 634, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53738.078125, Done: [False]
+==========
+t: 635, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53837.9765625, Done: [False]
+==========
+t: 636, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 53937.87890625, Done: [False]
+==========
+t: 637, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54037.77734375, Done: [False]
+==========
+t: 638, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54137.6796875, Done: [False]
+==========
+t: 639, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54237.578125, Done: [False]
+==========
+t: 640, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54337.4765625, Done: [False]
+==========
+t: 641, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54437.375, Done: [False]
+==========
+t: 642, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54537.2734375, Done: [False]
+==========
+t: 643, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54637.1796875, Done: [False]
+==========
+t: 644, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54737.078125, Done: [False]
+==========
+t: 645, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54836.9765625, Done: [False]
+==========
+t: 646, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 54936.87890625, Done: [False]
+==========
+t: 647, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55036.77734375, Done: [False]
+==========
+t: 648, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55136.671875, Done: [False]
+==========
+t: 649, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55236.578125, Done: [False]
+==========
+t: 650, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55336.4765625, Done: [False]
+==========
+t: 651, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55436.375, Done: [False]
+==========
+t: 652, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55536.2734375, Done: [False]
+==========
+t: 653, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55636.1796875, Done: [False]
+==========
+t: 654, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55736.078125, Done: [False]
+==========
+t: 655, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55835.9765625, Done: [False]
+==========
+t: 656, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 55935.875, Done: [False]
+==========
+t: 657, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56035.78125, Done: [False]
+==========
+t: 658, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56135.6796875, Done: [False]
+==========
+t: 659, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56235.578125, Done: [False]
+==========
+t: 660, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56335.4765625, Done: [False]
+==========
+t: 661, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56435.3828125, Done: [False]
+==========
+t: 662, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56535.28125, Done: [False]
+==========
+t: 663, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56635.1796875, Done: [False]
+==========
+t: 664, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56735.078125, Done: [False]
+==========
+t: 665, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56834.98046875, Done: [False]
+==========
+t: 666, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 56934.87890625, Done: [False]
+==========
+t: 667, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57034.78125, Done: [False]
+==========
+t: 668, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57134.6796875, Done: [False]
+==========
+t: 669, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57234.58203125, Done: [False]
+==========
+t: 670, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57334.48046875, Done: [False]
+==========
+t: 671, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57434.37890625, Done: [False]
+==========
+t: 672, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57534.27734375, Done: [False]
+==========
+t: 673, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57634.1796875, Done: [False]
+==========
+t: 674, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57734.078125, Done: [False]
+==========
+t: 675, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57833.98046875, Done: [False]
+==========
+t: 676, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 57933.87890625, Done: [False]
+==========
+t: 677, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58033.78125, Done: [False]
+==========
+t: 678, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58133.6796875, Done: [False]
+==========
+t: 679, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58233.578125, Done: [False]
+==========
+t: 680, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58333.48046875, Done: [False]
+==========
+t: 681, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58433.37890625, Done: [False]
+==========
+t: 682, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58533.27734375, Done: [False]
+==========
+t: 683, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58633.1796875, Done: [False]
+==========
+t: 684, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58733.08203125, Done: [False]
+==========
+t: 685, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58832.98046875, Done: [False]
+==========
+t: 686, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 58932.87890625, Done: [False]
+==========
+t: 687, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59032.77734375, Done: [False]
+==========
+t: 688, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59132.6796875, Done: [False]
+==========
+t: 689, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59232.578125, Done: [False]
+==========
+t: 690, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59332.4765625, Done: [False]
+==========
+t: 691, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59432.37890625, Done: [False]
+==========
+t: 692, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59532.28125, Done: [False]
+==========
+t: 693, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59632.1796875, Done: [False]
+==========
+t: 694, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59732.078125, Done: [False]
+==========
+t: 695, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59831.9765625, Done: [False]
+==========
+t: 696, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 59931.875, Done: [False]
+==========
+t: 697, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60031.77734375, Done: [False]
+==========
+t: 698, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60131.6796875, Done: [False]
+==========
+t: 699, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60231.578125, Done: [False]
+==========
+t: 700, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60331.4765625, Done: [False]
+==========
+t: 701, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60431.37890625, Done: [False]
+==========
+t: 702, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60531.28125, Done: [False]
+==========
+t: 703, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60631.1796875, Done: [False]
+==========
+t: 704, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60731.078125, Done: [False]
+==========
+t: 705, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60830.9765625, Done: [False]
+==========
+t: 706, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 60930.8828125, Done: [False]
+==========
+t: 707, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61030.78125, Done: [False]
+==========
+t: 708, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61130.6796875, Done: [False]
+==========
+t: 709, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61230.578125, Done: [False]
+==========
+t: 710, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61330.484375, Done: [False]
+==========
+t: 711, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61430.375, Done: [False]
+==========
+t: 712, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61530.28125, Done: [False]
+==========
+t: 713, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61630.1796875, Done: [False]
+==========
+t: 714, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61730.078125, Done: [False]
+==========
+t: 715, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61829.9765625, Done: [False]
+==========
+t: 716, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 61929.8828125, Done: [False]
+==========
+t: 717, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62029.78125, Done: [False]
+==========
+t: 718, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62129.6796875, Done: [False]
+==========
+t: 719, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62229.578125, Done: [False]
+==========
+t: 720, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62329.4765625, Done: [False]
+==========
+t: 721, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62429.375, Done: [False]
+==========
+t: 722, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62529.28125, Done: [False]
+==========
+t: 723, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62629.1796875, Done: [False]
+==========
+t: 724, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62729.078125, Done: [False]
+==========
+t: 725, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62828.9765625, Done: [False]
+==========
+t: 726, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 62928.8828125, Done: [False]
+==========
+t: 727, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63028.7734375, Done: [False]
+==========
+t: 728, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63128.6796875, Done: [False]
+==========
+t: 729, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63228.578125, Done: [False]
+==========
+t: 730, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63328.4765625, Done: [False]
+==========
+t: 731, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63428.375, Done: [False]
+==========
+t: 732, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63528.28125, Done: [False]
+==========
+t: 733, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63628.1796875, Done: [False]
+==========
+t: 734, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63728.078125, Done: [False]
+==========
+t: 735, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63827.9765625, Done: [False]
+==========
+t: 736, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 63927.87890625, Done: [False]
+==========
+t: 737, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64027.77734375, Done: [False]
+==========
+t: 738, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64127.6796875, Done: [False]
+==========
+t: 739, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64227.578125, Done: [False]
+==========
+t: 740, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64327.48046875, Done: [False]
+==========
+t: 741, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64427.37890625, Done: [False]
+==========
+t: 742, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64527.28125, Done: [False]
+==========
+t: 743, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64627.1796875, Done: [False]
+==========
+t: 744, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64727.078125, Done: [False]
+==========
+t: 745, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64826.9765625, Done: [False]
+==========
+t: 746, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 64926.87890625, Done: [False]
+==========
+t: 747, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65026.78125, Done: [False]
+==========
+t: 748, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65126.6796875, Done: [False]
+==========
+t: 749, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65226.578125, Done: [False]
+==========
+t: 750, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65326.48046875, Done: [False]
+==========
+t: 751, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65426.37890625, Done: [False]
+==========
+t: 752, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65526.27734375, Done: [False]
+==========
+t: 753, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65626.171875, Done: [False]
+==========
+t: 754, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65726.078125, Done: [False]
+==========
+t: 755, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65825.984375, Done: [False]
+==========
+t: 756, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 65925.875, Done: [False]
+==========
+t: 757, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66025.78125, Done: [False]
+==========
+t: 758, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66125.6796875, Done: [False]
+==========
+t: 759, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66225.578125, Done: [False]
+==========
+t: 760, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66325.484375, Done: [False]
+==========
+t: 761, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66425.375, Done: [False]
+==========
+t: 762, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66525.28125, Done: [False]
+==========
+t: 763, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66625.1796875, Done: [False]
+==========
+t: 764, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66725.078125, Done: [False]
+==========
+t: 765, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66824.984375, Done: [False]
+==========
+t: 766, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 66924.875, Done: [False]
+==========
+t: 767, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67024.78125, Done: [False]
+==========
+t: 768, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67124.6796875, Done: [False]
+==========
+t: 769, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67224.578125, Done: [False]
+==========
+t: 770, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67324.4765625, Done: [False]
+==========
+t: 771, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67424.3828125, Done: [False]
+==========
+t: 772, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67524.28125, Done: [False]
+==========
+t: 773, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67624.1796875, Done: [False]
+==========
+t: 774, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67724.078125, Done: [False]
+==========
+t: 775, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67823.9765625, Done: [False]
+==========
+t: 776, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 67923.875, Done: [False]
+==========
+t: 777, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68023.78125, Done: [False]
+==========
+t: 778, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68123.6796875, Done: [False]
+==========
+t: 779, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68223.578125, Done: [False]
+==========
+t: 780, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68323.4765625, Done: [False]
+==========
+t: 781, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68423.3828125, Done: [False]
+==========
+t: 782, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68523.28125, Done: [False]
+==========
+t: 783, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68623.1796875, Done: [False]
+==========
+t: 784, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68723.078125, Done: [False]
+==========
+t: 785, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68822.984375, Done: [False]
+==========
+t: 786, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 68922.8828125, Done: [False]
+==========
+t: 787, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69022.78125, Done: [False]
+==========
+t: 788, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69122.6796875, Done: [False]
+==========
+t: 789, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69222.5859375, Done: [False]
+==========
+t: 790, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69322.484375, Done: [False]
+==========
+t: 791, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69422.3828125, Done: [False]
+==========
+t: 792, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69522.28125, Done: [False]
+==========
+t: 793, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69622.1875, Done: [False]
+==========
+t: 794, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69722.078125, Done: [False]
+==========
+t: 795, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69821.984375, Done: [False]
+==========
+t: 796, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 69921.8828125, Done: [False]
+==========
+t: 797, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70021.78125, Done: [False]
+==========
+t: 798, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70121.6875, Done: [False]
+==========
+t: 799, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70221.5859375, Done: [False]
+==========
+t: 800, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70321.484375, Done: [False]
+==========
+t: 801, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70421.3828125, Done: [False]
+==========
+t: 802, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70521.28125, Done: [False]
+==========
+t: 803, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70621.1875, Done: [False]
+==========
+t: 804, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70721.0859375, Done: [False]
+==========
+t: 805, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70820.984375, Done: [False]
+==========
+t: 806, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 70920.8828125, Done: [False]
+==========
+t: 807, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71020.78125, Done: [False]
+==========
+t: 808, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71120.6875, Done: [False]
+==========
+t: 809, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71220.5859375, Done: [False]
+==========
+t: 810, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71320.484375, Done: [False]
+==========
+t: 811, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71420.3828125, Done: [False]
+==========
+t: 812, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71520.2890625, Done: [False]
+==========
+t: 813, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71620.1875, Done: [False]
+==========
+t: 814, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71720.0859375, Done: [False]
+==========
+t: 815, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71819.984375, Done: [False]
+==========
+t: 816, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 71919.8828125, Done: [False]
+==========
+t: 817, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72019.78125, Done: [False]
+==========
+t: 818, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72119.6796875, Done: [False]
+==========
+t: 819, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72219.5859375, Done: [False]
+==========
+t: 820, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72319.484375, Done: [False]
+==========
+t: 821, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72419.3828125, Done: [False]
+==========
+t: 822, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72519.28125, Done: [False]
+==========
+t: 823, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72619.1796875, Done: [False]
+==========
+t: 824, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72719.078125, Done: [False]
+==========
+t: 825, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72818.984375, Done: [False]
+==========
+t: 826, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 72918.8828125, Done: [False]
+==========
+t: 827, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73018.78125, Done: [False]
+==========
+t: 828, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73118.6796875, Done: [False]
+==========
+t: 829, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73218.5859375, Done: [False]
+==========
+t: 830, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73318.484375, Done: [False]
+==========
+t: 831, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73418.3828125, Done: [False]
+==========
+t: 832, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73518.28125, Done: [False]
+==========
+t: 833, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73618.1796875, Done: [False]
+==========
+t: 834, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73718.0859375, Done: [False]
+==========
+t: 835, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73817.984375, Done: [False]
+==========
+t: 836, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 73917.8828125, Done: [False]
+==========
+t: 837, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74017.78125, Done: [False]
+==========
+t: 838, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74117.6875, Done: [False]
+==========
+t: 839, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74217.578125, Done: [False]
+==========
+t: 840, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74317.484375, Done: [False]
+==========
+t: 841, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74417.3828125, Done: [False]
+==========
+t: 842, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74517.28125, Done: [False]
+==========
+t: 843, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74617.1796875, Done: [False]
+==========
+t: 844, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74717.0859375, Done: [False]
+==========
+t: 845, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74816.984375, Done: [False]
+==========
+t: 846, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 74916.8828125, Done: [False]
+==========
+t: 847, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75016.78125, Done: [False]
+==========
+t: 848, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75116.6796875, Done: [False]
+==========
+t: 849, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75216.578125, Done: [False]
+==========
+t: 850, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75316.484375, Done: [False]
+==========
+t: 851, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75416.3828125, Done: [False]
+==========
+t: 852, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75516.28125, Done: [False]
+==========
+t: 853, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75616.1796875, Done: [False]
+==========
+t: 854, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75716.0859375, Done: [False]
+==========
+t: 855, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75815.9765625, Done: [False]
+==========
+t: 856, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 75915.8828125, Done: [False]
+==========
+t: 857, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76015.78125, Done: [False]
+==========
+t: 858, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76115.6796875, Done: [False]
+==========
+t: 859, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76215.578125, Done: [False]
+==========
+t: 860, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76315.484375, Done: [False]
+==========
+t: 861, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76415.3828125, Done: [False]
+==========
+t: 862, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76515.28125, Done: [False]
+==========
+t: 863, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76615.1796875, Done: [False]
+==========
+t: 864, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76715.078125, Done: [False]
+==========
+t: 865, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76814.984375, Done: [False]
+==========
+t: 866, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 76914.8828125, Done: [False]
+==========
+t: 867, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77014.78125, Done: [False]
+==========
+t: 868, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77114.6875, Done: [False]
+==========
+t: 869, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77214.578125, Done: [False]
+==========
+t: 870, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77314.484375, Done: [False]
+==========
+t: 871, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77414.3828125, Done: [False]
+==========
+t: 872, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77514.28125, Done: [False]
+==========
+t: 873, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77614.1796875, Done: [False]
+==========
+t: 874, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77714.078125, Done: [False]
+==========
+t: 875, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77813.984375, Done: [False]
+==========
+t: 876, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 77913.8828125, Done: [False]
+==========
+t: 877, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78013.78125, Done: [False]
+==========
+t: 878, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78113.6875, Done: [False]
+==========
+t: 879, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78213.5859375, Done: [False]
+==========
+t: 880, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78313.484375, Done: [False]
+==========
+t: 881, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78413.3828125, Done: [False]
+==========
+t: 882, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78513.28125, Done: [False]
+==========
+t: 883, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78613.1875, Done: [False]
+==========
+t: 884, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78713.0859375, Done: [False]
+==========
+t: 885, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78812.984375, Done: [False]
+==========
+t: 886, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 78912.890625, Done: [False]
+==========
+t: 887, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79012.78125, Done: [False]
+==========
+t: 888, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79112.6875, Done: [False]
+==========
+t: 889, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79212.5859375, Done: [False]
+==========
+t: 890, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79312.484375, Done: [False]
+==========
+t: 891, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79412.390625, Done: [False]
+==========
+t: 892, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79512.2890625, Done: [False]
+==========
+t: 893, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79612.1875, Done: [False]
+==========
+t: 894, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79712.0859375, Done: [False]
+==========
+t: 895, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79811.984375, Done: [False]
+==========
+t: 896, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 79911.8828125, Done: [False]
+==========
+t: 897, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80011.78125, Done: [False]
+==========
+t: 898, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80111.6796875, Done: [False]
+==========
+t: 899, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80211.578125, Done: [False]
+==========
+t: 900, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80311.484375, Done: [False]
+==========
+t: 901, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80411.3828125, Done: [False]
+==========
+t: 902, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80511.28125, Done: [False]
+==========
+t: 903, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80611.1796875, Done: [False]
+==========
+t: 904, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80711.078125, Done: [False]
+==========
+t: 905, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80810.984375, Done: [False]
+==========
+t: 906, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 80910.8828125, Done: [False]
+==========
+t: 907, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81010.78125, Done: [False]
+==========
+t: 908, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81110.6796875, Done: [False]
+==========
+t: 909, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81210.5859375, Done: [False]
+==========
+t: 910, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81310.484375, Done: [False]
+==========
+t: 911, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81410.3828125, Done: [False]
+==========
+t: 912, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81510.28125, Done: [False]
+==========
+t: 913, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81610.1875, Done: [False]
+==========
+t: 914, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81710.0859375, Done: [False]
+==========
+t: 915, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81809.984375, Done: [False]
+==========
+t: 916, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 81909.8828125, Done: [False]
+==========
+t: 917, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82009.7890625, Done: [False]
+==========
+t: 918, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82109.6875, Done: [False]
+==========
+t: 919, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82209.5859375, Done: [False]
+==========
+t: 920, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82309.484375, Done: [False]
+==========
+t: 921, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82409.390625, Done: [False]
+==========
+t: 922, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82509.28125, Done: [False]
+==========
+t: 923, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82609.1875, Done: [False]
+==========
+t: 924, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82709.0859375, Done: [False]
+==========
+t: 925, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82808.984375, Done: [False]
+==========
+t: 926, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 82908.890625, Done: [False]
+==========
+t: 927, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83008.78125, Done: [False]
+==========
+t: 928, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83108.6875, Done: [False]
+==========
+t: 929, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83208.5859375, Done: [False]
+==========
+t: 930, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83308.484375, Done: [False]
+==========
+t: 931, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83408.390625, Done: [False]
+==========
+t: 932, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83508.28125, Done: [False]
+==========
+t: 933, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83608.1875, Done: [False]
+==========
+t: 934, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83708.0859375, Done: [False]
+==========
+t: 935, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83807.984375, Done: [False]
+==========
+t: 936, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 83907.890625, Done: [False]
+==========
+t: 937, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84007.78125, Done: [False]
+==========
+t: 938, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84107.6875, Done: [False]
+==========
+t: 939, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84207.5859375, Done: [False]
+==========
+t: 940, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84307.484375, Done: [False]
+==========
+t: 941, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84407.390625, Done: [False]
+==========
+t: 942, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84507.28125, Done: [False]
+==========
+t: 943, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84607.1875, Done: [False]
+==========
+t: 944, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84707.0859375, Done: [False]
+==========
+t: 945, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84806.984375, Done: [False]
+==========
+t: 946, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 84906.8828125, Done: [False]
+==========
+t: 947, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85006.78125, Done: [False]
+==========
+t: 948, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85106.6875, Done: [False]
+==========
+t: 949, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85206.5859375, Done: [False]
+==========
+t: 950, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85306.484375, Done: [False]
+==========
+t: 951, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85406.3828125, Done: [False]
+==========
+t: 952, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85506.28125, Done: [False]
+==========
+t: 953, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85606.1875, Done: [False]
+==========
+t: 954, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85706.0859375, Done: [False]
+==========
+t: 955, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85805.984375, Done: [False]
+==========
+t: 956, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 85905.8828125, Done: [False]
+==========
+t: 957, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86005.78125, Done: [False]
+==========
+t: 958, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86105.6875, Done: [False]
+==========
+t: 959, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86205.5859375, Done: [False]
+==========
+t: 960, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86305.484375, Done: [False]
+==========
+t: 961, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86405.390625, Done: [False]
+==========
+t: 962, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86505.2890625, Done: [False]
+==========
+t: 963, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86605.1875, Done: [False]
+==========
+t: 964, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86705.0859375, Done: [False]
+==========
+t: 965, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86804.984375, Done: [False]
+==========
+t: 966, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 86904.890625, Done: [False]
+==========
+t: 967, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87004.78125, Done: [False]
+==========
+t: 968, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87104.6875, Done: [False]
+==========
+t: 969, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87204.5859375, Done: [False]
+==========
+t: 970, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87304.484375, Done: [False]
+==========
+t: 971, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87404.3828125, Done: [False]
+==========
+t: 972, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87504.28125, Done: [False]
+==========
+t: 973, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87604.1875, Done: [False]
+==========
+t: 974, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87704.0859375, Done: [False]
+==========
+t: 975, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87803.984375, Done: [False]
+==========
+t: 976, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 87903.8828125, Done: [False]
+==========
+t: 977, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88003.78125, Done: [False]
+==========
+t: 978, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88103.6796875, Done: [False]
+==========
+t: 979, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88203.578125, Done: [False]
+==========
+t: 980, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88303.484375, Done: [False]
+==========
+t: 981, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88403.375, Done: [False]
+==========
+t: 982, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88503.28125, Done: [False]
+==========
+t: 983, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88603.1796875, Done: [False]
+==========
+t: 984, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88703.078125, Done: [False]
+==========
+t: 985, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88802.984375, Done: [False]
+==========
+t: 986, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 88902.875, Done: [False]
+==========
+t: 987, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89002.78125, Done: [False]
+==========
+t: 988, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89102.6796875, Done: [False]
+==========
+t: 989, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89202.578125, Done: [False]
+==========
+t: 990, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89302.4765625, Done: [False]
+==========
+t: 991, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89402.3828125, Done: [False]
+==========
+t: 992, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89502.28125, Done: [False]
+==========
+t: 993, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89602.1875, Done: [False]
+==========
+t: 994, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89702.078125, Done: [False]
+==========
+t: 995, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89801.984375, Done: [False]
+==========
+t: 996, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 89901.8828125, Done: [False]
+==========
+t: 997, State: [[0.6  0.07]], Action: [[1.]], Reward: [99.9],Reward_sum: 90001.78125, Done: [False]
+==========
+t: 998, State: [[-0.4116484  0.       ]], Action: [[1.]], Reward: [99.9],Reward_sum: 90101.6796875, Done: [ True]
+==========
+t: 999, State: [[-0.4139722  -0.00232382]], Action: [[-0.9999285]], Reward: [-0.0999857],Reward_sum: 90101.5859375, Done: [False]
+==========
+MountainCarContinuous-v0 - Steps: 1000, Return: 90101.5859375, State: [[-0.4139722  -0.00232382]]
+rewards_demo [-6.28144145e-02 -1.22574136e-01 -1.79188401e-01 -2.32622936e-01
+ -2.82904327e-01 -3.30120593e-01 -3.74417543e-01 -4.15991902e-01
+ -4.55081493e-01 -4.91954088e-01 -5.26896536e-01 -5.58453023e-01
+ -5.86469471e-01 -6.10485733e-01 -6.29249871e-01 -6.42488897e-01
+ -6.50920272e-01 -6.55282736e-01 -6.55835271e-01 -6.57313526e-01
+ -6.67796433e-01 -6.93385482e-01 -7.35325992e-01 -8.29652548e-01
+ -9.29542184e-01 -1.02953899e+00 -1.12953889e+00 -1.22953892e+00
+ -1.32953894e+00 -1.42953897e+00 -1.52953899e+00 -1.62953901e+00
+ -1.72953904e+00 -1.82953906e+00 -1.92953908e+00 -2.02953911e+00
+ -2.12953901e+00 -2.22953892e+00 -2.32953882e+00 -2.42953873e+00
+ -2.52953863e+00 -2.62953854e+00 -2.72953844e+00 -2.82953835e+00
+ -2.92953825e+00 -3.02953815e+00 -3.12953806e+00 -3.22953796e+00
+ -3.32953787e+00 -3.42953777e+00 -3.52953768e+00 -3.62953758e+00
+ -3.72953749e+00 -3.82953739e+00 -3.92953730e+00 -4.02953720e+00
+ -4.12953711e+00 -4.22953701e+00 -4.32953691e+00 -4.42953682e+00
+ -4.52953672e+00 -4.62953663e+00 -4.72953653e+00 -4.82953644e+00
+ -4.92953634e+00 -5.02953625e+00 -5.12953615e+00 -5.22953606e+00
+ -5.32953596e+00 -5.42953587e+00 -5.52953577e+00 -5.62953568e+00
+ -5.72953558e+00 -5.82953548e+00 -5.92953539e+00 -6.02953529e+00
+ -6.12953520e+00 -6.22953510e+00 -6.32953501e+00 -6.42953491e+00
+ -6.52953482e+00 -6.62953472e+00 -6.72953463e+00 -6.82953453e+00
+ -6.92953444e+00 -7.02953434e+00 -7.12953424e+00 -7.22953415e+00
+ -7.32953405e+00 -7.42953396e+00 -7.52953386e+00 -7.62953377e+00
+ -7.72953367e+00 -7.82953358e+00 -7.92953348e+00 -8.02953339e+00
+ -8.12953377e+00  9.17704697e+01  1.91670471e+02  2.91570465e+02
+  3.91470459e+02  4.91370453e+02  5.91270447e+02  6.91170471e+02
+  7.91070496e+02  8.90970520e+02  9.90870544e+02  1.09077051e+03
+  1.19067053e+03  1.29057056e+03  1.39047058e+03  1.49037061e+03
+  1.59027063e+03  1.69017065e+03  1.79007068e+03  1.88997070e+03
+  1.98987073e+03  2.08977075e+03  2.18967065e+03  2.28957056e+03
+  2.38947046e+03  2.48937036e+03  2.58927026e+03  2.68917017e+03
+  2.78907007e+03  2.88896997e+03  2.98886987e+03  3.08876978e+03
+  3.18866968e+03  3.28856958e+03  3.38846948e+03  3.48836938e+03
+  3.58826929e+03  3.68816919e+03  3.78806909e+03  3.88796899e+03
+  3.98786890e+03  4.08776880e+03  4.18766895e+03  4.28756885e+03
+  4.38746875e+03  4.48736865e+03  4.58726855e+03  4.68716846e+03
+  4.78706836e+03  4.88696826e+03  4.98686816e+03  5.08676807e+03
+  5.18666797e+03  5.28656787e+03  5.38646777e+03  5.48636768e+03
+  5.58626758e+03  5.68616748e+03  5.78606738e+03  5.88596729e+03
+  5.98586719e+03  6.08576709e+03  6.18566699e+03  6.28556689e+03
+  6.38546680e+03  6.48536670e+03  6.58526660e+03  6.68516650e+03
+  6.78506641e+03  6.88496631e+03  6.98486621e+03  7.08476611e+03
+  7.18466602e+03  7.28456592e+03  7.38446582e+03  7.48436572e+03
+  7.58426562e+03  7.68416553e+03  7.78406543e+03  7.88396533e+03
+  7.98386523e+03  8.08376514e+03  8.18366504e+03  8.28356543e+03
+  8.38346582e+03  8.48336621e+03  8.58326660e+03  8.68316699e+03
+  8.78306738e+03  8.88296777e+03  8.98286816e+03  9.08276855e+03
+  9.18266895e+03  9.28256934e+03  9.38246973e+03  9.48237012e+03
+  9.58227051e+03  9.68217090e+03  9.78207129e+03  9.88197168e+03
+  9.98187207e+03  1.00817725e+04  1.01816729e+04  1.02815732e+04
+  1.03814736e+04  1.04813740e+04  1.05812744e+04  1.06811748e+04
+  1.07810752e+04  1.08809756e+04  1.09808760e+04  1.10807764e+04
+  1.11806768e+04  1.12805771e+04  1.13804775e+04  1.14803779e+04
+  1.15802783e+04  1.16801787e+04  1.17800791e+04  1.18799795e+04
+  1.19798799e+04  1.20797803e+04  1.21796807e+04  1.22795811e+04
+  1.23794814e+04  1.24793818e+04  1.25792822e+04  1.26791826e+04
+  1.27790830e+04  1.28789834e+04  1.29788838e+04  1.30787842e+04
+  1.31786846e+04  1.32785850e+04  1.33784854e+04  1.34783857e+04
+  1.35782861e+04  1.36781865e+04  1.37780869e+04  1.38779873e+04
+  1.39778877e+04  1.40777881e+04  1.41776885e+04  1.42775889e+04
+  1.43774893e+04  1.44773896e+04  1.45772900e+04  1.46771904e+04
+  1.47770908e+04  1.48769912e+04  1.49768916e+04  1.50767920e+04
+  1.51766924e+04  1.52765928e+04  1.53764932e+04  1.54763936e+04
+  1.55762939e+04  1.56761943e+04  1.57760947e+04  1.58759951e+04
+  1.59758955e+04  1.60757959e+04  1.61756963e+04  1.62755967e+04
+  1.63754971e+04  1.64753965e+04  1.65752969e+04  1.66751973e+04
+  1.67750977e+04  1.68749980e+04  1.69748984e+04  1.70747988e+04
+  1.71746992e+04  1.72745996e+04  1.73745000e+04  1.74744004e+04
+  1.75743008e+04  1.76742012e+04  1.77741016e+04  1.78740020e+04
+  1.79739023e+04  1.80738027e+04  1.81737031e+04  1.82736035e+04
+  1.83735039e+04  1.84734043e+04  1.85733047e+04  1.86732051e+04
+  1.87731055e+04  1.88730059e+04  1.89729062e+04  1.90728066e+04
+  1.91727070e+04  1.92726074e+04  1.93725078e+04  1.94724082e+04
+  1.95723086e+04  1.96722090e+04  1.97721094e+04  1.98720098e+04
+  1.99719102e+04  2.00718105e+04  2.01717109e+04  2.02716113e+04
+  2.03715117e+04  2.04714121e+04  2.05713125e+04  2.06712129e+04
+  2.07711133e+04  2.08710137e+04  2.09709141e+04  2.10708145e+04
+  2.11707148e+04  2.12706152e+04  2.13705156e+04  2.14704160e+04
+  2.15703164e+04  2.16702168e+04  2.17701172e+04  2.18700176e+04
+  2.19699180e+04  2.20698184e+04  2.21697188e+04  2.22696191e+04
+  2.23695195e+04  2.24694199e+04  2.25693203e+04  2.26692207e+04
+  2.27691211e+04  2.28690215e+04  2.29689219e+04  2.30688223e+04
+  2.31687227e+04  2.32686230e+04  2.33685234e+04  2.34684238e+04
+  2.35683242e+04  2.36682246e+04  2.37681250e+04  2.38680254e+04
+  2.39679258e+04  2.40678262e+04  2.41677266e+04  2.42676270e+04
+  2.43675273e+04  2.44674277e+04  2.45673281e+04  2.46672285e+04
+  2.47671289e+04  2.48670293e+04  2.49669297e+04  2.50668301e+04
+  2.51667305e+04  2.52666309e+04  2.53665312e+04  2.54664316e+04
+  2.55663320e+04  2.56662324e+04  2.57661328e+04  2.58660332e+04
+  2.59659336e+04  2.60658340e+04  2.61657344e+04  2.62656348e+04
+  2.63655352e+04  2.64654355e+04  2.65653359e+04  2.66652363e+04
+  2.67651367e+04  2.68650371e+04  2.69649375e+04  2.70648379e+04
+  2.71647383e+04  2.72646387e+04  2.73645391e+04  2.74644395e+04
+  2.75643398e+04  2.76642402e+04  2.77641406e+04  2.78640410e+04
+  2.79639414e+04  2.80638418e+04  2.81637422e+04  2.82636426e+04
+  2.83635430e+04  2.84634434e+04  2.85633438e+04  2.86632441e+04
+  2.87631445e+04  2.88630449e+04  2.89629453e+04  2.90628457e+04
+  2.91627461e+04  2.92626465e+04  2.93625469e+04  2.94624473e+04
+  2.95623477e+04  2.96622480e+04  2.97621484e+04  2.98620488e+04
+  2.99619492e+04  3.00618496e+04  3.01617500e+04  3.02616504e+04
+  3.03615508e+04  3.04614512e+04  3.05613516e+04  3.06612520e+04
+  3.07611523e+04  3.08610527e+04  3.09609531e+04  3.10608535e+04
+  3.11607539e+04  3.12606543e+04  3.13605547e+04  3.14604551e+04
+  3.15603555e+04  3.16602559e+04  3.17601562e+04  3.18600566e+04
+  3.19599570e+04  3.20598574e+04  3.21597578e+04  3.22596582e+04
+  3.23595586e+04  3.24594590e+04  3.25593594e+04  3.26592598e+04
+  3.27591602e+04  3.28590586e+04  3.29589570e+04  3.30588555e+04
+  3.31587539e+04  3.32586523e+04  3.33585508e+04  3.34584492e+04
+  3.35583477e+04  3.36582461e+04  3.37581445e+04  3.38580430e+04
+  3.39579414e+04  3.40578398e+04  3.41577383e+04  3.42576367e+04
+  3.43575352e+04  3.44574336e+04  3.45573320e+04  3.46572305e+04
+  3.47571289e+04  3.48570273e+04  3.49569258e+04  3.50568242e+04
+  3.51567227e+04  3.52566211e+04  3.53565195e+04  3.54564180e+04
+  3.55563164e+04  3.56562148e+04  3.57561133e+04  3.58560117e+04
+  3.59559102e+04  3.60558086e+04  3.61557070e+04  3.62556055e+04
+  3.63555039e+04  3.64554023e+04  3.65553008e+04  3.66551992e+04
+  3.67550977e+04  3.68549961e+04  3.69548945e+04  3.70547930e+04
+  3.71546914e+04  3.72545898e+04  3.73544883e+04  3.74543867e+04
+  3.75542852e+04  3.76541836e+04  3.77540820e+04  3.78539805e+04
+  3.79538789e+04  3.80537773e+04  3.81536758e+04  3.82535742e+04
+  3.83534727e+04  3.84533711e+04  3.85532695e+04  3.86531680e+04
+  3.87530664e+04  3.88529648e+04  3.89528633e+04  3.90527617e+04
+  3.91526602e+04  3.92525586e+04  3.93524570e+04  3.94523555e+04
+  3.95522539e+04  3.96521523e+04  3.97520508e+04  3.98519492e+04
+  3.99518477e+04  4.00517461e+04  4.01516445e+04  4.02515430e+04
+  4.03514414e+04  4.04513398e+04  4.05512383e+04  4.06511367e+04
+  4.07510352e+04  4.08509336e+04  4.09508320e+04  4.10507305e+04
+  4.11506289e+04  4.12505273e+04  4.13504258e+04  4.14503242e+04
+  4.15502227e+04  4.16501211e+04  4.17500195e+04  4.18499180e+04
+  4.19498164e+04  4.20497148e+04  4.21496133e+04  4.22495117e+04
+  4.23494102e+04  4.24493086e+04  4.25492070e+04  4.26491055e+04
+  4.27490039e+04  4.28489023e+04  4.29488008e+04  4.30486992e+04
+  4.31485977e+04  4.32484961e+04  4.33483945e+04  4.34482930e+04
+  4.35481914e+04  4.36480898e+04  4.37479883e+04  4.38478867e+04
+  4.39477852e+04  4.40476836e+04  4.41475820e+04  4.42474805e+04
+  4.43473789e+04  4.44472773e+04  4.45471758e+04  4.46470742e+04
+  4.47469727e+04  4.48468711e+04  4.49467695e+04  4.50466680e+04
+  4.51465664e+04  4.52464648e+04  4.53463633e+04  4.54462617e+04
+  4.55461602e+04  4.56460586e+04  4.57459570e+04  4.58458555e+04
+  4.59457539e+04  4.60456523e+04  4.61455508e+04  4.62454492e+04
+  4.63453477e+04  4.64452461e+04  4.65451445e+04  4.66450430e+04
+  4.67449414e+04  4.68448398e+04  4.69447383e+04  4.70446367e+04
+  4.71445352e+04  4.72444336e+04  4.73443320e+04  4.74442305e+04
+  4.75441289e+04  4.76440273e+04  4.77439258e+04  4.78438242e+04
+  4.79437227e+04  4.80436211e+04  4.81435195e+04  4.82434180e+04
+  4.83433164e+04  4.84432148e+04  4.85431133e+04  4.86430117e+04
+  4.87429102e+04  4.88428086e+04  4.89427070e+04  4.90426055e+04
+  4.91425039e+04  4.92424023e+04  4.93423008e+04  4.94421992e+04
+  4.95420977e+04  4.96419961e+04  4.97418945e+04  4.98417930e+04
+  4.99416914e+04  5.00415898e+04  5.01414883e+04  5.02413867e+04
+  5.03412852e+04  5.04411836e+04  5.05410820e+04  5.06409805e+04
+  5.07408789e+04  5.08407773e+04  5.09406758e+04  5.10405742e+04
+  5.11404727e+04  5.12403711e+04  5.13402695e+04  5.14401680e+04
+  5.15400664e+04  5.16399648e+04  5.17398633e+04  5.18397617e+04
+  5.19396602e+04  5.20395586e+04  5.21394570e+04  5.22393555e+04
+  5.23392539e+04  5.24391523e+04  5.25390508e+04  5.26389492e+04
+  5.27388477e+04  5.28387461e+04  5.29386445e+04  5.30385430e+04
+  5.31384414e+04  5.32383398e+04  5.33382383e+04  5.34381367e+04
+  5.35380352e+04  5.36379336e+04  5.37378320e+04  5.38377305e+04
+  5.39376289e+04  5.40375273e+04  5.41374258e+04  5.42373242e+04
+  5.43372227e+04  5.44371211e+04  5.45370195e+04  5.46369180e+04
+  5.47368164e+04  5.48367148e+04  5.49366133e+04  5.50365117e+04
+  5.51364102e+04  5.52363086e+04  5.53362070e+04  5.54361055e+04
+  5.55360039e+04  5.56359023e+04  5.57358008e+04  5.58356992e+04
+  5.59355977e+04  5.60354961e+04  5.61353945e+04  5.62352930e+04
+  5.63351914e+04  5.64350898e+04  5.65349883e+04  5.66348867e+04
+  5.67347852e+04  5.68346836e+04  5.69345820e+04  5.70344805e+04
+  5.71343789e+04  5.72342773e+04  5.73341758e+04  5.74340742e+04
+  5.75339727e+04  5.76338711e+04  5.77337695e+04  5.78336680e+04
+  5.79335664e+04  5.80334648e+04  5.81333633e+04  5.82332617e+04
+  5.83331602e+04  5.84330586e+04  5.85329570e+04  5.86328555e+04
+  5.87327539e+04  5.88326523e+04  5.89325508e+04  5.90324492e+04
+  5.91323477e+04  5.92322461e+04  5.93321445e+04  5.94320430e+04
+  5.95319414e+04  5.96318398e+04  5.97317383e+04  5.98316367e+04
+  5.99315352e+04  6.00314336e+04  6.01313320e+04  6.02312305e+04
+  6.03311289e+04  6.04310273e+04  6.05309258e+04  6.06308242e+04
+  6.07307227e+04  6.08306211e+04  6.09305195e+04  6.10304180e+04
+  6.11303164e+04  6.12302148e+04  6.13301133e+04  6.14300117e+04
+  6.15299102e+04  6.16298086e+04  6.17297070e+04  6.18296055e+04
+  6.19295039e+04  6.20294023e+04  6.21293008e+04  6.22291992e+04
+  6.23290977e+04  6.24289961e+04  6.25288945e+04  6.26287930e+04
+  6.27286914e+04  6.28285898e+04  6.29284883e+04  6.30283867e+04
+  6.31282852e+04  6.32281836e+04  6.33280820e+04  6.34279805e+04
+  6.35278789e+04  6.36277773e+04  6.37276758e+04  6.38275742e+04
+  6.39274727e+04  6.40273711e+04  6.41272695e+04  6.42271680e+04
+  6.43270664e+04  6.44269648e+04  6.45268633e+04  6.46267617e+04
+  6.47266602e+04  6.48265586e+04  6.49264570e+04  6.50263555e+04
+  6.51262539e+04  6.52261523e+04  6.53260508e+04  6.54259492e+04
+  6.55258477e+04  6.56257500e+04  6.57256484e+04  6.58255469e+04
+  6.59254453e+04  6.60253438e+04  6.61252422e+04  6.62251406e+04
+  6.63250391e+04  6.64249375e+04  6.65248359e+04  6.66247344e+04
+  6.67246328e+04  6.68245312e+04  6.69244297e+04  6.70243281e+04
+  6.71242266e+04  6.72241250e+04  6.73240234e+04  6.74239219e+04
+  6.75238203e+04  6.76237188e+04  6.77236172e+04  6.78235156e+04
+  6.79234141e+04  6.80233125e+04  6.81232109e+04  6.82231094e+04
+  6.83230078e+04  6.84229062e+04  6.85228047e+04  6.86227031e+04
+  6.87226016e+04  6.88225000e+04  6.89223984e+04  6.90222969e+04
+  6.91221953e+04  6.92220938e+04  6.93219922e+04  6.94218906e+04
+  6.95217891e+04  6.96216875e+04  6.97215859e+04  6.98214844e+04
+  6.99213828e+04  7.00212812e+04  7.01211797e+04  7.02210781e+04
+  7.03209766e+04  7.04208750e+04  7.05207734e+04  7.06206719e+04
+  7.07205703e+04  7.08204688e+04  7.09203672e+04  7.10202656e+04
+  7.11201641e+04  7.12200625e+04  7.13199609e+04  7.14198594e+04
+  7.15197578e+04  7.16196562e+04  7.17195547e+04  7.18194531e+04
+  7.19193516e+04  7.20192500e+04  7.21191484e+04  7.22190469e+04
+  7.23189453e+04  7.24188438e+04  7.25187422e+04  7.26186406e+04
+  7.27185391e+04  7.28184375e+04  7.29183359e+04  7.30182344e+04
+  7.31181328e+04  7.32180312e+04  7.33179297e+04  7.34178281e+04
+  7.35177266e+04  7.36176250e+04  7.37175234e+04  7.38174219e+04
+  7.39173203e+04  7.40172188e+04  7.41171172e+04  7.42170156e+04
+  7.43169141e+04  7.44168125e+04  7.45167109e+04  7.46166094e+04
+  7.47165078e+04  7.48164062e+04  7.49163047e+04  7.50162031e+04
+  7.51161016e+04  7.52160000e+04  7.53158984e+04  7.54157969e+04
+  7.55156953e+04  7.56155938e+04  7.57154922e+04  7.58153906e+04
+  7.59152891e+04  7.60151875e+04  7.61150859e+04  7.62149844e+04
+  7.63148828e+04  7.64147812e+04  7.65146797e+04  7.66145781e+04
+  7.67144766e+04  7.68143750e+04  7.69142734e+04  7.70141719e+04
+  7.71140703e+04  7.72139688e+04  7.73138672e+04  7.74137656e+04
+  7.75136641e+04  7.76135625e+04  7.77134609e+04  7.78133594e+04
+  7.79132578e+04  7.80131562e+04  7.81130547e+04  7.82129531e+04
+  7.83128516e+04  7.84127500e+04  7.85126484e+04  7.86125469e+04
+  7.87124453e+04  7.88123438e+04  7.89122422e+04  7.90121406e+04
+  7.91120391e+04  7.92119375e+04  7.93118359e+04  7.94117344e+04
+  7.95116328e+04  7.96115312e+04  7.97114297e+04  7.98113281e+04
+  7.99112266e+04  8.00111250e+04  8.01110234e+04  8.02109219e+04
+  8.03108203e+04  8.04107188e+04  8.05106172e+04  8.06105156e+04
+  8.07104141e+04  8.08103125e+04  8.09102109e+04  8.10101094e+04
+  8.11100078e+04  8.12099062e+04  8.13098047e+04  8.14097031e+04
+  8.15096016e+04  8.16095000e+04  8.17093984e+04  8.18092969e+04
+  8.19091953e+04  8.20090938e+04  8.21089922e+04  8.22088906e+04
+  8.23087891e+04  8.24086875e+04  8.25085859e+04  8.26084844e+04
+  8.27083828e+04  8.28082812e+04  8.29081797e+04  8.30080781e+04
+  8.31079766e+04  8.32078750e+04  8.33077734e+04  8.34076719e+04
+  8.35075703e+04  8.36074688e+04  8.37073672e+04  8.38072656e+04
+  8.39071641e+04  8.40070625e+04  8.41069609e+04  8.42068594e+04
+  8.43067578e+04  8.44066562e+04  8.45065547e+04  8.46064531e+04
+  8.47063516e+04  8.48062500e+04  8.49061484e+04  8.50060469e+04
+  8.51059453e+04  8.52058438e+04  8.53057422e+04  8.54056406e+04
+  8.55055391e+04  8.56054375e+04  8.57053359e+04  8.58052344e+04
+  8.59051328e+04  8.60050312e+04  8.61049297e+04  8.62048281e+04
+  8.63047266e+04  8.64046250e+04  8.65045234e+04  8.66044219e+04
+  8.67043203e+04  8.68042188e+04  8.69041172e+04  8.70040156e+04
+  8.71039141e+04  8.72038125e+04  8.73037109e+04  8.74036094e+04
+  8.75035078e+04  8.76034062e+04  8.77033047e+04  8.78032031e+04
+  8.79031016e+04  8.80030000e+04  8.81028984e+04  8.82027969e+04
+  8.83026953e+04  8.84025938e+04  8.85024922e+04  8.86023906e+04
+  8.87022891e+04  8.88021875e+04  8.89020859e+04  8.90019844e+04
+  8.91018828e+04  8.92017812e+04  8.93016797e+04  8.94015781e+04
+  8.95014766e+04  8.96013750e+04  8.97012734e+04  8.98011719e+04
+  8.99010703e+04  9.00009688e+04  9.01008672e+04  9.01007656e+04]
+Execution time: 2.2775 seconds,Total True Reward = -45.8063
+Execution time: 1.7348 seconds,Total True Reward = -68.2208
+Execution time: 1.7351 seconds,Total True Reward = -76.1281
+Execution time: 1.7494 seconds,Total True Reward = -72.5270
+Execution time: 2.0237 seconds,Total True Reward = -60.8122
+Execution time: 1.7438 seconds,Total True Reward = -52.6263
+Execution time: 1.7512 seconds,Total True Reward = -45.2848
+Execution time: 1.7447 seconds,Total True Reward = -62.7152
+Execution time: 1.7422 seconds,Total True Reward = -46.5477
+Execution time: 1.7440 seconds,Total True Reward = -33.0792
+Execution time: 1.7477 seconds,Total True Reward = 68871.9321
+Execution time: 1.7530 seconds,Total True Reward = 73172.2747
+Execution time: 1.7523 seconds,Total True Reward = 74472.9525
+Execution time: 1.7533 seconds,Total True Reward = 74572.6674
+Execution time: 1.7550 seconds,Total True Reward = 42648.1673
+Execution time: 1.7524 seconds,Total True Reward = 74672.5429
+Execution time: 1.7499 seconds,Total True Reward = 74572.3983
+Execution time: 1.7535 seconds,Total True Reward = 72070.0645
+Execution time: 1.7447 seconds,Total True Reward = 73771.6264
+Execution time: 1.7477 seconds,Total True Reward = 75374.0454
+Execution time: 1.7464 seconds,Total True Reward = 75480.5106
+Execution time: 1.7409 seconds,Total True Reward = 73978.9206
+Execution time: 2.1227 seconds,Total True Reward = 17033.0070
+Execution time: 1.7509 seconds,Total True Reward = 75079.6350
+Execution time: 1.7569 seconds,Total True Reward = 30943.1719
+Execution time: 1.7606 seconds,Total True Reward = 43952.8815
+Execution time: 1.7438 seconds,Total True Reward = 42252.9236
+Execution time: 1.7541 seconds,Total True Reward = 43053.4800
+Execution time: 1.7573 seconds,Total True Reward = 11930.0489
+Execution time: 2.1503 seconds,Total True Reward = 48256.0339
+Execution time: 1.7614 seconds,Total True Reward = 57263.5925
+Execution time: 1.7528 seconds,Total True Reward = 48155.4983
+Execution time: 1.7446 seconds,Total True Reward = 13529.6029
+Execution time: 1.7566 seconds,Total True Reward = 42952.4673
+Execution time: 1.7556 seconds,Total True Reward = 10824.3038
+Execution time: 1.7521 seconds,Total True Reward = 16530.7188
+Execution time: 1.7517 seconds,Total True Reward = 37946.4785
+Execution time: 2.2223 seconds,Total True Reward = 56662.4302
+Execution time: 1.7587 seconds,Total True Reward = 56962.4273
+Execution time: 1.7528 seconds,Total True Reward = 56862.3015
+Execution time: 1.7454 seconds,Total True Reward = 58064.0544
+Execution time: 1.7454 seconds,Total True Reward = 56461.9029
+Execution time: 1.7580 seconds,Total True Reward = 66871.0852
+Execution time: 1.7481 seconds,Total True Reward = 67071.3300
+Execution time: 1.7475 seconds,Total True Reward = 56662.0565
+Execution time: 1.7585 seconds,Total True Reward = 58363.8765
+Execution time: 2.2655 seconds,Total True Reward = 58163.3936
+Execution time: 1.7541 seconds,Total True Reward = 56261.2857
+Execution time: 1.7486 seconds,Total True Reward = 55960.5304
+Execution time: 1.7507 seconds,Total True Reward = 56361.3410
+Execution time: 1.7860 seconds,Total True Reward = 56261.5880
+Execution time: 1.7471 seconds,Total True Reward = 56061.3363
+Execution time: 1.7498 seconds,Total True Reward = 55961.3291
+Execution time: 1.7553 seconds,Total True Reward = 55360.5150
+Execution time: 1.7492 seconds,Total True Reward = 53758.7756
+Execution time: 1.7474 seconds,Total True Reward = 55360.8792
+Execution time: 2.3165 seconds,Total True Reward = 55460.8633
+Execution time: 1.7513 seconds,Total True Reward = 64468.3100
+Execution time: 1.7640 seconds,Total True Reward = 67370.9978
+Execution time: 1.7564 seconds,Total True Reward = 67170.6221
+Execution time: 1.7550 seconds,Total True Reward = 67170.6189
+Execution time: 1.7724 seconds,Total True Reward = 57562.8588
+Execution time: 1.7649 seconds,Total True Reward = 66770.3231
+Execution time: 1.7454 seconds,Total True Reward = 55660.0658
+Execution time: 1.7137 seconds,Total True Reward = 66870.2746
+Execution time: 1.7088 seconds,Total True Reward = 55960.3987
+Execution time: 1.7144 seconds,Total True Reward = 67070.5649
+Execution time: 2.3918 seconds,Total True Reward = 68872.5346
+Execution time: 1.7138 seconds,Total True Reward = 66070.1048
+Execution time: 1.7108 seconds,Total True Reward = 67671.3537
+Execution time: 1.7198 seconds,Total True Reward = 12224.3758
+Execution time: 1.7170 seconds,Total True Reward = 66770.4162
+Execution time: 1.7108 seconds,Total True Reward = 42151.3873
+Execution time: 1.7175 seconds,Total True Reward = -84.2033
+Execution time: 1.7065 seconds,Total True Reward = 65469.5823
+Execution time: 1.7233 seconds,Total True Reward = 59064.7330
+Execution time: 1.7154 seconds,Total True Reward = 58964.5308
+Execution time: 1.7142 seconds,Total True Reward = 43752.9097
+Execution time: 1.7131 seconds,Total True Reward = 12528.9793
+Execution time: 2.4540 seconds,Total True Reward = 23935.3526
+Execution time: 1.7125 seconds,Total True Reward = 57061.1015
+Execution time: 1.7085 seconds,Total True Reward = 26136.7586
+Execution time: 1.7141 seconds,Total True Reward = 74175.7560
+Execution time: 1.7168 seconds,Total True Reward = 63766.1596
+Execution time: 1.7124 seconds,Total True Reward = 75377.1359
+Execution time: 1.7147 seconds,Total True Reward = 53757.4300
+Execution time: 1.7148 seconds,Total True Reward = 58062.4374
+Execution time: 1.7142 seconds,Total True Reward = -84.4162
+Execution time: 1.7158 seconds,Total True Reward = 63866.0325
+Execution time: 1.7151 seconds,Total True Reward = 31741.2934
+Execution time: 1.7101 seconds,Total True Reward = 66670.0858
+Execution time: 1.7095 seconds,Total True Reward = -83.5882
+Execution time: 1.7152 seconds,Total True Reward = 57561.8297
+Execution time: 2.5732 seconds,Total True Reward = 74976.9544
+Execution time: 1.7184 seconds,Total True Reward = 74976.9897
+Execution time: 1.7137 seconds,Total True Reward = 34143.5084
+Execution time: 1.7223 seconds,Total True Reward = 45751.0534
+Execution time: 1.7095 seconds,Total True Reward = 57462.1927
+Execution time: 1.7211 seconds,Total True Reward = 65668.5529
+Execution time: 1.7090 seconds,Total True Reward = 42447.7439
+Execution time: 1.7119 seconds,Total True Reward = 11822.6819
+Execution time: 1.7130 seconds,Total True Reward = 76578.3164
+Execution time: 1.7065 seconds,Total True Reward = 53457.7224
+Execution time: 1.7066 seconds,Total True Reward = 72473.6440
+Execution time: 1.7122 seconds,Total True Reward = 75977.3629
+Execution time: 1.7053 seconds,Total True Reward = 76177.6795
+Execution time: 1.7086 seconds,Total True Reward = 32843.0197
+Execution time: 1.7160 seconds,Total True Reward = 31140.1639
+Execution time: 2.6909 seconds,Total True Reward = 32342.1385
+Execution time: 1.7108 seconds,Total True Reward = 72974.9862
+Execution time: 1.7124 seconds,Total True Reward = 37343.4730
+Execution time: 1.7098 seconds,Total True Reward = 56661.5340
+Execution time: 1.7131 seconds,Total True Reward = 57362.2758
+Execution time: 1.7154 seconds,Total True Reward = 76678.0367
+Execution time: 1.7140 seconds,Total True Reward = 75676.9511
+Execution time: 1.7163 seconds,Total True Reward = 77279.0977
+Execution time: 1.7192 seconds,Total True Reward = 59862.6978
+Execution time: 1.7127 seconds,Total True Reward = -85.5141
+Execution time: 1.7080 seconds,Total True Reward = 52256.7807
+Execution time: 1.7072 seconds,Total True Reward = 55559.8802
+Execution time: 1.7052 seconds,Total True Reward = 66469.7969
+Execution time: 1.7018 seconds,Total True Reward = 75477.0954
+Execution time: 1.7147 seconds,Total True Reward = 65969.1742
+Execution time: 1.7077 seconds,Total True Reward = 76077.2974
+Execution time: 1.7053 seconds,Total True Reward = 76578.5640
+Execution time: 2.8277 seconds,Total True Reward = 76377.6138
+Execution time: 1.7106 seconds,Total True Reward = 75077.2351
+Execution time: 1.7128 seconds,Total True Reward = 75977.4092
+Execution time: 1.7121 seconds,Total True Reward = 75477.8208
+Execution time: 1.7074 seconds,Total True Reward = 74775.8078
+Execution time: 1.7199 seconds,Total True Reward = 73274.0933
+Execution time: 1.7134 seconds,Total True Reward = 76577.9989
+Execution time: 1.7123 seconds,Total True Reward = 66670.0806
+Execution time: 1.7085 seconds,Total True Reward = -79.1046
+Execution time: 1.7125 seconds,Total True Reward = -83.4067
+Execution time: 1.7025 seconds,Total True Reward = 75677.5907
+Execution time: 1.6991 seconds,Total True Reward = 75077.3691
+Execution time: 1.7055 seconds,Total True Reward = 77078.9739
+Execution time: 1.7092 seconds,Total True Reward = 73875.3697
+Execution time: 1.7030 seconds,Total True Reward = 76077.6988
+Execution time: 1.7094 seconds,Total True Reward = 76378.3415
+Execution time: 1.7096 seconds,Total True Reward = 76779.3542
+Execution time: 1.7138 seconds,Total True Reward = 75878.0318
+Execution time: 1.7168 seconds,Total True Reward = 75878.1069
+Execution time: 1.7232 seconds,Total True Reward = 74977.6391
+Execution time: 1.7097 seconds,Total True Reward = 75878.5664
+Execution time: 1.7158 seconds,Total True Reward = 75677.2015
+Execution time: 1.7092 seconds,Total True Reward = 74777.5974
+Execution time: 1.7146 seconds,Total True Reward = 74277.4547
+Execution time: 1.7108 seconds,Total True Reward = 74077.2672
+Execution time: 1.7117 seconds,Total True Reward = 74878.0125
+Execution time: 1.7080 seconds,Total True Reward = 74777.6143
+Execution time: 1.7026 seconds,Total True Reward = 75176.6297
+Execution time: 1.7106 seconds,Total True Reward = -74.7558
+Execution time: 1.7082 seconds,Total True Reward = 75577.8712
+Execution time: 1.7230 seconds,Total True Reward = 75477.8052
+Execution time: 1.7211 seconds,Total True Reward = 75477.8730
+Execution time: 1.7135 seconds,Total True Reward = 75477.9014
+Execution time: 1.7183 seconds,Total True Reward = 75077.5189
+Execution time: 1.7065 seconds,Total True Reward = 75077.6531
+Execution time: 1.7224 seconds,Total True Reward = 74877.7692
+Execution time: 1.7092 seconds,Total True Reward = 75278.2241
+Execution time: 1.7183 seconds,Total True Reward = 76779.2111
+Execution time: 1.7191 seconds,Total True Reward = 76569.0002
+Execution time: 3.1566 seconds,Total True Reward = 73867.3592
+Execution time: 1.7212 seconds,Total True Reward = 83484.7571
+Execution time: 1.7157 seconds,Total True Reward = 74978.0824
+Execution time: 1.7160 seconds,Total True Reward = 76579.4325
+Execution time: 1.7217 seconds,Total True Reward = 76879.1601
+Execution time: 1.7237 seconds,Total True Reward = 76876.5391
+Execution time: 1.7158 seconds,Total True Reward = 75267.8358
+Execution time: 1.7186 seconds,Total True Reward = 75478.7721
+Execution time: 1.7127 seconds,Total True Reward = 75278.7618
+Execution time: 1.7172 seconds,Total True Reward = 75278.8176
+Execution time: 1.7206 seconds,Total True Reward = 75278.8613
+Execution time: 1.7243 seconds,Total True Reward = 75278.9043
+Execution time: 1.7230 seconds,Total True Reward = 76279.3241
+Execution time: 1.7259 seconds,Total True Reward = -76.4200
+Execution time: 1.7151 seconds,Total True Reward = 75077.9897
+Execution time: 1.7184 seconds,Total True Reward = 76878.6696
+Execution time: 1.7216 seconds,Total True Reward = 72574.7259
+Execution time: 1.7198 seconds,Total True Reward = 85786.6464
+Execution time: 1.7183 seconds,Total True Reward = 84084.7568
+Execution time: 1.7206 seconds,Total True Reward = 75479.7118
+Execution time: 1.7162 seconds,Total True Reward = 75179.3770
+Execution time: 1.7179 seconds,Total True Reward = 74377.7725
+Execution time: 1.7201 seconds,Total True Reward = 75169.5713
+Execution time: 1.7348 seconds,Total True Reward = 75277.9594
+Execution time: 1.7120 seconds,Total True Reward = 76579.2948
+Execution time: 1.7186 seconds,Total True Reward = 75471.2254
+Execution time: 1.7119 seconds,Total True Reward = 49650.8244
+Execution time: 1.7233 seconds,Total True Reward = 44751.8777
+Execution time: 1.7545 seconds,Total True Reward = 47655.8603
+Execution time: 1.7226 seconds,Total True Reward = -75.2791
+Execution time: 1.7246 seconds,Total True Reward = 84384.8708
+Execution time: 1.7262 seconds,Total True Reward = 84986.4174
+Execution time: 1.7372 seconds,Total True Reward = 74377.4089
+Execution time: 1.7326 seconds,Total True Reward = 75679.8872
+Execution time: 1.7231 seconds,Total True Reward = 84785.2093
+Execution time: 1.7225 seconds,Total True Reward = 84073.7500
+Execution time: 1.7347 seconds,Total True Reward = 85586.4402
+Execution time: 1.7447 seconds,Total True Reward = 85687.1754
+Execution time: 1.7370 seconds,Total True Reward = 85776.2101
+Execution time: 1.7415 seconds,Total True Reward = 85675.5022
+Execution time: 1.7300 seconds,Total True Reward = -74.5188
+Execution time: 1.7334 seconds,Total True Reward = 75178.8152
+Execution time: 1.7310 seconds,Total True Reward = 84785.2106
+Execution time: 1.7266 seconds,Total True Reward = 84785.3212
+Execution time: 1.7198 seconds,Total True Reward = 84785.5443
+Execution time: 1.7171 seconds,Total True Reward = 84385.5385
+Execution time: 1.7135 seconds,Total True Reward = 84385.4364
+Execution time: 1.7190 seconds,Total True Reward = 84174.2042
+Execution time: 1.7213 seconds,Total True Reward = 84084.7423
+Execution time: 1.7202 seconds,Total True Reward = 83985.2670
+Execution time: 1.7206 seconds,Total True Reward = 75678.1017
+Execution time: 1.7234 seconds,Total True Reward = 83473.8517
+Execution time: 1.7303 seconds,Total True Reward = 84785.6287
+Execution time: 1.7237 seconds,Total True Reward = 84786.3232
+Execution time: 1.7431 seconds,Total True Reward = 84784.1285
+Execution time: 1.7204 seconds,Total True Reward = 84374.8156
+Execution time: 1.7351 seconds,Total True Reward = 76379.8899
+Execution time: 1.7160 seconds,Total True Reward = 55160.5595
+Execution time: 1.7176 seconds,Total True Reward = -74.9741
+Execution time: 1.7195 seconds,Total True Reward = 54660.3419
+Execution time: 1.7136 seconds,Total True Reward = 83884.2200
+Execution time: 1.7250 seconds,Total True Reward = -74.2272
+Execution time: 1.7275 seconds,Total True Reward = 77480.1641
+Execution time: 1.7265 seconds,Total True Reward = 75779.2634
+Execution time: 1.7139 seconds,Total True Reward = 75779.3481
+Execution time: 1.7241 seconds,Total True Reward = 75879.1901
+Execution time: 1.7187 seconds,Total True Reward = 75868.5829
+Execution time: 1.7092 seconds,Total True Reward = 66871.0561
+Execution time: 1.7152 seconds,Total True Reward = 76080.0375
+Execution time: 1.7214 seconds,Total True Reward = 76177.1260
+Execution time: 1.7211 seconds,Total True Reward = 76169.7635
+Execution time: 1.7112 seconds,Total True Reward = 76579.1044
+Execution time: 1.7175 seconds,Total True Reward = 76079.4553
+Execution time: 1.7282 seconds,Total True Reward = 74576.2895
+Execution time: 1.7218 seconds,Total True Reward = 75368.5464
+Execution time: 1.7258 seconds,Total True Reward = 75178.6455
+Execution time: 3.6708 seconds,Total True Reward = 75279.1038
+Execution time: 1.7215 seconds,Total True Reward = 75279.0263
+Execution time: 1.7248 seconds,Total True Reward = 75277.9646
+Execution time: 1.7216 seconds,Total True Reward = 75069.4035
+Execution time: 1.7231 seconds,Total True Reward = 74578.3291
+Execution time: 1.7203 seconds,Total True Reward = 76078.7036
+Execution time: 1.7269 seconds,Total True Reward = 65568.7290
+Execution time: 1.7164 seconds,Total True Reward = 75769.6702
+Execution time: 1.7206 seconds,Total True Reward = 74276.1662
+Execution time: 1.7263 seconds,Total True Reward = 75576.6903
+Execution time: 1.7085 seconds,Total True Reward = 84275.3506
+Execution time: 1.7171 seconds,Total True Reward = 76672.4993
+Execution time: 1.7204 seconds,Total True Reward = 65770.1238
+Execution time: 1.7250 seconds,Total True Reward = 59266.2541
+Execution time: 1.7242 seconds,Total True Reward = 46853.9298
+Execution time: 1.7227 seconds,Total True Reward = -70.9453
+Execution time: 1.7262 seconds,Total True Reward = 75478.9559
+Execution time: 1.7247 seconds,Total True Reward = 73876.8004
+Execution time: 1.7174 seconds,Total True Reward = 66469.8380
+Execution time: 1.7193 seconds,Total True Reward = 66569.9608
+Execution time: 1.7304 seconds,Total True Reward = 66570.0750
+Execution time: 1.7184 seconds,Total True Reward = 84585.9242
+Execution time: 1.7268 seconds,Total True Reward = 84486.0271
+Execution time: 1.7189 seconds,Total True Reward = 76179.9632
+Execution time: 1.7202 seconds,Total True Reward = 68564.3607
+Execution time: 1.7236 seconds,Total True Reward = 74075.1254
+Execution time: 1.7299 seconds,Total True Reward = 74177.6140
+Execution time: 1.7190 seconds,Total True Reward = 57565.9707
+Execution time: 1.7237 seconds,Total True Reward = 68674.7117
+Execution time: 1.7230 seconds,Total True Reward = -69.6532
+Execution time: 1.7617 seconds,Total True Reward = 76579.4343
+Execution time: 3.9169 seconds,Total True Reward = 82884.2848
+Execution time: 1.7213 seconds,Total True Reward = 82884.4695
+Execution time: 1.7280 seconds,Total True Reward = 84986.3465
+Execution time: 1.7257 seconds,Total True Reward = 84485.1158
+Execution time: 1.7208 seconds,Total True Reward = 80971.5736
+Execution time: 1.7244 seconds,Total True Reward = 76879.8802
+Execution time: 1.7269 seconds,Total True Reward = 75878.7679
+Execution time: 1.7300 seconds,Total True Reward = 76180.6258
+Execution time: 1.7220 seconds,Total True Reward = 76379.3395
+Execution time: 1.7181 seconds,Total True Reward = 83874.1726
+Execution time: 1.7286 seconds,Total True Reward = 76579.4456
+Execution time: 1.7200 seconds,Total True Reward = 67573.5761
+Execution time: 1.7246 seconds,Total True Reward = 67372.1368
+Execution time: 1.7225 seconds,Total True Reward = 67664.6211
+Execution time: 1.7181 seconds,Total True Reward = 76470.3953
+Execution time: 1.7203 seconds,Total True Reward = 76980.7086
+Execution time: 1.7184 seconds,Total True Reward = 77279.9723
+Execution time: 1.7175 seconds,Total True Reward = 77069.0705
+Execution time: 1.7249 seconds,Total True Reward = 84284.1344
+Execution time: 1.7235 seconds,Total True Reward = 83485.4277
+Execution time: 1.7238 seconds,Total True Reward = 84484.7514
+Execution time: 1.7231 seconds,Total True Reward = 86377.0622
+Execution time: 1.7185 seconds,Total True Reward = 84884.7798
+Execution time: 1.7241 seconds,Total True Reward = 84886.7146
+Execution time: 1.7285 seconds,Total True Reward = 77371.1872
+Execution time: 1.7249 seconds,Total True Reward = 85075.0868
+Execution time: 1.7184 seconds,Total True Reward = 76080.4437
+Execution time: 1.7396 seconds,Total True Reward = 76080.7690
+Execution time: 1.7306 seconds,Total True Reward = 85987.8401
+Execution time: 1.7201 seconds,Total True Reward = 76271.5239
+Execution time: 1.7270 seconds,Total True Reward = 76469.6404
+Execution time: 1.7195 seconds,Total True Reward = 85887.7677
+Execution time: 1.7311 seconds,Total True Reward = -60.6856
+Execution time: 1.7277 seconds,Total True Reward = 75379.7376
+Execution time: 4.1643 seconds,Total True Reward = 76281.5089
+Execution time: 1.7268 seconds,Total True Reward = 76481.3915
+Execution time: 1.7324 seconds,Total True Reward = 76481.3457
+Execution time: 1.7282 seconds,Total True Reward = 74668.7374
+Execution time: 1.7216 seconds,Total True Reward = 73968.2300
+Execution time: 1.7253 seconds,Total True Reward = 84987.0756
+Execution time: 1.7252 seconds,Total True Reward = 84987.0787
+Execution time: 1.7257 seconds,Total True Reward = 77779.4864
+Execution time: 1.7280 seconds,Total True Reward = 74867.6189
+Execution time: 1.7241 seconds,Total True Reward = 76880.8359
+Execution time: 1.7326 seconds,Total True Reward = 85887.7497
+Execution time: 1.7209 seconds,Total True Reward = 85888.5045
+Execution time: 1.7319 seconds,Total True Reward = 85976.3609
+Execution time: 1.7289 seconds,Total True Reward = 85977.8922
+Execution time: 1.7304 seconds,Total True Reward = 85887.5236
+Execution time: 1.7207 seconds,Total True Reward = 85876.2025
+Execution time: 1.7162 seconds,Total True Reward = 86386.8834
+Execution time: 1.7280 seconds,Total True Reward = 85881.2920
+Execution time: 1.7263 seconds,Total True Reward = 85174.2971
+Execution time: 1.7249 seconds,Total True Reward = 85186.3689
+Execution time: 1.7299 seconds,Total True Reward = 59772.5767
+Execution time: 1.7232 seconds,Total True Reward = 54770.8710
+Execution time: 1.7313 seconds,Total True Reward = 15646.1426
+Execution time: 1.7279 seconds,Total True Reward = 83986.1646
+Execution time: 1.7297 seconds,Total True Reward = 84787.9008
+Execution time: 1.7259 seconds,Total True Reward = 86588.8835
+Execution time: 1.7253 seconds,Total True Reward = 85075.8649
+Execution time: 1.7159 seconds,Total True Reward = 86485.4134
+Execution time: 1.7212 seconds,Total True Reward = 83673.8375
+Execution time: 1.7253 seconds,Total True Reward = 83585.3142
+Execution time: 1.7259 seconds,Total True Reward = 83585.4327
+Execution time: 1.7299 seconds,Total True Reward = -57.5552
+Execution time: 1.7256 seconds,Total True Reward = 86588.9853
+Execution time: 1.7182 seconds,Total True Reward = 86488.5698
+Execution time: 1.7331 seconds,Total True Reward = 86488.7186
+Execution time: 1.7195 seconds,Total True Reward = 87076.0465
+Execution time: 1.7197 seconds,Total True Reward = 86386.9345
+Execution time: 1.7215 seconds,Total True Reward = 86675.8797
+Execution time: 4.4708 seconds,Total True Reward = 86488.2107
+Execution time: 1.7270 seconds,Total True Reward = 86787.4538
+Execution time: 1.7281 seconds,Total True Reward = 74267.3968
+Execution time: 1.7347 seconds,Total True Reward = 85787.9443
+Execution time: 1.7309 seconds,Total True Reward = 85087.0439
+Execution time: 1.7284 seconds,Total True Reward = 84986.8194
+Execution time: 1.7283 seconds,Total True Reward = 85686.5057
+Execution time: 1.7260 seconds,Total True Reward = 85574.6709
+Execution time: 1.7287 seconds,Total True Reward = 84985.9789
+Execution time: 1.7189 seconds,Total True Reward = 84786.7649
+Execution time: 1.7258 seconds,Total True Reward = 84886.7372
+Execution time: 1.7302 seconds,Total True Reward = 85175.1373
+Execution time: 1.7238 seconds,Total True Reward = 86388.7251
+Execution time: 1.7250 seconds,Total True Reward = 85187.1264
+Execution time: 1.7163 seconds,Total True Reward = 86675.4274
+Execution time: 1.7261 seconds,Total True Reward = 85687.5881
+Execution time: 1.7318 seconds,Total True Reward = 86688.8618
+Execution time: 1.7366 seconds,Total True Reward = 86675.6418
+Execution time: 1.7285 seconds,Total True Reward = 86688.6078
+Execution time: 1.7181 seconds,Total True Reward = 86788.6066
+Execution time: 1.7258 seconds,Total True Reward = 84975.4849
+Execution time: 1.7181 seconds,Total True Reward = 85888.9534
+Execution time: 1.7310 seconds,Total True Reward = 85989.4321
+Execution time: 1.7273 seconds,Total True Reward = 85875.9577
+Execution time: 1.7198 seconds,Total True Reward = 85788.5360
+Execution time: 1.7275 seconds,Total True Reward = 85788.8603
+Execution time: 1.7240 seconds,Total True Reward = 85776.0976
+Execution time: 1.7186 seconds,Total True Reward = 85876.0670
+Execution time: 1.7295 seconds,Total True Reward = 85889.5105
+Execution time: 1.7219 seconds,Total True Reward = 85889.5407
+Execution time: 1.7292 seconds,Total True Reward = 85889.3945
+Execution time: 1.7228 seconds,Total True Reward = 85876.1522
+Execution time: 1.7275 seconds,Total True Reward = 85876.1513
+Execution time: 1.7234 seconds,Total True Reward = 85889.5460
+Execution time: 1.7250 seconds,Total True Reward = 85388.8610
+Execution time: 1.7169 seconds,Total True Reward = 86489.3253
+Execution time: 1.7179 seconds,Total True Reward = 86086.1239
+Execution time: 1.7282 seconds,Total True Reward = 86588.9196
+Execution time: 1.7351 seconds,Total True Reward = 78583.3847
+Execution time: 1.7209 seconds,Total True Reward = 79284.2279
+Execution time: 1.7201 seconds,Total True Reward = 81084.3819
+Execution time: 1.7263 seconds,Total True Reward = 89492.0421
+Execution time: 4.7118 seconds,Total True Reward = 89191.5009
+Execution time: 1.7278 seconds,Total True Reward = 89890.5974
+Execution time: 1.7185 seconds,Total True Reward = 91492.2058
+Execution time: 1.7167 seconds,Total True Reward = 83986.9427
+Execution time: 1.7318 seconds,Total True Reward = 92579.4718
+Execution time: 1.7207 seconds,Total True Reward = 65781.1722
+Execution time: 1.7242 seconds,Total True Reward = 84087.3890
+Execution time: 1.7218 seconds,Total True Reward = 92579.5775
+Execution time: 1.7180 seconds,Total True Reward = 92288.8455
+Execution time: 1.7232 seconds,Total True Reward = 90292.3193
+Execution time: 1.7328 seconds,Total True Reward = 87691.1742
+Execution time: 1.7199 seconds,Total True Reward = 73583.4316
+Execution time: 1.7263 seconds,Total True Reward = 89591.8661
+Execution time: 1.7232 seconds,Total True Reward = 89492.4463
+Execution time: 1.7209 seconds,Total True Reward = 90392.4806
+Execution time: 1.7255 seconds,Total True Reward = 90492.4516
+Execution time: 1.7246 seconds,Total True Reward = 88588.5120
+Execution time: 1.7202 seconds,Total True Reward = 90292.1750
+Execution time: 1.7330 seconds,Total True Reward = 90492.5143
+Execution time: 1.7329 seconds,Total True Reward = 90592.8356
+Execution time: 1.7893 seconds,Total True Reward = 90692.8834
+Execution time: 1.7185 seconds,Total True Reward = 90592.5644
+Execution time: 1.7282 seconds,Total True Reward = 90592.8677
+Execution time: 1.7337 seconds,Total True Reward = 85890.1322
+Execution time: 1.7281 seconds,Total True Reward = 90391.9064
+Execution time: 1.7230 seconds,Total True Reward = 90892.3615
+Execution time: 1.7243 seconds,Total True Reward = 90592.5539
+Execution time: 1.7203 seconds,Total True Reward = 90592.5469
+Execution time: 1.7303 seconds,Total True Reward = 90092.4969
+Execution time: 1.7294 seconds,Total True Reward = 89892.7527
+Execution time: 1.7277 seconds,Total True Reward = 87578.3334
+Execution time: 1.7318 seconds,Total True Reward = 88291.8495
+Execution time: 1.7249 seconds,Total True Reward = 89589.4877
+Execution time: 1.7282 seconds,Total True Reward = 88491.9907
+Execution time: 1.7270 seconds,Total True Reward = 90292.8744
+Execution time: 1.7258 seconds,Total True Reward = 80384.7959
+Execution time: 1.7158 seconds,Total True Reward = 88591.8049
+Execution time: 1.7177 seconds,Total True Reward = 90092.4758
+Execution time: 1.7257 seconds,Total True Reward = 79784.1154
+Execution time: 1.7351 seconds,Total True Reward = 90592.7615
+Execution time: 1.7267 seconds,Total True Reward = 91988.1140
+Execution time: 1.7321 seconds,Total True Reward = 89892.4000
+Execution time: 1.7258 seconds,Total True Reward = 90692.5238
+Execution time: 1.7303 seconds,Total True Reward = 90592.4245
+Execution time: 1.7244 seconds,Total True Reward = 90392.3620
+Execution time: 1.7345 seconds,Total True Reward = 90592.8177
+Execution time: 1.7252 seconds,Total True Reward = 90292.7836
+Execution time: 5.1069 seconds,Total True Reward = 89691.3618
+Execution time: 1.7302 seconds,Total True Reward = 89992.3547
+Execution time: 1.7307 seconds,Total True Reward = 87891.5898
+Execution time: 1.7257 seconds,Total True Reward = 88391.5700
+Execution time: 1.7298 seconds,Total True Reward = 89591.7151
+Execution time: 1.7213 seconds,Total True Reward = 91092.5653
+Execution time: 1.7223 seconds,Total True Reward = 90092.7344
+Execution time: 1.7235 seconds,Total True Reward = 89989.7356
+Execution time: 1.7307 seconds,Total True Reward = 88291.5875
+Execution time: 1.7313 seconds,Total True Reward = 90692.6673
+Execution time: 1.7278 seconds,Total True Reward = 90492.4839
+Execution time: 1.7267 seconds,Total True Reward = 90492.6099
+Execution time: 1.7249 seconds,Total True Reward = 89191.6828
+Execution time: 1.7247 seconds,Total True Reward = 90592.5851
+Execution time: 1.7226 seconds,Total True Reward = 90290.7998
+Execution time: 1.7231 seconds,Total True Reward = 90192.3074
+Execution time: 1.7290 seconds,Total True Reward = 87891.0517
+Execution time: 1.7191 seconds,Total True Reward = 86389.1041
+Execution time: 1.7284 seconds,Total True Reward = 89791.9484
+Execution time: 1.7258 seconds,Total True Reward = 89692.2200
+Execution time: 1.7227 seconds,Total True Reward = 90292.3852
+Execution time: 1.7264 seconds,Total True Reward = 89491.8863
+Execution time: 1.7289 seconds,Total True Reward = 90392.5041
+Execution time: 1.7275 seconds,Total True Reward = 87789.0536
+Execution time: 1.7301 seconds,Total True Reward = 90392.4499
+Execution time: 1.7232 seconds,Total True Reward = 90592.5043
+Execution time: 1.7243 seconds,Total True Reward = 88191.5629
+Execution time: 1.7269 seconds,Total True Reward = 90292.4636
+Execution time: 1.7320 seconds,Total True Reward = 90392.4955
+Execution time: 1.7281 seconds,Total True Reward = 88090.0656
+Execution time: 1.7247 seconds,Total True Reward = 88090.1662
+Execution time: 1.7266 seconds,Total True Reward = 90492.6772
+Execution time: 1.7323 seconds,Total True Reward = 90390.9185
+Execution time: 1.7233 seconds,Total True Reward = 90392.5149
+Execution time: 1.7265 seconds,Total True Reward = 90492.4974
+Execution time: 1.7224 seconds,Total True Reward = 90392.4290
+Execution time: 1.7260 seconds,Total True Reward = 89091.0523
+Execution time: 1.7320 seconds,Total True Reward = 90392.5538
+Execution time: 1.7352 seconds,Total True Reward = 90592.7583
+Execution time: 1.7300 seconds,Total True Reward = 90592.6588
+Execution time: 1.7267 seconds,Total True Reward = 90391.2426
+Execution time: 1.7316 seconds,Total True Reward = 90592.5622
+Execution time: 1.7194 seconds,Total True Reward = 78083.7378
+Execution time: 1.7196 seconds,Total True Reward = 88390.4146
+Execution time: 1.7248 seconds,Total True Reward = 90892.4612
+Execution time: 1.7294 seconds,Total True Reward = 89892.1680
+Execution time: 1.7289 seconds,Total True Reward = 90192.2238
+Execution time: 1.7277 seconds,Total True Reward = 90392.3620
+Execution time: 1.7240 seconds,Total True Reward = 89892.0592
+Execution time: 1.7274 seconds,Total True Reward = 82686.2954
+Execution time: 1.7290 seconds,Total True Reward = 92193.7810
+Execution time: 1.7289 seconds,Total True Reward = 92592.2152
+Execution time: 5.5583 seconds,Total True Reward = 82686.2630
+Execution time: 1.7246 seconds,Total True Reward = 89691.6476
+Execution time: 1.7317 seconds,Total True Reward = 82586.1431
+Execution time: 1.7331 seconds,Total True Reward = 79883.6938
+Execution time: 1.7287 seconds,Total True Reward = 91592.7556
+Execution time: 1.7338 seconds,Total True Reward = 91692.8231
+Execution time: 1.7244 seconds,Total True Reward = 91892.9813
+Execution time: 1.7308 seconds,Total True Reward = 81184.6833
+Execution time: 1.7219 seconds,Total True Reward = 91992.9187
+Execution time: 1.7330 seconds,Total True Reward = 91893.0268
+Execution time: 1.7226 seconds,Total True Reward = 85989.5932
+Execution time: 1.7333 seconds,Total True Reward = 91392.7820
+Execution time: 1.7304 seconds,Total True Reward = 91290.8221
+Execution time: 1.7271 seconds,Total True Reward = 91492.9961
+Execution time: 1.7224 seconds,Total True Reward = 89592.0561
+Execution time: 1.7302 seconds,Total True Reward = 90192.3745
+Execution time: 1.7334 seconds,Total True Reward = 89791.6957
+Execution time: 1.7292 seconds,Total True Reward = 84988.9491
+Execution time: 1.7238 seconds,Total True Reward = 91693.1090
+Execution time: 1.7263 seconds,Total True Reward = 91492.8184
+Execution time: 1.7203 seconds,Total True Reward = 91591.0986
+Execution time: 1.7279 seconds,Total True Reward = 85890.0856
+Execution time: 1.7251 seconds,Total True Reward = 88990.3608
+Execution time: 1.7290 seconds,Total True Reward = 84888.1890
+Execution time: 1.7310 seconds,Total True Reward = 91592.8198
+Execution time: 1.7330 seconds,Total True Reward = 91992.8768
+Execution time: 1.7295 seconds,Total True Reward = 91492.7119
+Execution time: 1.7374 seconds,Total True Reward = 85589.0493
+Execution time: 1.7255 seconds,Total True Reward = 91693.0268
+Execution time: 1.7294 seconds,Total True Reward = 91490.8254
+Execution time: 1.7319 seconds,Total True Reward = 76482.8219
+Execution time: 1.7187 seconds,Total True Reward = 91992.8292
+Execution time: 1.7346 seconds,Total True Reward = 91292.4660
+Execution time: 1.7244 seconds,Total True Reward = 91492.8373
+Execution time: 1.7264 seconds,Total True Reward = 91992.8656
+Execution time: 1.7349 seconds,Total True Reward = 91592.7966
+Execution time: 1.7306 seconds,Total True Reward = 86689.7451
+Execution time: 1.7271 seconds,Total True Reward = 91693.0094
+Execution time: 1.7188 seconds,Total True Reward = 91993.0189
+Execution time: 1.7252 seconds,Total True Reward = 91691.6538
+Execution time: 1.7247 seconds,Total True Reward = 91092.5480
+Execution time: 1.7252 seconds,Total True Reward = 82686.4004
+Execution time: 1.7230 seconds,Total True Reward = 90892.0989
+Execution time: 1.7284 seconds,Total True Reward = 91292.4664
+Execution time: 1.7264 seconds,Total True Reward = 89791.8871
+Execution time: 1.7281 seconds,Total True Reward = 89591.0537
+Execution time: 1.7401 seconds,Total True Reward = 89191.3982
+Execution time: 1.7279 seconds,Total True Reward = 90692.4838
+Execution time: 1.7292 seconds,Total True Reward = 90892.3909
+Execution time: 1.7376 seconds,Total True Reward = 91092.6526
+Execution time: 1.7356 seconds,Total True Reward = 89390.2134
+Execution time: 1.7299 seconds,Total True Reward = 81785.6233
+Execution time: 1.7298 seconds,Total True Reward = 92092.9455
+Execution time: 1.7298 seconds,Total True Reward = 91292.6041
+Execution time: 1.7187 seconds,Total True Reward = 89290.5946
+Execution time: 1.7311 seconds,Total True Reward = 82686.5659
+Execution time: 1.7263 seconds,Total True Reward = 92093.5267
+Execution time: 1.7279 seconds,Total True Reward = 90792.0572
+Execution time: 1.7378 seconds,Total True Reward = 90592.0349
+Execution time: 1.7358 seconds,Total True Reward = 91092.5560
+Execution time: 1.7346 seconds,Total True Reward = 92793.6104
+Execution time: 1.7317 seconds,Total True Reward = 90291.9451
+Execution time: 1.7207 seconds,Total True Reward = 91092.4178
+Execution time: 1.7245 seconds,Total True Reward = 91291.7494
+Execution time: 1.7262 seconds,Total True Reward = 88090.6193
+Execution time: 1.7243 seconds,Total True Reward = 90492.2899
+Execution time: 1.7311 seconds,Total True Reward = 89491.6804
+Execution time: 1.7273 seconds,Total True Reward = 90692.0687
+Execution time: 1.7361 seconds,Total True Reward = 89590.9251
+Execution time: 1.7263 seconds,Total True Reward = 85190.1002
+Execution time: 1.7414 seconds,Total True Reward = 91593.1065
+Execution time: 1.7313 seconds,Total True Reward = 89390.8817
+Execution time: 1.7359 seconds,Total True Reward = 91993.1978
+Execution time: 1.7324 seconds,Total True Reward = 91993.2585
+Execution time: 1.7280 seconds,Total True Reward = 91792.2764
+Execution time: 1.7327 seconds,Total True Reward = 90892.2106
+Execution time: 1.7338 seconds,Total True Reward = 91392.8862
+Execution time: 1.7242 seconds,Total True Reward = 86090.2719
+Execution time: 1.7312 seconds,Total True Reward = 86089.6893
+Execution time: 1.7287 seconds,Total True Reward = 91993.0021
+Execution time: 1.7269 seconds,Total True Reward = 92693.6000
+Execution time: 1.7321 seconds,Total True Reward = 89491.1950
+Execution time: 1.7237 seconds,Total True Reward = 92393.5289
+Execution time: 1.7291 seconds,Total True Reward = 92093.1806
+Execution time: 1.7296 seconds,Total True Reward = 77481.4151
+Execution time: 1.7327 seconds,Total True Reward = 85886.7088
+Execution time: 1.7270 seconds,Total True Reward = 91292.7454
+Execution time: 1.7194 seconds,Total True Reward = 91992.9799
+Execution time: 1.7201 seconds,Total True Reward = 91792.8934
+Execution time: 1.7276 seconds,Total True Reward = 91693.0781
+Execution time: 1.7242 seconds,Total True Reward = 90892.1610
+Execution time: 1.7246 seconds,Total True Reward = 90992.2526
+Execution time: 1.7321 seconds,Total True Reward = 91893.3998
+Execution time: 1.7399 seconds,Total True Reward = 91092.8878
+Execution time: 1.7358 seconds,Total True Reward = 91893.1238
+Execution time: 1.7272 seconds,Total True Reward = 91893.1882
+Execution time: 1.7232 seconds,Total True Reward = 91793.2314
+Execution time: 1.7284 seconds,Total True Reward = 90091.6372
+Execution time: 1.7293 seconds,Total True Reward = 90792.2458
+Execution time: 1.7302 seconds,Total True Reward = 90692.1328
+Execution time: 1.7240 seconds,Total True Reward = 82386.8181
+Execution time: 1.7317 seconds,Total True Reward = 91893.0211
+Execution time: 1.7221 seconds,Total True Reward = 76981.0333
+Execution time: 1.7258 seconds,Total True Reward = 89290.8931
+Execution time: 1.7256 seconds,Total True Reward = 92593.5365
+Execution time: 1.7336 seconds,Total True Reward = 92293.2607
+Execution time: 1.7283 seconds,Total True Reward = 92093.1201
+Execution time: 1.7244 seconds,Total True Reward = 82485.6764
+Execution time: 1.7248 seconds,Total True Reward = 92193.2933
+Execution time: 1.7316 seconds,Total True Reward = 91492.7535
+Execution time: 1.7337 seconds,Total True Reward = 92293.3945
+Execution time: 1.7312 seconds,Total True Reward = 85890.5131
+Execution time: 1.7311 seconds,Total True Reward = 91893.1579
+Execution time: 1.7317 seconds,Total True Reward = 91893.3030
+Execution time: 1.7294 seconds,Total True Reward = 81685.8700
+Execution time: 1.7333 seconds,Total True Reward = 89791.8354
+Execution time: 1.7339 seconds,Total True Reward = 78983.6539
+Execution time: 1.7330 seconds,Total True Reward = 86790.7574
+Execution time: 1.7225 seconds,Total True Reward = 85690.9171
+Execution time: 1.7278 seconds,Total True Reward = 85990.5555
+Execution time: 6.5571 seconds,Total True Reward = 84588.2935
+Execution time: 1.7318 seconds,Total True Reward = 86289.4182
+Execution time: 1.7303 seconds,Total True Reward = 86689.5390
+Execution time: 1.7287 seconds,Total True Reward = 86289.0304
+Execution time: 1.7240 seconds,Total True Reward = 84487.7854
+Execution time: 1.7298 seconds,Total True Reward = 84187.7216
+Execution time: 1.7304 seconds,Total True Reward = 71676.5961
+Execution time: 1.7299 seconds,Total True Reward = 86189.1276
+Execution time: 1.7235 seconds,Total True Reward = 86489.0915
+Execution time: 1.7209 seconds,Total True Reward = 86689.1618
+Execution time: 1.7162 seconds,Total True Reward = 80885.5261
+Execution time: 1.7630 seconds,Total True Reward = 86289.1031
+Execution time: 1.7350 seconds,Total True Reward = 85788.7793
+Execution time: 1.7291 seconds,Total True Reward = 86589.4527
+Execution time: 1.7336 seconds,Total True Reward = 84487.6479
+Execution time: 1.7276 seconds,Total True Reward = 84688.6059
+Execution time: 1.7215 seconds,Total True Reward = 85188.8547
+Execution time: 1.7249 seconds,Total True Reward = 85189.2474
+Execution time: 1.7347 seconds,Total True Reward = 85389.0405
+Execution time: 1.7380 seconds,Total True Reward = 84588.4925
+Execution time: 1.7286 seconds,Total True Reward = 84888.9007
+Execution time: 1.7318 seconds,Total True Reward = 86491.5766
+Execution time: 1.7338 seconds,Total True Reward = 86491.6803
+Execution time: 1.7301 seconds,Total True Reward = 86391.6828
+Execution time: 1.7305 seconds,Total True Reward = 86691.4504
+Execution time: 1.7320 seconds,Total True Reward = 83787.9256
+Execution time: 1.7279 seconds,Total True Reward = 86590.3381
+Execution time: 1.7215 seconds,Total True Reward = 85890.6254
+Execution time: 1.7305 seconds,Total True Reward = 78884.2081
+Execution time: 1.7338 seconds,Total True Reward = 85890.8853
+Execution time: 1.7268 seconds,Total True Reward = 86489.1351
+Execution time: 1.7297 seconds,Total True Reward = 84387.8419
+Execution time: 1.7294 seconds,Total True Reward = 78983.7556
+Execution time: 1.7249 seconds,Total True Reward = 83687.0580
+Execution time: 1.7292 seconds,Total True Reward = 84087.8000
+Execution time: 1.7347 seconds,Total True Reward = 78684.9952
+Execution time: 1.7299 seconds,Total True Reward = 74979.2734
+Execution time: 1.7262 seconds,Total True Reward = 83084.8965
+Execution time: 1.7179 seconds,Total True Reward = 86388.9239
+Execution time: 1.7283 seconds,Total True Reward = 83888.1648
+Execution time: 1.7272 seconds,Total True Reward = 80986.3365
+Execution time: 1.7299 seconds,Total True Reward = 82686.5332
+Execution time: 1.7327 seconds,Total True Reward = 82987.0738
+Execution time: 1.7196 seconds,Total True Reward = 78484.1045
+Execution time: 1.7231 seconds,Total True Reward = 85190.0772
+Execution time: 1.7301 seconds,Total True Reward = 77683.4575
+Execution time: 1.7262 seconds,Total True Reward = 78983.7958
+Execution time: 1.7342 seconds,Total True Reward = 83987.6345
+Execution time: 1.7262 seconds,Total True Reward = 78983.7809
+Execution time: 1.7273 seconds,Total True Reward = 79083.7329
+Execution time: 1.7323 seconds,Total True Reward = 78883.4009
+Execution time: 1.7260 seconds,Total True Reward = 78883.8015
+Execution time: 1.7263 seconds,Total True Reward = 77682.6316
+Execution time: 1.7287 seconds,Total True Reward = 83686.7096
+Execution time: 1.7183 seconds,Total True Reward = 81385.7037
+Execution time: 1.7241 seconds,Total True Reward = 80784.9483
+Execution time: 1.7137 seconds,Total True Reward = 79384.4986
+Execution time: 1.7280 seconds,Total True Reward = 80785.7612
+Execution time: 1.7316 seconds,Total True Reward = 88591.0890
+Execution time: 1.7321 seconds,Total True Reward = 79284.0396
+Execution time: 1.7266 seconds,Total True Reward = 80885.7813
+Execution time: 1.7231 seconds,Total True Reward = 79184.5995
+Execution time: 1.7377 seconds,Total True Reward = 79884.3290
+Execution time: 1.7236 seconds,Total True Reward = 84187.9772
+Execution time: 1.7240 seconds,Total True Reward = 79083.4028
+Execution time: 1.7456 seconds,Total True Reward = 78883.3521
+Execution time: 1.7347 seconds,Total True Reward = 87089.2041
+Execution time: 1.7261 seconds,Total True Reward = 84190.0101
+Execution time: 1.7208 seconds,Total True Reward = 84089.8854
+Execution time: 1.7296 seconds,Total True Reward = 89591.7933
+Execution time: 7.2262 seconds,Total True Reward = 82085.2481
+Execution time: 1.7348 seconds,Total True Reward = 81285.6166
+Execution time: 1.7269 seconds,Total True Reward = 80084.3923
+Execution time: 1.7296 seconds,Total True Reward = 90191.6470
+Execution time: 1.7377 seconds,Total True Reward = 79984.2763
+Execution time: 1.7321 seconds,Total True Reward = 83086.3147
+Execution time: 1.7304 seconds,Total True Reward = 78081.7353
+Execution time: 1.7348 seconds,Total True Reward = 91593.0809
+Execution time: 1.7286 seconds,Total True Reward = 85688.6111
+Execution time: 1.7332 seconds,Total True Reward = 91190.8949
+Execution time: 1.7327 seconds,Total True Reward = 91992.8723
+Execution time: 1.7336 seconds,Total True Reward = 86989.4872
+Execution time: 1.7267 seconds,Total True Reward = 89891.2433
+Execution time: 1.7307 seconds,Total True Reward = 91492.5497
+Execution time: 1.7340 seconds,Total True Reward = 90492.5932
+Execution time: 1.7274 seconds,Total True Reward = 89091.2628
+Execution time: 1.7279 seconds,Total True Reward = 79484.4479
+Execution time: 1.7276 seconds,Total True Reward = 91692.8882
+Execution time: 1.7279 seconds,Total True Reward = 80783.6426
+Execution time: 1.7317 seconds,Total True Reward = 91893.0289
+Execution time: 1.7313 seconds,Total True Reward = 91492.8111
+Execution time: 1.7240 seconds,Total True Reward = 91192.5605
+Execution time: 1.7223 seconds,Total True Reward = 89891.9433
+Execution time: 1.7347 seconds,Total True Reward = 90492.3579
+Execution time: 1.7270 seconds,Total True Reward = 89692.1386
+Execution time: 1.7262 seconds,Total True Reward = 90492.3987
+Execution time: 1.7340 seconds,Total True Reward = 90492.4430
+Execution time: 1.7234 seconds,Total True Reward = 90292.2847
+Execution time: 1.7260 seconds,Total True Reward = 90192.1693
+Execution time: 1.7218 seconds,Total True Reward = 86189.6284
+Execution time: 1.7233 seconds,Total True Reward = 90592.1371
+Execution time: 1.7372 seconds,Total True Reward = 91893.0851
+Execution time: 1.7333 seconds,Total True Reward = 91692.7403
+Execution time: 1.7264 seconds,Total True Reward = 87089.6628
+Execution time: 1.7236 seconds,Total True Reward = 89591.5245
+Execution time: 1.7315 seconds,Total True Reward = 85888.6490
+Execution time: 1.7305 seconds,Total True Reward = 91992.7346
+Execution time: 1.7318 seconds,Total True Reward = 91892.7786
+Execution time: 1.7298 seconds,Total True Reward = 91892.9959
+Execution time: 1.7261 seconds,Total True Reward = 80284.6830
+Execution time: 1.7264 seconds,Total True Reward = 91893.0643
+Execution time: 1.7356 seconds,Total True Reward = 91892.9054
+Execution time: 1.7351 seconds,Total True Reward = 91592.9375
+Execution time: 1.7237 seconds,Total True Reward = 79483.8852
+Execution time: 1.7221 seconds,Total True Reward = 91893.2024
+Execution time: 1.7229 seconds,Total True Reward = 91893.0250
+Execution time: 1.7285 seconds,Total True Reward = 91793.3245
+Execution time: 1.7297 seconds,Total True Reward = 85089.2150
+Execution time: 1.7270 seconds,Total True Reward = 91893.0549
+Execution time: 1.7244 seconds,Total True Reward = 91892.8868
+Execution time: 1.7248 seconds,Total True Reward = 90792.0071
+Execution time: 1.7276 seconds,Total True Reward = 81485.0836
+Execution time: 1.7327 seconds,Total True Reward = 91892.9267
+Execution time: 1.7291 seconds,Total True Reward = 85788.9580
+Execution time: 1.7287 seconds,Total True Reward = 92193.1102
+Execution time: 1.7295 seconds,Total True Reward = 92293.1932
+Execution time: 1.7310 seconds,Total True Reward = 92193.2084
+Execution time: 1.7288 seconds,Total True Reward = 91492.8930
+Execution time: 1.7251 seconds,Total True Reward = 91793.2047
+Execution time: 1.7295 seconds,Total True Reward = 82686.8909
+Execution time: 1.7278 seconds,Total True Reward = 91492.3718
+Execution time: 1.7294 seconds,Total True Reward = 87490.3003
+Execution time: 1.7322 seconds,Total True Reward = 92193.0403
+Execution time: 1.7283 seconds,Total True Reward = 92293.0991
+Execution time: 1.7349 seconds,Total True Reward = 92093.0334
+Execution time: 1.7434 seconds,Total True Reward = 87089.8734
+Execution time: 1.7317 seconds,Total True Reward = 92293.2442
+Execution time: 1.7256 seconds,Total True Reward = 92293.3437
+Execution time: 1.7224 seconds,Total True Reward = 92293.3881
+Execution time: 1.7285 seconds,Total True Reward = 83486.6233
+Execution time: 1.7265 seconds,Total True Reward = 92293.5203
+Execution time: 1.7308 seconds,Total True Reward = 92293.5989
+Execution time: 1.7232 seconds,Total True Reward = 92193.3746
+Execution time: 1.7267 seconds,Total True Reward = 90592.4391
+Execution time: 1.7341 seconds,Total True Reward = 82085.6527
+Execution time: 1.7296 seconds,Total True Reward = 92193.0522
+Execution time: 1.7339 seconds,Total True Reward = 92293.1216
+Execution time: 1.7309 seconds,Total True Reward = 92293.1425
+Execution time: 7.8323 seconds,Total True Reward = 92193.1109
+Execution time: 1.7232 seconds,Total True Reward = 90392.2788
+Execution time: 1.7260 seconds,Total True Reward = 82086.2431
+Execution time: 1.7292 seconds,Total True Reward = 92293.3203
+Execution time: 1.7329 seconds,Total True Reward = 87390.7090
+Execution time: 1.7270 seconds,Total True Reward = 92293.7112
+Execution time: 1.7462 seconds,Total True Reward = 83086.2963
+Execution time: 1.7353 seconds,Total True Reward = 90892.9925
+Execution time: 1.7396 seconds,Total True Reward = 78983.7684
+Execution time: 1.7255 seconds,Total True Reward = 84589.8035
+Execution time: 1.7368 seconds,Total True Reward = 85688.9250
+Execution time: 1.7338 seconds,Total True Reward = 83486.0732
+Execution time: 1.7216 seconds,Total True Reward = 85187.5197
+Execution time: 1.7274 seconds,Total True Reward = 84887.9482
+Execution time: 1.7245 seconds,Total True Reward = 85889.1155
+Execution time: 1.7261 seconds,Total True Reward = 85088.9467
+Execution time: 1.7183 seconds,Total True Reward = 79084.6184
+Execution time: 1.7255 seconds,Total True Reward = 76681.1779
+Execution time: 1.7232 seconds,Total True Reward = 74178.6263
+Execution time: 1.7289 seconds,Total True Reward = 85688.0210
+Execution time: 1.7280 seconds,Total True Reward = 84887.0460
+Execution time: 1.7271 seconds,Total True Reward = 86288.4227
+Execution time: 1.7273 seconds,Total True Reward = 84486.7915
+Execution time: 1.7249 seconds,Total True Reward = 85690.2979
+Execution time: 1.7263 seconds,Total True Reward = 87890.0997
+Execution time: 1.7227 seconds,Total True Reward = 88190.5118
+Execution time: 1.7289 seconds,Total True Reward = 81785.2971
+Execution time: 1.7230 seconds,Total True Reward = 81085.4147
+Execution time: 1.7321 seconds,Total True Reward = 83787.5081
+Execution time: 1.7284 seconds,Total True Reward = 83589.4728
+Execution time: 1.7267 seconds,Total True Reward = 76981.0969
+Execution time: 1.7214 seconds,Total True Reward = 85988.1549
+Execution time: 1.7322 seconds,Total True Reward = 70174.8278
+Execution time: 1.7309 seconds,Total True Reward = 62268.6155
+Execution time: 1.7292 seconds,Total True Reward = 86288.1451
+Execution time: 1.7219 seconds,Total True Reward = 74778.6443
+Execution time: 1.7183 seconds,Total True Reward = 86788.9079
+Execution time: 1.7315 seconds,Total True Reward = 86488.8342
+Execution time: 1.7231 seconds,Total True Reward = 82985.8455
+Execution time: 1.7193 seconds,Total True Reward = 82384.8208
+Execution time: 1.7309 seconds,Total True Reward = 83986.4458
+Execution time: 1.7302 seconds,Total True Reward = 83785.8789
+Execution time: 1.7324 seconds,Total True Reward = 92092.3194
+Execution time: 1.7231 seconds,Total True Reward = 91492.1736
+Execution time: 1.7170 seconds,Total True Reward = 91892.4747
+Execution time: 1.7238 seconds,Total True Reward = 85188.8711
+Execution time: 1.7246 seconds,Total True Reward = 89491.7300
+Execution time: 1.7265 seconds,Total True Reward = 91892.8211
+Execution time: 1.7261 seconds,Total True Reward = 91492.6148
+Execution time: 1.7319 seconds,Total True Reward = 89692.2679
+Execution time: 1.7301 seconds,Total True Reward = 85289.3245
+Execution time: 1.7728 seconds,Total True Reward = 91292.6403
+Execution time: 1.7266 seconds,Total True Reward = 91092.4813
+Execution time: 1.7274 seconds,Total True Reward = 77382.2100
+Execution time: 1.7229 seconds,Total True Reward = 89690.9302
+Execution time: 1.7301 seconds,Total True Reward = 91392.3328
+Execution time: 1.7288 seconds,Total True Reward = 91492.4488
+Execution time: 1.7211 seconds,Total True Reward = 91792.6317
+Execution time: 1.7295 seconds,Total True Reward = 89591.6108
+Execution time: 1.7271 seconds,Total True Reward = 90091.7789
+Execution time: 1.7311 seconds,Total True Reward = 90792.1055
+Execution time: 1.7298 seconds,Total True Reward = 82085.4408
+Execution time: 1.7282 seconds,Total True Reward = 91192.5420
+Execution time: 1.7284 seconds,Total True Reward = 91893.0727
+Execution time: 1.7224 seconds,Total True Reward = 88990.8979
+Execution time: 1.7286 seconds,Total True Reward = 81985.5870
+Execution time: 1.7256 seconds,Total True Reward = 91893.1870
+Execution time: 1.7277 seconds,Total True Reward = 91893.0298
+Execution time: 1.7298 seconds,Total True Reward = 91292.0708
+Execution time: 1.7291 seconds,Total True Reward = 90392.3061
+Execution time: 1.7287 seconds,Total True Reward = 89592.1346
+Execution time: 1.7200 seconds,Total True Reward = 90092.0904
+Execution time: 1.7215 seconds,Total True Reward = 91392.7146
+Execution time: 1.7266 seconds,Total True Reward = 92093.1268
+Execution time: 1.7194 seconds,Total True Reward = 86489.3481
+Execution time: 1.7340 seconds,Total True Reward = 88790.6181
+Execution time: 1.7285 seconds,Total True Reward = 92393.4608
+Execution time: 1.7338 seconds,Total True Reward = 89091.2596
+Execution time: 1.7384 seconds,Total True Reward = 92093.5224
+Execution time: 1.7282 seconds,Total True Reward = 91993.2241
+Execution time: 1.7211 seconds,Total True Reward = 90492.5558
+Execution time: 1.7208 seconds,Total True Reward = 90292.6014
+Execution time: 1.7223 seconds,Total True Reward = 90592.5947
+Execution time: 1.7371 seconds,Total True Reward = 90892.5243
+Execution time: 1.7290 seconds,Total True Reward = 90792.5048
+Execution time: 1.7293 seconds,Total True Reward = 92193.1447
+Execution time: 8.6405 seconds,Total True Reward = 92193.2267
+Execution time: 1.7259 seconds,Total True Reward = 81484.8338
+Execution time: 1.7316 seconds,Total True Reward = 89892.0625
+Execution time: 1.7293 seconds,Total True Reward = 92193.3028
+Execution time: 1.7255 seconds,Total True Reward = 92193.3596
+Execution time: 1.7285 seconds,Total True Reward = 92093.4023
+Execution time: 1.7337 seconds,Total True Reward = 86089.7296
+Execution time: 1.7326 seconds,Total True Reward = 92193.1588
+Execution time: 1.7316 seconds,Total True Reward = 91992.8137
+Execution time: 1.7339 seconds,Total True Reward = 79084.6138
+Execution time: 1.7230 seconds,Total True Reward = 79983.2190
+Execution time: 1.7330 seconds,Total True Reward = 84486.7346
+Execution time: 1.7405 seconds,Total True Reward = 77083.0841
+Execution time: 1.7260 seconds,Total True Reward = 74380.5877
+Execution time: 1.7242 seconds,Total True Reward = 86088.0716
+Execution time: 1.7341 seconds,Total True Reward = 84686.4220
+Execution time: 1.7319 seconds,Total True Reward = 74478.7084
+Execution time: 1.7290 seconds,Total True Reward = 85687.4567
+Execution time: 1.7293 seconds,Total True Reward = 85987.4482
+Execution time: 1.7312 seconds,Total True Reward = 85789.5632
+Execution time: 1.7291 seconds,Total True Reward = 85889.7655
+Execution time: 1.7358 seconds,Total True Reward = 84987.8451
+Execution time: 1.7320 seconds,Total True Reward = 81884.3607
+Execution time: 1.7298 seconds,Total True Reward = 91592.2499
+Execution time: 1.7228 seconds,Total True Reward = 78883.1825
+Execution time: 1.7307 seconds,Total True Reward = 85389.2509
+Execution time: 1.7318 seconds,Total True Reward = 85689.1250
+Execution time: 1.7318 seconds,Total True Reward = 91292.0996
+Execution time: 1.7333 seconds,Total True Reward = 80985.4259
+Execution time: 1.7258 seconds,Total True Reward = 85789.4339
+Execution time: 1.7313 seconds,Total True Reward = 85087.6145
+Execution time: 1.7308 seconds,Total True Reward = 85687.8726
+Execution time: 1.7295 seconds,Total True Reward = 79583.9432
+Execution time: 1.7211 seconds,Total True Reward = 77586.3195
+Execution time: 1.7176 seconds,Total True Reward = 86388.2565
+Execution time: 1.7218 seconds,Total True Reward = 86388.2671
+Execution time: 1.7327 seconds,Total True Reward = 86288.3724
+Execution time: 1.7292 seconds,Total True Reward = 83686.8947
+Execution time: 1.7216 seconds,Total True Reward = 76280.8338
+Execution time: 1.7306 seconds,Total True Reward = 79883.9513
+Execution time: 1.7368 seconds,Total True Reward = 83586.4431
+Execution time: 1.7279 seconds,Total True Reward = 81286.2024
+Execution time: 1.7303 seconds,Total True Reward = 83786.9902
+Execution time: 1.7339 seconds,Total True Reward = 80083.9556
+Execution time: 1.7316 seconds,Total True Reward = 75883.4752
+Execution time: 1.7260 seconds,Total True Reward = 86288.3353
+Execution time: 1.7287 seconds,Total True Reward = 75279.7094
+Execution time: 1.7325 seconds,Total True Reward = 73877.8603
+Execution time: 1.7312 seconds,Total True Reward = 84086.8417
+Execution time: 1.7257 seconds,Total True Reward = 80783.7065
+Execution time: 1.7330 seconds,Total True Reward = 92292.6155
+Execution time: 1.7266 seconds,Total True Reward = 92492.8781
+Execution time: 1.7270 seconds,Total True Reward = 78883.3144
+Execution time: 1.7258 seconds,Total True Reward = 89690.9690
+Execution time: 1.7311 seconds,Total True Reward = 81485.1487
+Execution time: 1.7305 seconds,Total True Reward = 81684.8777
+Execution time: 1.7254 seconds,Total True Reward = 81584.1347
+Execution time: 1.7307 seconds,Total True Reward = 81383.9306
+Execution time: 1.7298 seconds,Total True Reward = 82385.2098
+Execution time: 1.7355 seconds,Total True Reward = 92092.2906
+Execution time: 1.7251 seconds,Total True Reward = 91492.0723
+Execution time: 1.7345 seconds,Total True Reward = 87189.8475
+Execution time: 1.7273 seconds,Total True Reward = 81585.0609
+Execution time: 1.7239 seconds,Total True Reward = 78082.5774
+Execution time: 1.7179 seconds,Total True Reward = 88690.6611
+Execution time: 1.7280 seconds,Total True Reward = 81684.5044
+Execution time: 1.7247 seconds,Total True Reward = 79885.1665
+Execution time: 1.7297 seconds,Total True Reward = 89591.0114
+Execution time: 1.7248 seconds,Total True Reward = 85087.7844
+Execution time: 1.7263 seconds,Total True Reward = 88290.0311
+Execution time: 1.7289 seconds,Total True Reward = 82585.5040
+Execution time: 1.7206 seconds,Total True Reward = 91492.1294
+Execution time: 1.7277 seconds,Total True Reward = 91492.6272
+Execution time: 1.7268 seconds,Total True Reward = 86989.8545
+Execution time: 1.7225 seconds,Total True Reward = 91192.6484
+Execution time: 1.7286 seconds,Total True Reward = 91893.1511
+Execution time: 1.7261 seconds,Total True Reward = 87590.5114
+Execution time: 1.7319 seconds,Total True Reward = 91792.3006
+Execution time: 1.7186 seconds,Total True Reward = 77883.0821
+Execution time: 1.7294 seconds,Total True Reward = 81985.4782
+Execution time: 1.7281 seconds,Total True Reward = 90290.6685
+Execution time: 1.7272 seconds,Total True Reward = 82284.9495
+Execution time: 1.7666 seconds,Total True Reward = 79382.4946
+Execution time: 1.7402 seconds,Total True Reward = 84787.3667
+Execution time: 1.7380 seconds,Total True Reward = 91291.2792
+Execution time: 1.7470 seconds,Total True Reward = 92192.3501
+Execution time: 1.7393 seconds,Total True Reward = 89590.3826
+Execution time: 1.7359 seconds,Total True Reward = 91391.9647
+Execution time: 1.7337 seconds,Total True Reward = 89490.4848
+Execution time: 1.7393 seconds,Total True Reward = 89791.0306
+Execution time: 1.7437 seconds,Total True Reward = 90691.9136
+Execution time: 1.7461 seconds,Total True Reward = 90692.0346
+Execution time: 1.7379 seconds,Total True Reward = 90092.0612
+Execution time: 1.7293 seconds,Total True Reward = 89791.1859
+Execution time: 9.4770 seconds,Total True Reward = 85588.5910
+Execution time: 1.7339 seconds,Total True Reward = 91592.7740
+Execution time: 1.7221 seconds,Total True Reward = 91592.9117
+Execution time: 1.7313 seconds,Total True Reward = 91692.9664
+Execution time: 1.7214 seconds,Total True Reward = 79783.9363
+Execution time: 1.7277 seconds,Total True Reward = 91593.0967
+Execution time: 1.7208 seconds,Total True Reward = 90992.4161
+Execution time: 1.7297 seconds,Total True Reward = 83787.5351
+Execution time: 1.7350 seconds,Total True Reward = 92093.2726
+Execution time: 1.7364 seconds,Total True Reward = 81084.8223
+Execution time: 1.7357 seconds,Total True Reward = 81285.5893
+Execution time: 1.7290 seconds,Total True Reward = 90491.6751
+Execution time: 1.7347 seconds,Total True Reward = 82185.9299
+Execution time: 1.7287 seconds,Total True Reward = 90191.2668
+Execution time: 1.7305 seconds,Total True Reward = 90591.7427
+Execution time: 1.7236 seconds,Total True Reward = 86290.2541
+Execution time: 1.7339 seconds,Total True Reward = 78883.4310
+Execution time: 1.7402 seconds,Total True Reward = 89490.6285
+Execution time: 1.7342 seconds,Total True Reward = 89390.5363
+Execution time: 1.7344 seconds,Total True Reward = 89090.3025
+Execution time: 1.7345 seconds,Total True Reward = 79183.6512
+Execution time: 1.7319 seconds,Total True Reward = 91692.7640
+Execution time: 1.7337 seconds,Total True Reward = 89490.9532
+Execution time: 1.7349 seconds,Total True Reward = 88991.6435
+Execution time: 1.7327 seconds,Total True Reward = 81986.7431
+Execution time: 1.7300 seconds,Total True Reward = 91592.7583
+Execution time: 1.7351 seconds,Total True Reward = 89090.4262
+Execution time: 1.7363 seconds,Total True Reward = 91592.9221
+Execution time: 1.7266 seconds,Total True Reward = 81085.6865
+Execution time: 1.7349 seconds,Total True Reward = 82286.1307
+Execution time: 1.7356 seconds,Total True Reward = 90591.8723
+Execution time: 1.7381 seconds,Total True Reward = 90892.1386
+Execution time: 1.7257 seconds,Total True Reward = 91492.7849
+Execution time: 1.7304 seconds,Total True Reward = 89892.0778
+Execution time: 1.7393 seconds,Total True Reward = 71979.4933
+Execution time: 1.7283 seconds,Total True Reward = 88490.4343
+Execution time: 1.7310 seconds,Total True Reward = 90990.9798
+Execution time: 1.7364 seconds,Total True Reward = 90390.5343
+Execution time: 1.7338 seconds,Total True Reward = 81584.6781
+Execution time: 1.7301 seconds,Total True Reward = 83888.0511
+Execution time: 1.7221 seconds,Total True Reward = 90690.7994
+Execution time: 1.7321 seconds,Total True Reward = 89790.0217
+Execution time: 1.7396 seconds,Total True Reward = 78284.2349
+Execution time: 1.7300 seconds,Total True Reward = 84187.5636
+Execution time: 1.7266 seconds,Total True Reward = 89490.8002
+Execution time: 1.7347 seconds,Total True Reward = 81986.9638
+Execution time: 1.7365 seconds,Total True Reward = 85689.6689
+Execution time: 1.7288 seconds,Total True Reward = 76282.5702
+Execution time: 1.7250 seconds,Total True Reward = 73576.9345
+Execution time: 1.7324 seconds,Total True Reward = 84185.9413
+Execution time: 1.7335 seconds,Total True Reward = 85887.3660
+Execution time: 1.7354 seconds,Total True Reward = 85689.5017
+Execution time: 1.7348 seconds,Total True Reward = 80184.1257
+Execution time: 1.7489 seconds,Total True Reward = 82384.4712
+Execution time: 1.7453 seconds,Total True Reward = 87189.8052
+Execution time: 1.7389 seconds,Total True Reward = 88589.8112
+Execution time: 1.7405 seconds,Total True Reward = 78783.0212
+Execution time: 1.7340 seconds,Total True Reward = 81685.7387
+Execution time: 1.7316 seconds,Total True Reward = 81585.0788
+Execution time: 1.7245 seconds,Total True Reward = 87689.9046
+Execution time: 1.7331 seconds,Total True Reward = 87290.0815
+Execution time: 1.7353 seconds,Total True Reward = 84388.5359
+Execution time: 1.7280 seconds,Total True Reward = 81485.2702
+Execution time: 1.7316 seconds,Total True Reward = 86388.8507
+Execution time: 1.7345 seconds,Total True Reward = 81184.7392
+Execution time: 1.7292 seconds,Total True Reward = 73779.8345
+Execution time: 1.7364 seconds,Total True Reward = 87890.6004
+Execution time: 1.7354 seconds,Total True Reward = 87590.1624

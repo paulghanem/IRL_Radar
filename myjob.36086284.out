@@ -1,0 +1,127 @@
+Running on node: v010
+CUDA_VISIBLE_DEVICES = 0,1,2,3,4,5,6,7
+[CudaDevice(id=0), CudaDevice(id=1), CudaDevice(id=2), CudaDevice(id=3), CudaDevice(id=4), CudaDevice(id=5), CudaDevice(id=6), CudaDevice(id=7)]
+Using AIRL:  True
+Using GAIL:  True
+Using RGCL:  False
+Experiment State @  2025-11-19 08:35:09.023189-05:00
+Experiment Saved @  results/experiment_125
+Experiment Settings Saved @  results/experiment_125
+125
+Loaded data from expert_agents/CartPole-v1/ppo.pkl.
+CartPole-v1 - Steps: 200, Return: 200.0, State: [-0.02312959 -0.02138637  0.01030321  0.02436888]
+rewards_demo [  1.   2.   3.   4.   5.   6.   7.   8.   9.  10.  11.  12.  13.  14.
+  15.  16.  17.  18.  19.  20.  21.  22.  23.  24.  25.  26.  27.  28.
+  29.  30.  31.  32.  33.  34.  35.  36.  37.  38.  39.  40.  41.  42.
+  43.  44.  45.  46.  47.  48.  49.  50.  51.  52.  53.  54.  55.  56.
+  57.  58.  59.  60.  61.  62.  63.  64.  65.  66.  67.  68.  69.  70.
+  71.  72.  73.  74.  75.  76.  77.  78.  79.  80.  81.  82.  83.  84.
+  85.  86.  87.  88.  89.  90.  91.  92.  93.  94.  95.  96.  97.  98.
+  99. 100. 101. 102. 103. 104. 105. 106. 107. 108. 109. 110. 111. 112.
+ 113. 114. 115. 116. 117. 118. 119. 120. 121. 122. 123. 124. 125. 126.
+ 127. 128. 129. 130. 131. 132. 133. 134. 135. 136. 137. 138. 139. 140.
+ 141. 142. 143. 144. 145. 146. 147. 148. 149. 150. 151. 152. 153. 154.
+ 155. 156. 157. 158. 159. 160. 161. 162. 163. 164. 165. 166. 167. 168.
+ 169. 170. 171. 172. 173. 174. 175. 176. 177. 178. 179. 180. 181. 182.
+ 183. 184. 185. 186. 187. 188. 189. 190. 191. 192. 193. 194. 195. 196.
+ 197. 198. 199. 200.]
+Execution time: 2.1561 seconds,Total True Reward = 200.0000
+Execution time: 1.6770 seconds,Total True Reward = 200.0000
+Execution time: 1.6728 seconds,Total True Reward = 200.0000
+Execution time: 1.9808 seconds,Total True Reward = 200.0000
+Execution time: 1.6806 seconds,Total True Reward = 200.0000
+Execution time: 1.6940 seconds,Total True Reward = 200.0000
+Execution time: 1.6694 seconds,Total True Reward = 200.0000
+Execution time: 2.0085 seconds,Total True Reward = 200.0000
+Execution time: 1.6712 seconds,Total True Reward = 200.0000
+Execution time: 1.6635 seconds,Total True Reward = 200.0000
+Execution time: 1.6884 seconds,Total True Reward = 200.0000
+Execution time: 1.6067 seconds,Total True Reward = 200.0000
+Execution time: 2.0539 seconds,Total True Reward = 200.0000
+Execution time: 1.7003 seconds,Total True Reward = 200.0000
+Execution time: 1.6879 seconds,Total True Reward = 200.0000
+Execution time: 1.6743 seconds,Total True Reward = 200.0000
+Execution time: 1.6670 seconds,Total True Reward = 200.0000
+Execution time: 1.6860 seconds,Total True Reward = 170.0000
+Execution time: 2.1825 seconds,Total True Reward = 200.0000
+Execution time: 1.6907 seconds,Total True Reward = 200.0000
+Execution time: 1.6740 seconds,Total True Reward = 200.0000
+Execution time: 1.6658 seconds,Total True Reward = 200.0000
+Execution time: 1.6556 seconds,Total True Reward = 92.0000
+Execution time: 1.6640 seconds,Total True Reward = 200.0000
+Execution time: 2.2272 seconds,Total True Reward = 200.0000
+Execution time: 1.6626 seconds,Total True Reward = 66.0000
+Execution time: 1.6825 seconds,Total True Reward = 44.0000
+Execution time: 1.6863 seconds,Total True Reward = 41.0000
+Execution time: 1.6874 seconds,Total True Reward = 42.0000
+Execution time: 1.6875 seconds,Total True Reward = 45.0000
+Execution time: 1.6831 seconds,Total True Reward = 51.0000
+Execution time: 2.2728 seconds,Total True Reward = 63.0000
+Execution time: 1.6628 seconds,Total True Reward = 200.0000
+Execution time: 1.6643 seconds,Total True Reward = 200.0000
+Execution time: 1.6845 seconds,Total True Reward = 200.0000
+Execution time: 1.6686 seconds,Total True Reward = 200.0000
+Execution time: 1.6782 seconds,Total True Reward = 200.0000
+Execution time: 1.6775 seconds,Total True Reward = 200.0000
+Execution time: 1.6590 seconds,Total True Reward = 200.0000
+Execution time: 2.3603 seconds,Total True Reward = 200.0000
+Execution time: 1.6866 seconds,Total True Reward = 200.0000
+Execution time: 1.6708 seconds,Total True Reward = 200.0000
+Execution time: 1.6635 seconds,Total True Reward = 200.0000
+Execution time: 1.6704 seconds,Total True Reward = 200.0000
+Execution time: 1.6907 seconds,Total True Reward = 200.0000
+Execution time: 1.6807 seconds,Total True Reward = 200.0000
+Execution time: 1.6765 seconds,Total True Reward = 200.0000
+Execution time: 1.6799 seconds,Total True Reward = 200.0000
+Execution time: 2.4381 seconds,Total True Reward = 200.0000
+Execution time: 1.6678 seconds,Total True Reward = 200.0000
+Execution time: 1.6692 seconds,Total True Reward = 200.0000
+Execution time: 1.6803 seconds,Total True Reward = 200.0000
+Execution time: 1.6807 seconds,Total True Reward = 40.0000
+Execution time: 1.6790 seconds,Total True Reward = 40.0000
+Execution time: 1.7061 seconds,Total True Reward = 47.0000
+Execution time: 1.7276 seconds,Total True Reward = 36.0000
+Execution time: 1.6782 seconds,Total True Reward = 38.0000
+Execution time: 1.6667 seconds,Total True Reward = 29.0000
+Execution time: 2.5350 seconds,Total True Reward = 34.0000
+Execution time: 1.6810 seconds,Total True Reward = 36.0000
+Execution time: 1.6265 seconds,Total True Reward = 37.0000
+Execution time: 1.6775 seconds,Total True Reward = 44.0000
+Execution time: 1.6704 seconds,Total True Reward = 42.0000
+Execution time: 1.6794 seconds,Total True Reward = 35.0000
+Execution time: 1.6851 seconds,Total True Reward = 35.0000
+Execution time: 1.6671 seconds,Total True Reward = 43.0000
+Execution time: 1.6630 seconds,Total True Reward = 45.0000
+Execution time: 1.6765 seconds,Total True Reward = 47.0000
+Execution time: 1.6648 seconds,Total True Reward = 48.0000
+Execution time: 2.6621 seconds,Total True Reward = 49.0000
+Execution time: 1.6815 seconds,Total True Reward = 50.0000
+Execution time: 1.6662 seconds,Total True Reward = 51.0000
+Execution time: 1.6785 seconds,Total True Reward = 48.0000
+Execution time: 1.6698 seconds,Total True Reward = 45.0000
+Execution time: 1.6818 seconds,Total True Reward = 46.0000
+Execution time: 1.6691 seconds,Total True Reward = 49.0000
+Execution time: 1.6707 seconds,Total True Reward = 53.0000
+Execution time: 1.6846 seconds,Total True Reward = 54.0000
+Execution time: 1.6854 seconds,Total True Reward = 56.0000
+Execution time: 1.6862 seconds,Total True Reward = 53.0000
+Execution time: 1.6730 seconds,Total True Reward = 63.0000
+Execution time: 1.6781 seconds,Total True Reward = 55.0000
+Execution time: 2.7906 seconds,Total True Reward = 50.0000
+Execution time: 1.6737 seconds,Total True Reward = 74.0000
+Execution time: 1.6663 seconds,Total True Reward = 73.0000
+Execution time: 1.6609 seconds,Total True Reward = 58.0000
+Execution time: 1.6853 seconds,Total True Reward = 79.0000
+Execution time: 1.6712 seconds,Total True Reward = 125.0000
+Execution time: 1.6600 seconds,Total True Reward = 112.0000
+Execution time: 1.6624 seconds,Total True Reward = 200.0000
+Execution time: 1.6873 seconds,Total True Reward = 200.0000
+Execution time: 1.6653 seconds,Total True Reward = 200.0000
+Execution time: 1.6618 seconds,Total True Reward = 200.0000
+Execution time: 1.6864 seconds,Total True Reward = 200.0000
+Execution time: 1.6642 seconds,Total True Reward = 200.0000
+Execution time: 1.6561 seconds,Total True Reward = 151.0000
+Execution time: 2.9132 seconds,Total True Reward = 200.0000
+Execution time: 1.6641 seconds,Total True Reward = 200.0000
+Execution time: 1.6823 seconds,Total True Reward = 200.0000
+Execution time: 1.6670 seconds,Total True Reward = 200.0000
