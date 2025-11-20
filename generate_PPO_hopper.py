@@ -11,7 +11,7 @@ from stable_baselines3 import PPO
 # ============================================================
 # Create a NEW folder for this run inside expert_agents/Hopper
 # ============================================================
-RUN_NAME = "run_01"   # <-- Change this per experiment: run_02, run_03, etc.
+RUN_NAME = "run_02"   # <-- Change this per experiment: run_02, run_03, etc.
 
 model_dir = f"expert_agents/Hopper/{RUN_NAME}/models"
 log_dir   = f"expert_agents/Hopper/{RUN_NAME}/logs"
@@ -41,22 +41,6 @@ if train:
         "MlpPolicy",
         env,
         verbose=1,
-
-        # === PPO hyperparameters optimized for Hopper ===
-        n_steps=2048,
-        batch_size=64,
-        n_epochs=10,
-        gamma=0.99,
-        learning_rate=3e-4,
-        gae_lambda=0.95,
-        clip_range=0.2,
-        ent_coef=0.0,
-        vf_coef=0.5,
-        max_grad_norm=0.5,
-
-        use_sde=False,  # Important: SDE hurts Hopper
-
-        tensorboard_log=log_dir,
         device="cuda"   # Force GPU training
     )
 

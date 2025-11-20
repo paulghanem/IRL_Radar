@@ -29,22 +29,6 @@ if train:
         "MlpPolicy",
         env,
         verbose=1,
-
-        # === Stable-Baselines3 RL-Zoo best values === #
-        n_steps=4096,
-        batch_size=256,
-        n_epochs=10,
-        gamma=0.99,
-        learning_rate=3e-4,
-        gae_lambda=0.95,
-        clip_range=0.2,
-        ent_coef=0.0,
-        vf_coef=0.5,
-        max_grad_norm=0.5,
-        use_sde=True,            # ⭐ helps a lot for HalfCheetah
-        sde_sample_freq=4,
-
-        tensorboard_log=log_dir,
         device="cuda"            # IMPORTANT: forces GPU usage
     )
 
