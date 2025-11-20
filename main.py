@@ -477,13 +477,13 @@ for runs in range (args.runs):
         epoch_cost.append(total_cost)
         expert_cost.append(rewards_demo)
            
-        # if np.remainder(i,10)==0:
-        #     save_dir = f"{epoch_cost_dir}/{method}"
-        #     os.makedirs(save_dir, exist_ok=True)
-        #     np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
-        #     np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
-        #     #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
-        #     #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
+        if np.remainder(i,10)==0:
+            save_dir = f"{epoch_cost_dir}/{method}"
+            os.makedirs(save_dir, exist_ok=True)
+            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
+            np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
+            #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
+            #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 
    
     #epoch_cost_runs.append(epoch_cost)
