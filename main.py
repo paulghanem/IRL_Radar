@@ -65,8 +65,8 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps_expert",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
@@ -90,7 +90,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="HalfCheetah-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -98,8 +98,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=20,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -171,21 +171,38 @@ with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as ou
     json.dump(vars(args), outfile)
 
 assets_dir="assets"
-if args.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4","Swimmer"]:
     if args.gym_env=="HalfCheetah-v4":
         env_xml = "half_cheetah.xml"
-    elif args.gym_env=="Ant":
+        args.frame_skip=5
+        args.dt=0.01
+    elif args.gym_env=="Ant-v4":
         env_xml = "ant.xml"
+        args.frame_skip=5
+        args.dt=0.01
     elif args.gym_env=="Hopper":
         env_xml = "hopper.xml"
+        args.frame_skip=4
+        args.dt=0.002
     elif args.gym_env=="Walker2d":
         env_xml = "walker2d.xml"
+        args.frame_skip=4
+        args.dt=0.002
     elif args.gym_env=="Humanoid-v4":
         env_xml = "humanoid.xml"
+        args.frame_skip=5
+        args.dt=0.003
+    elif args.gym_env=="Swimmer":
+        env_xml = "Swimmer.xml"
+        args.frame_skip=4
+        args.dt=0.01
 
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
+    if args.gym_env=="Humanoid-v4":
+        model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)
+    
 
 
 mean_rewards = []
@@ -460,13 +477,13 @@ for runs in range (args.runs):
         epoch_cost.append(total_cost)
         expert_cost.append(rewards_demo)
            
-        if np.remainder(i,10)==0:
-            save_dir = f"{epoch_cost_dir}/{method}"
-            os.makedirs(save_dir, exist_ok=True)
-            np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
-            np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
-            #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
-            #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
+        # if np.remainder(i,10)==0:
+        #     save_dir = f"{epoch_cost_dir}/{method}"
+        #     os.makedirs(save_dir, exist_ok=True)
+        #     np.save(f"{save_dir}/cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",epoch_cost)
+        #     np.save(f"{save_dir}/expert_cost_{10* i}_seed={args.seed}_lambda={args.lambda_}_horizon={args.horizon}_trajectories={args.num_traj}_Q={args.Q}_P={args.P}_ndim={args.hidden_dim}.npy",expert_cost)
+        #     #np.save(osp.join(epoch_cost_dir,method+'_epoch_cost.npy'), epoch_cost_runs)
+        #     #np.save(osp.join(epoch_cost_dir,method+'_expert_cost.npy'), expert_cost_runs)
 
    
     #epoch_cost_runs.append(epoch_cost)

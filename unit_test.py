@@ -20,7 +20,7 @@ import pdb
 
 
 
-gym_env="HalfCheetah-v4"
+gym_env="Hopper"
 max_frames=1
 
 mjx_model=None
@@ -78,15 +78,16 @@ else:
 _dynamics=get_step_model(gym_env,env)
 
 def step_mjx(state,action,mjx_model,mjx_data,_dynamics,gym_env,frame_skip):
-    next_state=kinematics_mujoco(mjx_model,mjx_data,state.flatten(),action.reshape((1,-1)),_dynamics,gym_env,frame_skip=frame_skip).flatten()
+    next_state=kinematics_mujoco(mjx_model,mjx_data,state.flatten(),action.reshape((1,-1)),gym_env,frame_skip=frame_skip).flatten()
     return next_state
 
-def reward_fn(gym_env, state, action,forward_reward, mjx_data):
+def reward_fn(gym_env, state, action,next_state, mjx_data,dt,frame_skip):
+    forward_reward=(next_state[0]-state[0])/(dt*frame_skip)
    
     if gym_env == "CartPole-v1":
-        x=state[0]
+        x=next_state[0]
         x_threshold=2.4
-        theta_cart=state[2]
+        theta_cart=next_state[2]
         theta_threshold_radians=12 * 2 * math.pi / 360
         out_of_bounds = (x < -x_threshold) | (x > x_threshold)
         bad_angle = (theta_cart < -theta_threshold_radians) | (theta_cart > theta_threshold_radians)
@@ -101,18 +102,18 @@ def reward_fn(gym_env, state, action,forward_reward, mjx_data):
 
         r = jnp.where(terminated, 0.0, 1.0)
     if gym_env == "Pendulum-v1":
-        x=state[0]
-        y=state[1]
+        x=next_state[0]
+        y=next_state[1]
         theta_pend=jnp.atan2(y,x)
-        theta_dot=state[2]
+        theta_dot=next_state[2]
         r = -(jnp.pow(theta_pend,2) + 0.1 * jnp.pow(theta_dot,2) + 0.001 * jnp.pow(action,2))
        
     if gym_env == "MountainCarContinuous-v0":
         r=-0.1 * jnp.pow(action,2)
         goal_position = 0.45
         goal_velocity = 0.0
-        x=state[0]
-        xd=state[1]
+        x=next_state[0]
+        xd=next_state[1]
         r = r + jnp.where(x >= goal_position, 100.0, 0.0)
         # if goal_position <= x :
         #     r+=100 
@@ -125,7 +126,7 @@ def reward_fn(gym_env, state, action,forward_reward, mjx_data):
     if gym_env == "Ant-v4":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
         alive_bonus=1
-        if state[2] <0.2 or state[2]>1:
+        if next_state[2] <0.2 or next_state[2]>1:
             alive_bonus=0
         ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
         r = forward_reward - ctrl_cost+alive_bonus
@@ -134,13 +135,13 @@ def reward_fn(gym_env, state, action,forward_reward, mjx_data):
     if gym_env == "Hopper":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
         alive_bonus=1
-        if any(x < -100 for x in state[2:]) or any(x > 100 for x in state[2:]):
+        if any(x < -100 for x in next_state[2:]) or any(x > 100 for x in next_state[2:]):
             alive_bonus=0
            # break
-        if state[2] < -0.2  or state[2] > 0.2:
+        if next_state[2] < -0.2  or next_state[2] > 0.2:
             alive_bonus=0
            # break 
-        if state[1] < 0.7:
+        if next_state[1] < 0.7:
             alive_bonus=0
             #break  
        
@@ -151,7 +152,7 @@ def reward_fn(gym_env, state, action,forward_reward, mjx_data):
     if gym_env == "Walker2d":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
         alive_bonus=1
-        if jnp.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
+        if jnp.abs(next_state[2])>1 or next_state[1] <0.8 or next_state[1]>2:
             alive_bonus=0
         
         ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
@@ -161,7 +162,7 @@ def reward_fn(gym_env, state, action,forward_reward, mjx_data):
     if gym_env == "Humanoid-v4":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
         alive_bonus=5
-        if state[2] <1 or state[2]>2:
+        if next_state[2] <1 or next_state[2]>2:
             alive_bonus=0
         #pdb.set_trace()
         quad_impact_cost = 0.5e-6 * jnp.square(mjx_data.cfrc_ext).sum()
@@ -186,8 +187,8 @@ for i in [0.1,0.2,0.3,0.4,0.5,0.6,.7,.8]:
     #pdb.set_trace()
     
     next_state=step_mjx(state,action,mjx_model,mjx_data,_dynamics,gym_env,frame_skip=frame_skip)
-    forward_reward=(next_state[0]-state[0])/(dt*frame_skip)
-    r= reward_fn(gym_env, next_state, action, forward_reward, mjx_data)
+    #forward_reward=(next_state[0]-state[0])/(dt*frame_skip)
+    r= reward_fn(gym_env, state, action, next_state, mjx_data,dt,frame_skip)
 
 
     obs, reward, terminated, truncated, info = env.step(action.flatten())

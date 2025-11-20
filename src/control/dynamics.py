@@ -16,6 +16,8 @@ import pdb
 from mujoco import mjx 
 from functools import partial
 
+
+
 @struct.dataclass
 class CartPoleEnvState(environment.EnvState):
     x: jnp.ndarray
@@ -245,29 +247,79 @@ def kinematics(state, action, step_fn):
 
 
 
-@partial(jax.jit, static_argnames=("step_fn", "gym_env", "frame_skip"))
-def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env,frame_skip=1):
-    """Rollout a jitted gymnax episode with lax.scan."""
+# @partial(jax.jit, static_argnames=("step_fn", "gym_env", "frame_skip"))
+# def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env,frame_skip=1):
+#     """Rollout a jitted gymnax episode with lax.scan."""
 
-    def policy_step(state, tmp):
-        """lax.scan compatible step transition in jax env."""
-        action = tmp
-        def substep_fn(subcarry, _):
-            next_state = step_fn(mjx_model, mjx_data, subcarry, action, gym_env)
+#     def policy_step(state, tmp):
+#         """lax.scan compatible step transition in jax env."""
+#         action = tmp
+#         def substep_fn(subcarry, _):
+#             next_state = step_fn(mjx_model, mjx_data, subcarry, action, gym_env)
             
-            return next_state, None
+#             return next_state, None
 
-        next_state, _ = jax.lax.scan(substep_fn, state, xs=None, length=frame_skip)
+#         next_state, _ = jax.lax.scan(substep_fn, state, xs=None, length=frame_skip)
         
-        carry = next_state
-        return carry, carry
+#         carry = next_state
+#         return carry, carry
 
-    # Scan over episode step loop
-    _, scan_out = jax.lax.scan(
-        policy_step,
-        state,
-        action,
-    )
-    # Return masked sum of rewards accumulated by agent in episode
-    states = scan_out
+#     # Scan over episode step loop
+#     _, scan_out = jax.lax.scan(
+#         policy_step,
+#         state,
+#         action,
+#     )
+#     # Return masked sum of rewards accumulated by agent in episode
+#     states = scan_out
+#     return states
+
+
+@partial(jax.jit, static_argnames=("gym_env", "frame_skip"))
+def kinematics_mujoco(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
+    """
+    Functional MJX rollout with lax.scan.
+
+    Args:
+        mjx_model: mjx.Model
+        mjx_data:  mjx.Data  (initial data, e.g. from reset_mjx_state)
+        init_state: (s_dim,) or (batch, s_dim) array of [qpos, qvel]
+        actions: (T, a_dim) or (T, batch, a_dim) array
+        gym_env: env name (static, unused except for API consistency)
+        frame_skip: int, number of mjx.step calls per RL step (static)
+
+    Returns:
+        states: (T, s_dim) or (T, batch, s_dim) array of [qpos, qvel]
+    """
+
+    # Ensure init_state is used only once: set qpos/qvel at t=0
+    def _init_from_state(mjx_data, state):
+        return mjx_data.replace(
+            qpos=state[..., : mjx_model.nq],
+            qvel=state[..., mjx_model.nq : mjx_model.nq + mjx_model.nv],
+        )
+
+    mjx_data = _init_from_state(mjx_data, init_state)
+
+    def one_step(carry_data, action_t):
+        """
+        carry_data: mjx.Data at time t
+        action_t: action at time t
+        """
+
+        def substep(d, _):
+            # Set control, step physics once
+            d = d.replace(ctrl=action_t)
+            d = mjx.step(mjx_model, d)
+            return d, None
+
+        # Perform frame_skip internal physics steps
+        carry_data, _ = lax.scan(substep, carry_data, xs=None, length=frame_skip)
+
+        # Observation = [qpos, qvel]
+        obs_t = jnp.concatenate([carry_data.qpos, carry_data.qvel], axis=-1)
+        return carry_data, obs_t
+
+    # Scan over time dimension
+    _, states = lax.scan(one_step, mjx_data, actions)
     return states
