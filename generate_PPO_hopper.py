@@ -21,7 +21,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 sb3_algo = "PPO"
 TIMESTEPS = 10000
-env_name = "Hopper-v5"   # Use proper version
+env_name = "Hopper"   # Use proper version
 
 # ============================================================
 # Environment
