@@ -9,13 +9,13 @@ import gymnasium as gym
 from stable_baselines3 import PPO
 
 model_dir = "expert_agents"
-log_dir = "logs_Hopper"
+log_dir = "logs_HalfCheetah-v4"
 os.makedirs(model_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 
 sb3_algo = "PPO"
 TIMESTEPS = 10000
-env_name = "Hopper"
+env_name = "HalfCheetah-v4"
 
 env = gym.make(env_name, exclude_current_positions_from_observation=False)
 
