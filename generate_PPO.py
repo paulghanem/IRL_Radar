@@ -9,13 +9,13 @@ import gymnasium as gym
 from stable_baselines3 import PPO
 
 model_dir = "expert_agents"
-log_dir = "logs_HalfCheetah-v4"
+log_dir = "logs_Hopper"
 os.makedirs(model_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 
 sb3_algo = "PPO"
 TIMESTEPS = 10000
-env_name = "HalfCheetah-v4"
+env_name = "Hopper"
 
 env = gym.make(env_name, exclude_current_positions_from_observation=False)
 
@@ -57,7 +57,7 @@ elif load:
 while iterations < 1000:
     iterations += 1
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False)
-    model.save(f"{model_dir}/{env_name}/{sb3_algo}_{TIMESTEPS * iterations}")
+    model.save(f"{model_dir}/{env_name}_1/{sb3_algo}_{TIMESTEPS * iterations}")
 
 model.save(f"{model_dir}/{env_name}/{sb3_algo}")
 

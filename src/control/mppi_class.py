@@ -480,13 +480,22 @@ class MPPI:
             
             
         if gym_env == "Walker2d":
-            #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-            alive_bonus=1
-            if jnp.abs(next_state[2])>1 or next_state[1] <0.8 or next_state[1]>2:
-                alive_bonus=0
-            
+            alive_bonus = 1.0
+        
+            # JAX boolean: True when robot falls
+            fall_cond = (
+                (jnp.abs(next_state[2]) > 1.0) |
+                (next_state[1] < 0.8) |
+                (next_state[1] > 2.0)
+            )
+        
+            # If fall_cond is True → alive_bonus = 0
+            alive_bonus = jnp.where(fall_cond, 0.0, alive_bonus)
+        
             ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+        
             r = forward_reward - ctrl_cost + alive_bonus
+
             
             
         if gym_env == "Humanoid-v4":

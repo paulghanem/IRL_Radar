@@ -90,7 +90,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="HalfCheetah-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -98,8 +98,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=20,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=500,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
