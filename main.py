@@ -35,6 +35,7 @@ from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 from utils.helpers import GenerateDemo
 
 import gymnax
+#from brax import envs
 # Redirect NumPy 2.x paths to NumPy 1.x
 #sys.modules["numpy._core"] = np.core
 #sys.modules["numpy._core.numeric"] = np.core.numeric
@@ -65,9 +66,9 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=100,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=100,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
+parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--rirl_iterations",default=9,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
@@ -90,7 +91,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -98,8 +99,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=5,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=5,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -171,31 +172,39 @@ with open(os.path.join(args.results_savepath,"hyperparameters.json"), "w") as ou
     json.dump(vars(args), outfile)
 
 assets_dir="assets"
+args.dt=1
+args.frame_skip=1
 if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4","Swimmer"]:
     if args.gym_env=="HalfCheetah-v4":
         env_xml = "half_cheetah.xml"
         args.frame_skip=5
         args.dt=0.01
+        #env_brax = envs.get_environment('halfcheetah')
     elif args.gym_env=="Ant-v4":
         env_xml = "ant.xml"
         args.frame_skip=5
         args.dt=0.01
+        #env_brax = envs.get_environment('Ant')
     elif args.gym_env=="Hopper":
         env_xml = "hopper.xml"
         args.frame_skip=4
         args.dt=0.002
+        #env_brax = envs.get_environment('Hopper')
     elif args.gym_env=="Walker2d":
         env_xml = "walker2d.xml"
         args.frame_skip=4
         args.dt=0.002
+       # env_brax = envs.get_environment('walker2d',exclude_current_positions_from_observation=False)
     elif args.gym_env=="Humanoid-v4":
         env_xml = "humanoid.xml"
         args.frame_skip=5
         args.dt=0.003
+        #env_brax = envs.get_environment('Humanoid')
     elif args.gym_env=="Swimmer":
         env_xml = "Swimmer.xml"
         args.frame_skip=4
         args.dt=0.01
+        #env_brax = envs.get_environment('Swimmer')
 
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
@@ -287,7 +296,7 @@ for runs in range (args.runs):
     
             # policy = P_MPPI((args.s_dim,),  args.a_dim,args=args)
             cost_f = CostNN(state_dims=args.s_dim,hidden_dim=args.hidden_dim) #CostNN(state_dims=args.s_dim)
-            
+            @jax.jit
             def cost_function(state,state_train):
     
                 return state_train.apply_fn({'params':state_train.params},state.reshape(1,-1)).ravel()
@@ -300,39 +309,24 @@ for runs in range (args.runs):
     
             
             
-            if args.PPO:
-                model_p=policy_model(action_dim=args.a_dim)
-                dummy_input = jnp.zeros((1, args.s_dim))  # (batch, obs)
+            # if args.PPO:
+            #     model_p=policy_model(action_dim=args.a_dim)
+            #     dummy_input = jnp.zeros((1, args.s_dim))  # (batch, obs)
                 
-                params_p = model_p.init(init_rng, dummy_input)['params']
-                #variables_p = model_p.init(init_rng, jnp.ones((1, args.s_dim)))
+            #     params_p = model_p.init(init_rng, dummy_input)['params']
+            #     #variables_p = model_p.init(init_rng, jnp.ones((1, args.s_dim)))
         
-                #params_p = variables_p['params']
-                # params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
-                # params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
-                tx = optax.adam(learning_rate=3e-4)
-                state_train_p = train_state.TrainState.create(apply_fn=model_p.apply, params=params_p, tx=tx)
-                policy= PPOPolicy(action_dim=args.a_dim, mjx_model=mjx_model,dynamics=get_step_model(args.gym_env,env),policy_model=state_train_p,policy_net=model_p,args=args)
+            #     #params_p = variables_p['params']
+            #     # params['Dense_0']['bias']=jnp.ones(params['Dense_0']['bias'].shape)
+            #     # params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
+            #     tx = optax.adam(learning_rate=3e-4)
+            #     state_train_p = train_state.TrainState.create(apply_fn=model_p.apply, params=params_p, tx=tx)
+            #     policy= PPOPolicy(action_dim=args.a_dim, mjx_model=mjx_model,dynamics=get_step_model(args.gym_env,env),policy_model=state_train_p,policy_net=model_p,args=args)
 
               
-            else:
-                policy = MPPI(
-                    horizon=args.horizon,
-                    num_samples=args.num_traj,
-                    # subiterations=args.MPPI_iterations,
-                    dim_state=args.s_dim,
-                    dim_control=args.a_dim,
-                    dynamics=get_step_model(args.gym_env,env),
-                    cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
-                    u_min=u_min,
-                    u_max=u_max,
-                    sigmas=cov_scaler,
-                    lambda_=args.lambda_,
-                    env=env,
-                    mjx_model=mjx_model,
-                    gym_env=args.gym_env
-                )
-                
+            
+               
+ 
                     
             # cost_optimizer = torch.optim.Adam(cost_f.parameters(), 1e-2, weight_decay=1e-4)
             
@@ -344,7 +338,25 @@ for runs in range (args.runs):
             # params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
             tx = optax.adam(learning_rate=args.lr)
             state_train = train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
-    
+            policy = MPPI(
+                state_train=state_train,
+                horizon=args.horizon,
+                num_samples=args.num_traj,
+                # subiterations=args.MPPI_iterations,
+                dim_state=args.s_dim,
+                dim_control=args.a_dim,
+                dynamics=get_step_model(args.gym_env,env),
+                cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
+                u_min=u_min,
+                u_max=u_max,
+                sigmas=cov_scaler,
+                lambda_=args.lambda_,
+                env=env,
+                mjx_model=mjx_model,
+                gym_env=args.gym_env,
+                use_mujoco=True
+            )
+               
             D_demo=np.array([])
         
             demo_trajs=[[states_d,actions_d,actions_d]]
@@ -394,7 +406,8 @@ for runs in range (args.runs):
             else:
                 start = time.time()
                 #trajs = [policy.generate_session(args,state_train,initial_state,D_demo,thetas)]
-                trajs=[policy.generate_session_lax(args,state_train,D_demo)]
+                #trajs=[policy.generate_session_lax(args,state_train,D_demo)]
+                trajs=[policy.generate_session_loop(args,state_train,D_demo)]
                 end = time.time()
                 
 

@@ -25,6 +25,15 @@ import pdb
 from cost_jax import apply_model, apply_model_AIRL, update_model
 from mujoco import mjx 
 import random
+import jax
+import jax.tree_util as jtu
+import time
+if not hasattr(jax, "tree_map"):
+    jax.tree_map = jtu.tree_map
+
+
+
+
 
 @jax.jit
 def update_theta(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d, gradient_s):
@@ -41,45 +50,6 @@ def update_theta_diag(theta, P_theta, Q_theta, hessian_d, hessian_s, gradient_d,
     theta = theta - P_theta*(gradient_d - gradient_s)
     
     return theta,P_theta
-def load_config(config_fname, seed_id=0, lrate=None):
-    """Load training configuration and random seed of experiment."""
-    import yaml
-    import re
-    from dotmap import DotMap
-
-    def load_yaml(config_fname: str) -> dict:
-        """Load in YAML config file."""
-        loader = yaml.SafeLoader
-        loader.add_implicit_resolver(
-            "tag:yaml.org,2002:float",
-            re.compile(
-                """^(?:
-            [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
-            |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
-            |\\.[0-9_]+(?:[eE][-+][0-9]+)?
-            |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\\.[0-9_]*
-            |[-+]?\\.(?:inf|Inf|INF)
-            |\\.(?:nan|NaN|NAN))$""",
-                re.X,
-            ),
-            list("-+0123456789."),
-        )
-        with open(config_fname) as file:
-            yaml_config = yaml.load(file, Loader=loader)
-        return yaml_config
-
-    config = load_yaml(config_fname)
-    config["train_config"]["seed_id"] = seed_id
-    if lrate is not None:
-        if "lr_begin" in config["train_config"].keys():
-            config["train_config"]["lr_begin"] = lrate
-            config["train_config"]["lr_end"] = lrate
-        else:
-            try:
-                config["train_config"]["opt_params"]["lrate_init"] = lrate
-            except Exception:
-                pass
-    return DotMap(config)
 
 
 def mass_center(model,state):
@@ -94,6 +64,9 @@ def mass_center(model,state):
     
     # Return x-coordinate of the center of mass (you can return full com if needed)
     return com[0]
+
+
+
 class MPPI:
     """
     Model Predictive Path Integral Control,
@@ -102,6 +75,7 @@ class MPPI:
 
     def __init__(
             self,
+            state_train,
             horizon: int,
             num_samples: int,
             dim_state: int,
@@ -117,6 +91,8 @@ class MPPI:
             env=None,
             mjx_model=None,
             gym_env=None,
+            env_brax=None,
+            use_mujoco=bool
     ) -> None:
         """
         :param horizon: Predictive horizon length.
@@ -160,13 +136,17 @@ class MPPI:
         self._lambda = lambda_
         self._exploration = exploration
         self.env=env
+        self.env_brax=env_brax
         self.mjx_model=mjx_model
         self.gym_env=gym_env
+        self.use_mujoco=use_mujoco
+        self.state_train=state_train
         if self.mjx_model is not None :
             self.mjx_data = mjx.make_data(self.mjx_model)
         else:
             self.mjx_data=None
             
+       
 
         # noise distribution
         self._covariance = jnp.zeros((
@@ -270,15 +250,13 @@ class MPPI:
     
         return data
 
-    # def forward(self,state,state_train=None,gail=False):
-    #     for i in range(100):
-    #         self.step(state,state_train,gail)
-    #
-    #     # predivtive state seq
-    #     expanded_optimal_action_seq = jnp.tile(self._previous_action_seq,(1, 1, 1))
-    #     optimal_state_seq = self._states_prediction(state, expanded_optimal_action_seq)
-    #
-    #     return self.step(state,state_train,gail)
+    def reset_batched(self,keys):
+        return jax.vmap(self.env_brax.reset)(keys)
+
+    def step_batched(self,state, actions):
+        return jax.vmap(self.env_brax.step)(state, actions)
+
+
     def forward_pure(self,state, state_train=None, gail=False,*,key,prev_action_seq,frame_skip):
         """
         Pure MPPI forward step.
@@ -320,9 +298,14 @@ class MPPI:
             if self.gym_env in ["Ant"]:
                 st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
             initial_state = jnp.tile(st, (self._num_samples, 1))
+            #pdb.set_trace()
+            start = time.time()
             state_seq_batch = jax.vmap(
                 kinematics_mujoco, in_axes=(None, None, 0, 0, None,None)
             )(self.mjx_model, self.mjx_data, initial_state, perturbed_action_seqs, self.gym_env,frame_skip)
+            end = time.time()
+            print(f"Execution time_forward(s): {end - start:.4f} seconds")
+            #pdb.set_trace()
             initial_state = initial_state.reshape((initial_state.shape[0], 1, initial_state.shape[1]))
             state_seq_batch = jnp.concatenate((initial_state, state_seq_batch), axis=1)
             if self.gym_env in ["Ant"]:
@@ -353,24 +336,182 @@ class MPPI:
             total_costs = -jnp.log(D)
     
         # weights and optimal control
+        start = time.time()
+        
+        total_costs = total_costs.block_until_ready()
+        
         weights = jax.nn.softmax(-total_costs / self._lambda, axis=0)
-    
+        end = time.time()
+        print(f"Execution time_softmax(s): {end - start:.4f} seconds")
         optimal_action_seq = jnp.sum(
             weights.reshape(self._num_samples, 1, 1) * perturbed_action_seqs,
             axis=0,
         )
     
         expanded_optimal_action_seq = jnp.tile(prev_action_seq, (1, 1, 1))
-        optimal_state_seq = self._states_prediction(state, expanded_optimal_action_seq,frame_skip)
-    
+        #optimal_state_seq = self._states_prediction(state, expanded_optimal_action_seq,frame_skip)
+        optimal_state_seq=0
         # new_prev_action_seq: in many MPPI impls you set it to optimal for warm start
         new_prev_action_seq = optimal_action_seq
     
         return optimal_action_seq, optimal_state_seq, key, new_prev_action_seq
 
 
-   
+
+
+
     
+    # def forward_pure_brax(self,state, state_train=None, gail=False,*,key,prev_action_seq,frame_skip,brax_state0):
+    #     """
+    #     Pure MPPI forward step.
+    #     Args:
+    #         state: jnp.ndarray shape (state_dim,)
+    #         prev_action_seq: jnp.ndarray shape (H, act_dim)  # previously 'self._previous_action_seq'
+    #         key: PRNGKey
+    #     Returns:
+    #         optimal_action_seq: (H, act_dim)
+    #         optimal_state_seq:  (H+1, state_dim)
+    #         new_key: PRNGKey
+    #         new_prev_action_seq: (H, act_dim)
+    #     """
+    #     print("brax_state0.pipeline_state.q shape =", brax_state0.pipeline_state.q.shape)
+    #     print("brax_state0.obs shape =", brax_state0.obs.shape)
+       
+
+    #     def rollout_brax(env, init_state, action_seqs):
+    #         """
+    #         env: Brax env
+    #         init_state: env.State (unbatched)
+    #         action_seqs: (B, H, act_dim)
+    #         returns:
+    #             obs_batch: (B, H+1, obs_dim)
+    #             final_states: (B, ...)
+    #         """
+    #         B, H, act_dim = action_seqs.shape
+        
+    #         def rollout_single(actions_1):
+    #             # actions_1: (H, act_dim)
+    #             def step_fn(state, action_t):
+                    
+    #                 next_state = env.step(state, action_t)  # NOT vmapped
+    #                 return next_state, next_state.obs      # (obs_dim,)
+                
+    #             final_state, obs_seq = jax.lax.scan(
+    #                 step_fn,
+    #                 init_state,      # unbatched!
+    #                 actions_1        # (H, act_dim)
+    #             )
+                
+        
+    #             # prepend initial obs
+    #             obs_seq = jnp.concatenate(
+    #                 [init_state.obs[None, :], obs_seq], 
+    #                 axis=0
+    #             )  # (H+1, obs_dim)
+        
+    #             return obs_seq, final_state
+        
+    #         # vmap over batch dim of action_seqs
+    #         obs_batch, final_states = jax.vmap(
+    #             rollout_single,
+    #             in_axes=(0,)
+    #         )(action_seqs)
+        
+    #         return obs_batch, final_states
+
+        
+        
+
+    #     assert state.shape == (self._dim_state,)
+    
+    #     mean_action_seq = prev_action_seq  # no clone; keep JAX arrays
+    
+    #     # random sampling with reparametrization trick
+    #     action_noises = multivariate_normal(
+    #         key, mean=self.zero_mean, cov=self._covariance, shape=self._sample_shape
+    #     )
+    #     key, _ = jax.random.split(key)
+    
+    #     # noise injection with exploration
+    #     threshold = int(self._num_samples * (1.0 - self._exploration))
+    #     inherited_samples = mean_action_seq + action_noises[:threshold]
+    #     perturbed_action_seqs = jnp.concatenate(
+    #         [inherited_samples, action_noises[threshold:]], axis=0
+    #     )
+    
+    #     # clamp actions
+    #     perturbed_action_seqs = jnp.clip(
+    #         perturbed_action_seqs, self._u_min, self._u_max
+    #     )
+    
+    #     # rollout samples in parallel
+    #     if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+    #         st = state
+    #         if self.gym_env in ["Ant"]:
+    #             st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
+        
+    #         # set the brax observation to the current gym state
+    #         brax_state0 = brax_state0.replace(obs=st)  # st: (obs_dim,)
+           
+    #         # perturbed_action_seqs: (B, H, act_dim)  where B = self._num_samples
+    #         start = time.time()
+    #         state_seq_batch, _ = rollout_brax(
+    #             self.env_brax,
+    #             brax_state0,          # unbatched state
+    #             perturbed_action_seqs # (B, H, act_dim)
+    #         )
+    #         end = time.time()
+    #         print(f"Execution time: {end - start:.4f} seconds")
+           
+           
+    #         # state_seq_batch: (B, H+1, obs_dim)
+        
+    #         if self.gym_env in ["Ant"]:
+    #             # remove the extra root components if you added them in st
+    #             state_seq_batch = state_seq_batch[:, :, 2:]
+    #             st = st[2:]
+    #     else:
+    #         initial_state = jnp.tile(state, (self._num_samples, 1, 1))
+    #         state_seq_batch = jax.vmap(kinematics, in_axes=(0, 0, None))(
+    #             initial_state, perturbed_action_seqs, self._dynamics
+    #         )
+    #         state_seq_batch = jnp.squeeze(state_seq_batch, axis=-2)
+    #         state_seq_batch = jnp.concatenate((initial_state, state_seq_batch), axis=1)
+
+    #     # compute sample costs
+    #     # costs over horizon: (num_samples, horizon)
+    #     costs = jax.vmap(self._cost_func, in_axes=(1, None))(state_seq_batch[:, :-1, :], state_train)
+    #     costs = costs[:, :, 0]  # assuming cost_func returns (..., 1)
+    #     costs = costs.T  # (num_samples, horizon)
+    
+    #     terminal_costs = self._cost_func(
+    #         state_seq_batch[:, -1, :], state_train
+    #     ).ravel()
+    
+    #     total_costs = jnp.sum(costs, axis=1) + terminal_costs
+    
+    #     if gail:
+    #         D = jnp.exp(-total_costs) / (jnp.exp(-total_costs) + 1.0)
+    #         total_costs = -jnp.log(D)
+    
+    #     # weights and optimal control
+    #     weights = jax.nn.softmax(-total_costs / self._lambda, axis=0)
+    
+    #     optimal_action_seq = jnp.sum(
+    #         weights.reshape(self._num_samples, 1, 1) * perturbed_action_seqs,
+    #         axis=0,
+    #     )
+    
+    #     expanded_optimal_action_seq = jnp.tile(prev_action_seq, (1, 1, 1))
+        
+    #    # optimal_state_seq = self._states_prediction(state, expanded_optimal_action_seq,frame_skip)
+    #     optimal_state_seq =0
+    #     # new_prev_action_seq: in many MPPI impls you set it to optimal for warm start
+    #     new_prev_action_seq = optimal_action_seq
+    
+    #     return optimal_action_seq, optimal_state_seq, key, new_prev_action_seq
+
+
 
 
     def _states_prediction(
@@ -383,6 +524,7 @@ class MPPI:
                 initial_state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
             initial_state=jnp.array(initial_state.reshape((1,-1)),dtype=jnp.float64)
             action_seqs=jnp.array(action_seqs,dtype=jnp.float64)
+            
             state_seqs=jax.vmap(kinematics_mujoco,in_axes=(None,None,0,0,None,None))(self.mjx_model,self.mjx_data,initial_state,action_seqs,self.gym_env,frame_skip)
             state_seqs= jnp.concatenate((jnp.tile(initial_state,(1,1,1)), state_seqs), axis=1)
             if self.gym_env in ["Ant"]:
@@ -709,4 +851,159 @@ class MPPI:
         
         return states, traj_probs, actions, rewards,P_theta,params 
 
+
+    def generate_session_loop(self, args, state_train, D_demo, mpc_method=None, thetas=None):
+        key = jax.random.PRNGKey(args.seed)
+        dt = args.dt
+        frame_skip = args.frame_skip
+    
+        # -----------------------------
+        # INITIAL STATE
+        # -----------------------------
+        init_state = D_demo[0, :args.s_dim]
+    
+        # Warm-start action seq from class attribute
+        prev_action_seq = self._previous_action_seq
+    
+        env = args.gym_env
+    
+        # -----------------------------
+        # Environment reset
+        # -----------------------------
+        if env in ["CartPole-v1", "Pendulum-v1", "MountainCarContinuous-v0"]:
+            self.env, self.env_params = gymnax.make(env)
+            _, rng_reset = jax.random.split(key)
+            env_state = self.env.reset(rng_reset, self.env_params)
+    
+        elif env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+            self.mjx_data = self.reset_mjx_state(self.mjx_model, key=key)
+    
+        else:
+            env_state = self.env.reset(seed=args.seed)
+    
+        # -----------------------------
+        # Buffers for trajectory
+        # -----------------------------
+        states_buf = []
+        probs_buf = []
+        actions_buf = []
+        rewards_buf = []
+    
+        # -----------------------------
+        # LOOP ROLLOUT (replaces lax.scan)
+        # -----------------------------
+        state = init_state
+        key, key_reset = jax.random.split(key)
+        # create B independent reset keys
+        reset_keys = jax.random.split(key_reset, self._num_samples)
+        #brax_state0 = self.env_brax.reset(reset_keys[0])
+
+
+        
+      
+    
+        for t in range(args.N_steps):
+            #brax_state = brax_state0   # true Brax State
+            #state = brax_state.obs  
+    
+            # ---------------------------------------------------
+            # FORWARD MPPI STEP (SAME AS BEFORE)
+            # ---------------------------------------------------
+          
+            
+            # action_seq, _, key, prev_action_seq = self.forward_pure_jitted(
+            #             state=state,
+            #             params=self.state_train.params,
+            #             key=key,
+            #             prev_action_seq=prev_action_seq,
+            #             zero_mean=self.zero_mean,
+            #             covariance=self._covariance,
+            #             u_min=self._u_min,
+            #             u_max=self._u_max,
+            #             lambda_=self._lambda,
+            #             num_samples=self._num_samples,
+            #             exploration=self._exploration,
+            #             horizon=self._horizon,
+            #             dim_state=self._dim_state,
+            #             mjx_model=self.mjx_model,
+            #             mjx_data=self.mjx_data,
+            #             dynamics_fn=self._dynamics,      # if you want non-MuJoCo envs
+            #             gym_env=self.gym_env,
+            #             frame_skip=frame_skip,
+            #             use_mujoco=self.use_mujoco,
+            #         )
+
+            action_seq, _, key, prev_action_seq = self.forward_pure(
+                state=state,
+                state_train=state_train,
+                gail=args.gail,
+                key=key,
+                prev_action_seq=prev_action_seq,
+                frame_skip=frame_skip,#
+                
+            )
+            
+            
+    
+            # First action in sequence
+            action = action_seq[0, :]
+    
+            # ---------------------------------------------------
+            # DYNAMICS UPDATE (MuJoCo or simple env)
+            # ---------------------------------------------------
+            if env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+                next_state = kinematics_mujoco(
+                    self.mjx_model,
+                    self.mjx_data,
+                    state.flatten(),
+                    action.reshape((1, -1)),
+                    env,
+                    frame_skip=frame_skip
+                ).flatten()
+                
+                # brax_state = self.env_brax.step(brax_state, action)  # ✅ use Brax State here
+                # next_state = brax_state.obs  
+    
+            else:
+                next_state = self._dynamics(state, action)
+    
+            next_state = next_state.ravel()  # ensure shape
+    
+            # ---------------------------------------------------
+            # REWARD
+            # ---------------------------------------------------
+            prob = jnp.array([1.0])
+            r = self.reward_fn(env, state, action, next_state, self.mjx_data, dt, frame_skip)
+    
+            # ---------------------------------------------------
+            # SAVE STEP
+            # ---------------------------------------------------
+            states_buf.append(state)
+            actions_buf.append(action)
+            probs_buf.append(prob)
+            rewards_buf.append(r)
+    
+            # ---------------------------------------------------
+            # MOVE TO NEXT STATE
+            # ---------------------------------------------------
+            state = next_state
+    
+        # -----------------------------------
+        # UPDATE WARM START AFTER ROLLOUT
+        # -----------------------------------
+        self._previous_action_seq = prev_action_seq
+        self.reset()
+    
+        # -----------------------------------
+        # Convert to arrays and return
+        # -----------------------------------
+        total_reward = jnp.sum(jnp.array(rewards_buf))
+    
+        return (
+            jnp.array(states_buf).tolist(),
+            jnp.array(probs_buf).tolist(),
+            jnp.array(actions_buf).tolist(),
+            float(total_reward),
+        )
+    
 

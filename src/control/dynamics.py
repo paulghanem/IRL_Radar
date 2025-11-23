@@ -17,7 +17,6 @@ from mujoco import mjx
 from functools import partial
 
 
-
 @struct.dataclass
 class CartPoleEnvState(environment.EnvState):
     x: jnp.ndarray
@@ -247,33 +246,6 @@ def kinematics(state, action, step_fn):
 
 
 
-# @partial(jax.jit, static_argnames=("step_fn", "gym_env", "frame_skip"))
-# def kinematics_mujoco(mjx_model,mjx_data,state,action, step_fn,gym_env,frame_skip=1):
-#     """Rollout a jitted gymnax episode with lax.scan."""
-
-#     def policy_step(state, tmp):
-#         """lax.scan compatible step transition in jax env."""
-#         action = tmp
-#         def substep_fn(subcarry, _):
-#             next_state = step_fn(mjx_model, mjx_data, subcarry, action, gym_env)
-            
-#             return next_state, None
-
-#         next_state, _ = jax.lax.scan(substep_fn, state, xs=None, length=frame_skip)
-        
-#         carry = next_state
-#         return carry, carry
-
-#     # Scan over episode step loop
-#     _, scan_out = jax.lax.scan(
-#         policy_step,
-#         state,
-#         action,
-#     )
-#     # Return masked sum of rewards accumulated by agent in episode
-#     states = scan_out
-#     return states
-
 
 @partial(jax.jit, static_argnames=("gym_env", "frame_skip"))
 def kinematics_mujoco(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
@@ -323,3 +295,5 @@ def kinematics_mujoco(mjx_model, mjx_data, init_state, actions, gym_env, frame_s
     # Scan over time dimension
     _, states = lax.scan(one_step, mjx_data, actions)
     return states
+
+# This is the FAST batched version (adapted from the first code block)

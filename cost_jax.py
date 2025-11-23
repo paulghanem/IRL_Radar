@@ -84,7 +84,7 @@ def cost_fn(state_train,params,states,N):
     #costs_samp =-jnp.log(state_train.apply_fn({'params': params}, states)+1e-2)
     costs = (state_train.apply_fn({'params': params}, states)+1e-6).flatten()/N
     
-    return costs[0].astype(float)
+    return costs[0]
 
 jax.jit
 def apply_model(state_train, states, actions,states_expert,actions_expert,probs,probs_experts,UB=False):
