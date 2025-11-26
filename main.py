@@ -1,9 +1,41 @@
 # %%
+# Configure CUDA library paths for JAX - must be done BEFORE importing JAX
+import os
+import sys
+import glob
+
+# Set JAX environment variables
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+
+# Find and configure CUDA library paths from site-packages
+site_packages = None
+for path in sys.path:
+    if 'site-packages' in path and os.path.exists(os.path.join(path, 'nvidia')):
+        site_packages = path
+        break
+
+if site_packages:
+    nvidia_path = os.path.join(site_packages, 'nvidia')
+    subdirs = [d for d in os.listdir(nvidia_path) if os.path.isdir(os.path.join(nvidia_path, d))]
+
+    lib_paths = []
+    for subdir in subdirs:
+        lib_path = os.path.join(nvidia_path, subdir, 'lib')
+        if os.path.exists(lib_path):
+            lib_paths.append(lib_path)
+
+    if lib_paths:
+        existing_ld_path = os.environ.get('LD_LIBRARY_PATH', '')
+        new_ld_path = ':'.join(lib_paths)
+        if existing_ld_path:
+            new_ld_path = f"{new_ld_path}:{existing_ld_path}"
+        os.environ['LD_LIBRARY_PATH'] = new_ld_path
+
+# Now import the rest
 from flax.training import train_state,checkpoints
 
-import flax 
+import flax
 import optax
-import os
 import argparse
 import os.path as osp
 
