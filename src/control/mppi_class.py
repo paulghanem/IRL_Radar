@@ -7,6 +7,7 @@ import jax.numpy as jnp
 import jax.lax as lax
 from jax.random import multivariate_normal
 import functools
+import time
 
 from src.control.dynamics import kinematics,kinematics_mujoco
 from src.objective_fns.cost_to_go_fns import get_cost
@@ -716,8 +717,9 @@ class MPPI:
             new_carry = (next_state, key, prev_action_seq)
             outputs = (state, prob, action, r)
             return new_carry, outputs
-        
+
        # rollout_step_jit = jax.jit(rollout_step, static_argnums=(0,))
+
         (final_carry, traj) = lax.scan(
             rollout_step,
             (init_state, key, prev_action_seq0),
@@ -899,9 +901,11 @@ class MPPI:
         #brax_state0 = self.env_brax.reset(reset_keys[0])
 
 
-        
-      
-    
+
+
+        # Start timing the timesteps for loop
+        timesteps_start = time.time()
+
         for t in range(args.N_steps):
             #brax_state = brax_state0   # true Brax State
             #state = brax_state.obs  
@@ -987,7 +991,12 @@ class MPPI:
             # MOVE TO NEXT STATE
             # ---------------------------------------------------
             state = next_state
-    
+
+        # End timing and print
+        timesteps_end = time.time()
+        timesteps_duration = timesteps_end - timesteps_start
+        print(f"Timesteps for loop execution time: {timesteps_duration:.4f} seconds")
+
         # -----------------------------------
         # UPDATE WARM START AFTER ROLLOUT
         # -----------------------------------
