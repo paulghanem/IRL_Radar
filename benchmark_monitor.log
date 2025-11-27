@@ -1,0 +1,141 @@
+Monitoring benchmark jobs...
+
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:46:03)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:46:33)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:47:03)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:47:33)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:48:03)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:48:33)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:49:03)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:49:33)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:50:04)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:50:34)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: R
+Waiting... (18:51:04)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: R
+Job 36233171: ST
+Waiting... (18:51:34)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:52:04)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:52:34)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:53:04)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:53:34)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:54:04)
+Job 36233168: R
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:54:36)
+Job 36233168: ST
+Job 36233169: R
+Job 36233170: ST
+Job 36233171: ST
+Waiting... (18:55:06)
+Job 36233168: ST
+Job 36233169: R
+Waiting... (18:55:36)
+Job 36233168: ST
+Job 36233169: R
+Waiting... (18:56:06)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:56:36)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:57:06)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:57:36)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:58:07)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:58:37)
+Job 36233168: ST
+Job 36233169: ST
+Waiting... (18:59:07)
+Job 36233169: ST
+Waiting... (18:59:37)
+Job 36233169: ST
+Waiting... (19:00:07)
+
+All jobs completed! Checking results...
+JobID             State ExitCode    Elapsed 
+------------ ---------- -------- ---------- 
+36233168      COMPLETED      0:0   00:09:01 
+36233168.ba+  COMPLETED      0:0   00:09:01 
+36233168.ex+  COMPLETED      0:0   00:09:01 
+36233169      COMPLETED      0:0   00:10:17 
+36233169.ba+  COMPLETED      0:0   00:10:17 
+36233169.ex+  COMPLETED      0:0   00:10:17 
+36233170      COMPLETED      0:0   00:05:33 
+36233170.ba+  COMPLETED      0:0   00:05:33 
+36233170.ex+  COMPLETED      0:0   00:05:33 
+36233171      COMPLETED      0:0   00:05:04 
+36233171.ba+  COMPLETED      0:0   00:05:04 
+36233171.ex+  COMPLETED      0:0   00:05:04 

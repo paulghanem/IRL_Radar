@@ -1,0 +1,65 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p GPU-shared
+#SBATCH --gpus=h100-80:1
+#SBATCH -t 08:00:00
+
+#SBATCH --output=myjob.%j.out
+#SBATCH --error=myjob.%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ghanem.p@northeastern.edu
+
+echo "=========================================="
+echo "GPU Training Job Started"
+echo "=========================================="
+echo "Job ID: $SLURM_JOB_ID"
+echo "Node: $SLURM_NODELIST"
+echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
+echo "=========================================="
+
+# Load conda environment
+module load anaconda3/2024.10-1
+conda activate rirl
+
+# *** CRITICAL: GPU Environment Variables ***
+# These are required for JAX to work properly on GPU
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+export JAX_DISABLE_X64=1
+
+echo ""
+echo "Verifying GPU setup..."
+python -c "
+import jax
+print('JAX version:', jax.__version__)
+print('JAX devices:', jax.devices())
+print('Backend:', jax.default_backend())
+" 2>&1 | grep -v "cuFFT\|cuDNN\|cuBLAS"
+
+echo ""
+echo "=========================================="
+echo "Starting Training"
+echo "=========================================="
+
+# Run your training
+# You can use either MJX (faster) or Brax
+# The code will automatically use GPU acceleration
+python main.py \
+    --seed=$SEED \
+    --UB     \
+    --horizon=30 \
+    --N_steps=1000 \
+    --N_steps_expert=1000 \
+    --gym_env="HalfCheetah-v4" \
+    --lr=1e-4 \
+    --num_traj=2000\
+    --reward_fn_updates=15 \
+    --lambda_=0.01 \
+    --rirl_iterations=1000 \
+    --Q=1e-4 \
+    --P=1e-2 \
+    --hidden_dim=16
+
+echo ""
+echo "=========================================="
+echo "Training Complete"
+echo "=========================================="

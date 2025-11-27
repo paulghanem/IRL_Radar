@@ -1,0 +1,27 @@
+2025-11-26 13:16:32.595302: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764180992.617009  521658 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764180992.623874  521658 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-11-26 13:16:32.648732: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+============================================================
+Regenerating Walker2d Expert with Stable Baselines3
+============================================================
+NumPy version: 1.26.4
+
+Creating PPO model...
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+
+Training for 10M timesteps (this will take a while)...
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 18       |
+|    ep_rew_mean     | 0.000844 |
+| time/              |          |
+|    fps             | 1598     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------

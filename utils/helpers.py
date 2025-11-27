@@ -184,8 +184,8 @@ class GenerateDemo(object):
             base = osp.join(self.base,f"{env_name}.zip")
         else:
             if self.env_name =="Ant":
-                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=True),max_steps=max_frames)
-            else:  
+                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
+            else:
                 env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
            
             model=PPO("MlpPolicy", env,verbose=1)

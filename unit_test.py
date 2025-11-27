@@ -20,7 +20,7 @@ import pdb
 
 
 
-gym_env="Walker2d"
+gym_env="Hopper"
 max_frames=1
 
 mjx_model=None
@@ -125,26 +125,24 @@ def reward_fn(gym_env, state, action,next_state, mjx_data,dt,frame_skip):
         
     if gym_env == "Ant-v4":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-        alive_bonus=1
-        if next_state[2] <0.2 or next_state[2]>1:
-            alive_bonus=0
+        alive_bonus = 1.0
+        fall_cond = (next_state[2] < 0.2) | (next_state[2] > 1)
+        alive_bonus = jnp.where(fall_cond, 0.0, 1.0)
         ctrl_cost = 0.5 * jnp.sum(jnp.square(action))
-        r = forward_reward - ctrl_cost+alive_bonus
+        r = forward_reward - ctrl_cost + alive_bonus
         
         
     if gym_env == "Hopper":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-        alive_bonus=1
-        if any(x < -100 for x in next_state[2:]) or any(x > 100 for x in next_state[2:]):
-            alive_bonus=0
-           # break
-        if next_state[2] < -0.2  or next_state[2] > 0.2:
-            alive_bonus=0
-           # break 
-        if next_state[1] < 0.7:
-            alive_bonus=0
-            #break  
-       
+        alive_bonus = 1.0
+
+        # JAX-compatible fall condition checks
+        out_of_bounds = jnp.any((next_state[2:] < -100) | (next_state[2:] > 100))
+        bad_angle = (next_state[2] < -0.2) | (next_state[2] > 0.2)
+        bad_height = (next_state[1] < 0.7)
+        fall_cond = out_of_bounds | bad_angle | bad_height
+        alive_bonus = jnp.where(fall_cond, 0.0, 1.0)
+
         ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
         r = forward_reward - ctrl_cost + alive_bonus
         
@@ -170,14 +168,14 @@ def reward_fn(gym_env, state, action,next_state, mjx_data,dt,frame_skip):
         
     if gym_env == "Humanoid-v4":
         #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-        alive_bonus=5
-        if next_state[2] <1 or next_state[2]>2:
-            alive_bonus=0
+        alive_bonus = 5.0
+        fall_cond = (next_state[2] < 1) | (next_state[2] > 2)
+        alive_bonus = jnp.where(fall_cond, 0.0, 5.0)
         #pdb.set_trace()
         quad_impact_cost = 0.5e-6 * jnp.square(mjx_data.cfrc_ext).sum()
-        quad_impact_cost = min(quad_impact_cost, 10)
+        quad_impact_cost = jnp.minimum(quad_impact_cost, 10)
         ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
-        r = 1.25*forward_reward - ctrl_cost  + alive_bonus
+        r = 1.25*forward_reward - ctrl_cost + alive_bonus
            
     if gym_env == "Swimmer":   
         ctrl_cost = 1e-4 * jnp.sum(jnp.square(action))

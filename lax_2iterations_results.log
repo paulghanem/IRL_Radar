@@ -1,0 +1,17 @@
+======================================================================
+  LAX VERSION - 2 Iterations Detailed Analysis
+======================================================================
+
+Parameters:
+  N_steps: 100
+  horizon: 50
+  num_traj: 500
+  rirl_iterations: 2
+  Environment: Walker2d
+======================================================================
+
+Initializing policy...
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_lax_2iterations.py", line 51, in <module>
+    policy = PPOPolicy(args)
+TypeError: PPOPolicy.__init__() missing 6 required positional arguments: 'action_dim', 'mjx_model', 'dynamics', 'policy_model', 'policy_net', and 'args'

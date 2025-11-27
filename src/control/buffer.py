@@ -33,7 +33,9 @@ class SerializedBuffer:
         return self.states.shape[0]
 
     @classmethod
-    def load(cls, path: str, device=jax.devices("cpu")[0]) -> SerializedBuffer:
+    def load(cls, path: str, device=None) -> SerializedBuffer:
+        if device is None:
+            device = jax.devices()[0]
         """Load from torch file or npz (depending on how saved)."""
         import torch
         tmp = torch.load(path, map_location="cpu")

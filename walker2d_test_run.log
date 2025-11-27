@@ -1,0 +1,72 @@
+Monitoring for first Walker2d checkpoint: expert_agents/Walker2d/PPO_200000_steps.zip
+Will run test with N_steps=5, horizon=5, num_traj=5 once checkpoint appears
+
+15:14:25 - Waiting for checkpoint...
+15:14:55 - Waiting for checkpoint...
+15:15:25 - Waiting for checkpoint...
+15:15:55 - Waiting for checkpoint...
+15:16:25 - Waiting for checkpoint...
+15:16:55 - Waiting for checkpoint...
+15:17:25 - Waiting for checkpoint...
+15:17:55 - Waiting for checkpoint...
+15:18:25 - Waiting for checkpoint...
+15:18:55 - Waiting for checkpoint...
+
+==========================================
+Checkpoint detected at Wed Nov 26 15:18:55 EST 2025
+==========================================
+
+Running Walker2d test on CPU with first checkpoint...
+2025-11-26 15:19:03.286484: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764188343.443587 2366341 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764188343.499220 2366341 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+ERROR:2025-11-26 15:19:15,391:jax._src.xla_bridge:444: Jax plugin configuration error: Exception when calling jax_plugins.xla_cuda12.initialize()
+Traceback (most recent call last):
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax/_src/xla_bridge.py", line 442, in discover_pjrt_plugins
+    plugin_module.initialize()
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax_plugins/xla_cuda12/__init__.py", line 324, in initialize
+    _check_cuda_versions(raise_on_first_error=True)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax_plugins/xla_cuda12/__init__.py", line 281, in _check_cuda_versions
+    local_device_count = cuda_versions.cuda_device_count()
+RuntimeError: jaxlib/cuda/versions_helpers.cc:113: operation cuInit(0) failed: Unknown CUDA error 303; cuGetErrorName failed. This probably means that JAX was unable to load the CUDA libraries.
+ERROR:jax._src.xla_bridge:Jax plugin configuration error: Exception when calling jax_plugins.xla_cuda12.initialize()
+Traceback (most recent call last):
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax/_src/xla_bridge.py", line 442, in discover_pjrt_plugins
+    plugin_module.initialize()
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax_plugins/xla_cuda12/__init__.py", line 324, in initialize
+    _check_cuda_versions(raise_on_first_error=True)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax_plugins/xla_cuda12/__init__.py", line 281, in _check_cuda_versions
+    local_device_count = cuda_versions.cuda_device_count()
+RuntimeError: jaxlib/cuda/versions_helpers.cc:113: operation cuInit(0) failed: Unknown CUDA error 303; cuGetErrorName failed. This probably means that JAX was unable to load the CUDA libraries.
+/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/gymnasium/envs/registration.py:521: UserWarning: [33mWARN: Using the latest versioned environment `Walker2d-v4` instead of the unversioned environment `Walker2d`.[0m
+  logger.warn(
+[CpuDevice(id=0)]
+Using AIRL:  False
+Using GAIL:  False
+Using RGCL:  False
+Experiment State @  2025-11-26 15:19:23.295035-05:00
+Experiment Saved @  results/experiment_123
+Experiment Settings Saved @  results/experiment_123
+123
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/main.py", line 305, in <module>
+    states_d,actions_d,rewards_demo,env = demo_generator.generate_demo(args.seed)
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/utils/helpers.py", line 164, in generate_demo
+    states,actions,rewards,env = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/utils/helpers.py", line 194, in generate_gymnasium_demo
+    model = model.load(base, env,device)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/base_class.py", line 680, in load
+    data, params, pytorch_variables = load_from_zip_file(
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/save_util.py", line 434, in load_from_zip_file
+    data = json_to_data(json_data, custom_objects=custom_objects)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/save_util.py", line 165, in json_to_data
+    deserialized_object = cloudpickle.loads(base64_object)
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+
+==========================================
+Test complete at Wed Nov 26 15:19:30 EST 2025
+==========================================

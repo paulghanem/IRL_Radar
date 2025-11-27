@@ -1,0 +1,2 @@
+salloc: error: QOSMaxSubmitJobPerUserLimit
+salloc: error: Job submit/allocate failed: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)

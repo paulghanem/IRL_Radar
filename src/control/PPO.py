@@ -268,8 +268,8 @@ class PPOPolicy():
             logp=self.calculate_log_pi(log_std, noise, action)
             
             #state=kinematics_mujoco(self.mjx_model,self.mjx_data,state,action,self._dynamics,self.gym_env)
-            state=jnp.array(state,dtype=jnp.float64)
-            action=jnp.array(action,dtype=jnp.float64)
+            state=jnp.array(state)
+            action=jnp.array(action)
             next_state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action.reshape((1,-1)),self._dynamics,self.gym_env,frame_skip=frame_skip).flatten()
           
            

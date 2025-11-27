@@ -1,0 +1,5 @@
+========================================
+Attempting to run Walker2d on H100 via srun
+========================================
+srun: error: Slurm job 36211558 has expired
+srun: Check SLURM_JOB_ID environment variable. Expired or invalid job 36211558

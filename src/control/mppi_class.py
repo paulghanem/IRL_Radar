@@ -299,12 +299,10 @@ class MPPI:
                 st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
             initial_state = jnp.tile(st, (self._num_samples, 1))
             #pdb.set_trace()
-            start = time.time()
+            # Note: timing removed - incompatible with lax.scan tracing
             state_seq_batch = jax.vmap(
                 kinematics_mujoco, in_axes=(None, None, 0, 0, None,None)
             )(self.mjx_model, self.mjx_data, initial_state, perturbed_action_seqs, self.gym_env,frame_skip)
-            end = time.time()
-            print(f"Execution time_forward(s): {end - start:.4f} seconds")
             #pdb.set_trace()
             initial_state = initial_state.reshape((initial_state.shape[0], 1, initial_state.shape[1]))
             state_seq_batch = jnp.concatenate((initial_state, state_seq_batch), axis=1)
@@ -336,13 +334,8 @@ class MPPI:
             total_costs = -jnp.log(D)
     
         # weights and optimal control
-        start = time.time()
-        
-        total_costs = total_costs.block_until_ready()
-        
+        # Note: timing and block_until_ready() removed - incompatible with lax.scan tracing
         weights = jax.nn.softmax(-total_costs / self._lambda, axis=0)
-        end = time.time()
-        print(f"Execution time_softmax(s): {end - start:.4f} seconds")
         optimal_action_seq = jnp.sum(
             weights.reshape(self._num_samples, 1, 1) * perturbed_action_seqs,
             axis=0,
@@ -522,8 +515,8 @@ class MPPI:
             initial_state=state
             if self.gym_env in ["Ant"]:
                 initial_state=jnp.concat((jnp.reshape(self.mjx_data.qpos[0:2],(2,)),state))
-            initial_state=jnp.array(initial_state.reshape((1,-1)),dtype=jnp.float64)
-            action_seqs=jnp.array(action_seqs,dtype=jnp.float64)
+            initial_state=jnp.array(initial_state.reshape((1,-1)))
+            action_seqs=jnp.array(action_seqs)
             
             state_seqs=jax.vmap(kinematics_mujoco,in_axes=(None,None,0,0,None,None))(self.mjx_model,self.mjx_data,initial_state,action_seqs,self.gym_env,frame_skip)
             state_seqs= jnp.concatenate((jnp.tile(initial_state,(1,1,1)), state_seqs), axis=1)
@@ -606,17 +599,20 @@ class MPPI:
             
         if gym_env == "Hopper":
             #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-            alive_bonus=1
-            if any(x < -100 for x in next_state[2:]) or any(x > 100 for x in next_state[2:]):
-                alive_bonus=0
-               # break
-            if next_state[2] < -0.2  or next_state[2] > 0.2:
-                alive_bonus=0
-               # break 
-            if next_state[1] < 0.7:
-                alive_bonus=0
-                #break  
-           
+            alive_bonus = 1.0
+
+            # JAX-compatible fall condition checks
+            # Check if any state values are out of bounds [-100, 100]
+            out_of_bounds = jnp.any((next_state[2:] < -100) | (next_state[2:] > 100))
+            # Check angle constraint
+            bad_angle = (next_state[2] < -0.2) | (next_state[2] > 0.2)
+            # Check height constraint
+            bad_height = (next_state[1] < 0.7)
+            # Combine all fall conditions
+            fall_cond = out_of_bounds | bad_angle | bad_height
+            # Set alive_bonus to 0 if any fall condition is true
+            alive_bonus = jnp.where(fall_cond, 0.0, 1.0)
+
             ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
             r = forward_reward - ctrl_cost + alive_bonus
             
@@ -798,7 +794,7 @@ class MPPI:
             if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
                 next_state = kinematics_mujoco(
                     self.mjx_model, self.mjx_data, state, action.reshape(1,-1),
-                    self._dynamics, self.gym_env,frame_skip=frame_skip
+                    self.gym_env, frame_skip=frame_skip
                 ).reshape(-1)
             else:
                 next_state = self._dynamics(state, action).reshape(-1)
@@ -882,12 +878,13 @@ class MPPI:
             env_state = self.env.reset(seed=args.seed)
     
         # -----------------------------
-        # Buffers for trajectory
+        # Buffers for trajectory (PRE-ALLOCATED JAX ARRAYS)
         # -----------------------------
-        states_buf = []
-        probs_buf = []
-        actions_buf = []
-        rewards_buf = []
+        # Pre-allocate arrays on GPU instead of Python lists
+        states_buf = jnp.zeros((args.N_steps, args.s_dim))
+        probs_buf = jnp.zeros((args.N_steps, 1))
+        actions_buf = jnp.zeros((args.N_steps, args.a_dim))
+        rewards_buf = jnp.zeros((args.N_steps,))
     
         # -----------------------------
         # LOOP ROLLOUT (replaces lax.scan)
@@ -976,12 +973,12 @@ class MPPI:
             r = self.reward_fn(env, state, action, next_state, self.mjx_data, dt, frame_skip)
     
             # ---------------------------------------------------
-            # SAVE STEP
+            # SAVE STEP (USE JAX ARRAY INDEXING - STAYS ON GPU)
             # ---------------------------------------------------
-            states_buf.append(state)
-            actions_buf.append(action)
-            probs_buf.append(prob)
-            rewards_buf.append(r)
+            states_buf = states_buf.at[t].set(state)
+            actions_buf = actions_buf.at[t].set(action)
+            probs_buf = probs_buf.at[t].set(prob)
+            rewards_buf = rewards_buf.at[t].set(r)
     
             # ---------------------------------------------------
             # MOVE TO NEXT STATE
@@ -995,14 +992,14 @@ class MPPI:
         self.reset()
     
         # -----------------------------------
-        # Convert to arrays and return
+        # Return arrays (KEEP ON GPU, NO .tolist())
         # -----------------------------------
-        total_reward = jnp.sum(jnp.array(rewards_buf))
-    
+        total_reward = jnp.sum(rewards_buf)
+
         return (
-            jnp.array(states_buf).tolist(),
-            jnp.array(probs_buf).tolist(),
-            jnp.array(actions_buf).tolist(),
+            states_buf.tolist(),
+            probs_buf.tolist(),
+            actions_buf.tolist(),
             float(total_reward),
         )
     
