@@ -1,0 +1,34 @@
+# Job output files
+*.out
+*.err
+
+# Result files
+results/
+
+# Logs
+logs_*/
+
+# Temporary test files
+test_learning_*
+test_simple_walker2d_cpu_*
+test_simple_walker2d_gcl_*
+test_simple_walker2d_rgcl_*
+test_simple_walker2d_gpu_*
+simple_gcl_*
+simple_rgcl_*
+simple_walker_gpu_*
+simple_walker_direct_*
+simple_walker_ppo_*
+
+# Expert demo files (keep the generation script, but ignore generated files)
+expert_demo_*.npz
+
+# Compiled Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+

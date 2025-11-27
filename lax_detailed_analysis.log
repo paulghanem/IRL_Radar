@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_lax_detailed.py", line 13, in <module>
-    from src.utils.run_config import get_args
-  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/./src/utils.py", line 12, in <module>
-    from src.FIM_new.FIM_RADAR import FIM_Visualization,FIM_Visualization_NN
-ModuleNotFoundError: No module named 'src.FIM_new'
