@@ -1,0 +1,56 @@
+==========================================
+Direct GPU Test - Simplified Walker2d
+==========================================
+Start time: Thu Nov 27 14:26:53 EST 2025
+Node: v006.ib.bridges2.psc.edu
+
+Thu Nov 27 14:26:53 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.03              Driver Version: 560.35.03      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla V100-SXM2-32GB           On  |   00000000:B3:00.0 Off |                    0 |
+| N/A   28C    P0             39W /  300W |       1MiB /  32768MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+Testing JAX GPU availability...
+JAX version: 0.6.2
+JAX devices: [CudaDevice(id=0)]
+Backend: gpu
+
+==========================================
+Testing Simple Walker2d Dynamics
+==========================================
+
+JAX Backend: gpu
+JAX Devices: [CudaDevice(id=0)]
+
+Test 1: Single 1000-step trajectory
+  Time: 0.2674s (0.27ms per step)
+  Total reward: 9897.30
+  Final x position: 88.99
+
+Test 2: Vectorized execution (500 parallel trajectories, 100 steps each)
+  Time: 0.0561s
+  Total steps: 50000
+  Steps per second: 891142
+  Time per step: 0.0011ms
+
+==================================================
+GPU TEST SUCCESSFUL!
+==================================================
+
+End time: Thu Nov 27 14:26:58 EST 2025
+==========================================

@@ -1,0 +1,22 @@
+2025-11-27 13:27:55.708900: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764268075.832883   67390 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764268075.878493   67390 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_simple_walker2d.py", line 352, in <module>
+    main()
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_simple_walker2d.py", line 234, in main
+    r = simple_walker2d_reward(states[i], actions[i], states[i+1])
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/src/control/simple_walker2d.py", line 138, in simple_walker2d_reward
+    ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax/_src/numpy/ufuncs.py", line 3229, in square
+    x = ensure_arraylike("square", x)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax/_src/numpy/util.py", line 155, in ensure_arraylike
+    check_arraylike(fun_name, *args)
+  File "/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/jax/_src/numpy/util.py", line 181, in check_arraylike
+    raise TypeError(msg.format(fun_name, type(arg), pos))
+TypeError: square requires ndarray or scalar arguments, got <class 'list'> at position 0.

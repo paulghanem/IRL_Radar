@@ -1,0 +1,49 @@
+==========================================
+Simple Walker2d GCL - Horizon 20 - Seed 126
+horizon=20, num_traj=1000, 1000 iterations
+Started at: Thu Nov 27 04:16:22 EST 2025
+==========================================
+================================================================================
+SIMPLIFIED WALKER2D TEST - GCL
+================================================================================
+Method: GCL
+Horizon: 20, Trajectories: 1000
+N_steps: 1000, Iterations: 1000
+Q: 0.001, P: 0.01
+================================================================================
+Initializing reward model...
+
+================================================================================
+RUNNING GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Testing GCL with generate_session_lax...
+Warmup run (includes JIT compilation)...
+Warmup completed: 0.99 seconds
+
+Running 1000 iterations...
+Iteration 100/1000: Avg Time=0.7729s, Avg Reward=1079.51
+Iteration 200/1000: Avg Time=0.7763s, Avg Reward=1079.51
+Iteration 300/1000: Avg Time=0.7777s, Avg Reward=1079.51
+Iteration 400/1000: Avg Time=0.7847s, Avg Reward=1079.51
+Iteration 500/1000: Avg Time=0.7827s, Avg Reward=1079.51
+Iteration 600/1000: Avg Time=0.7856s, Avg Reward=1079.51
+Iteration 700/1000: Avg Time=0.7853s, Avg Reward=1079.51
+Iteration 800/1000: Avg Time=0.7949s, Avg Reward=1079.51
+Iteration 900/1000: Avg Time=0.7929s, Avg Reward=1079.51
+Iteration 1000/1000: Avg Time=0.8024s, Avg Reward=1079.51
+
+================================================================================
+RESULTS - GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Total time: 785.53 seconds (0.22 hours)
+Average time per iteration: 0.7855 seconds
+Average reward (all iterations): 1079.51
+Final reward (last 100 iterations): 1079.51
+Time per step (avg): 0.0008 seconds
+================================================================================
+
+Results saved to simple_walker2d_gcl_seed126_results.txt
+================================================================================
+==========================================
+Completed at: Thu Nov 27 04:29:45 EST 2025
+==========================================

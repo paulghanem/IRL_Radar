@@ -1,0 +1,39 @@
+==========================================
+GPU TEST - Simplified Walker2d GCL
+1 iteration, 100 steps
+Started at: Thu Nov 27 02:08:34 EST 2025
+==========================================
+================================================================================
+SIMPLIFIED WALKER2D TEST - GCL
+================================================================================
+Method: GCL
+Horizon: 50, Trajectories: 500
+N_steps: 100, Iterations: 1
+Q: 1e-05, P: 0.01
+================================================================================
+Initializing reward model...
+
+================================================================================
+RUNNING GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Testing GCL with generate_session_lax...
+Warmup run (includes JIT compilation)...
+Warmup completed: 1.02 seconds
+
+Running 1 iterations...
+
+================================================================================
+RESULTS - GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Total time: 0.76 seconds (0.00 hours)
+Average time per iteration: 0.7599 seconds
+Average reward (all iterations): 102.64
+Final reward (last 100 iterations): 1.03
+Time per step (avg): 0.0076 seconds
+================================================================================
+
+Results saved to simple_walker2d_gcl_results.txt
+================================================================================
+==========================================
+Completed at: Thu Nov 27 02:08:56 EST 2025
+==========================================

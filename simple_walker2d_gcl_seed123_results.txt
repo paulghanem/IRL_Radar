@@ -1,0 +1,22 @@
+Method: GCL
+Parameters: horizon=20, num_traj=500
+N_steps=100, iterations=10
+Q=0.001, P=0.01
+
+Total time: 16.70 seconds (0.00 hours)
+Average time per iteration: 1.6701 seconds
+Average reward (all iterations): 100.03
+Final reward (last 100 iterations): 10.00
+Time per step (avg): 0.0167 seconds
+
+Iteration-by-iteration data:
+1,4.1681,100.03
+2,1.3775,100.03
+3,1.3850,100.03
+4,1.3958,100.03
+5,1.3911,100.03
+6,1.3946,100.03
+7,1.3942,100.03
+8,1.3913,100.03
+9,1.4003,100.03
+10,1.4026,100.03

@@ -1,0 +1,40 @@
+==========================================
+Quick Test: GCL with Learning (10 iterations)
+Started at: Thu Nov 27 13:30:07 EST 2025
+==========================================
+================================================================================
+SIMPLIFIED WALKER2D TEST - GCL
+================================================================================
+Method: GCL
+Horizon: 20, Trajectories: 500
+N_steps: 100, Iterations: 10
+Q: 0.001, P: 0.01
+================================================================================
+Generating expert demonstrations...
+Expert trajectory generated. Total expert reward: 220.84
+Initializing reward model...
+
+================================================================================
+RUNNING GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Testing GCL with generate_session_lax...
+Warmup run (includes JIT compilation)...
+Warmup completed: 1.40 seconds
+
+Running 10 iterations with reward function updates...
+
+================================================================================
+RESULTS - GCL WITH SIMPLIFIED WALKER2D
+================================================================================
+Total time: 18.41 seconds (0.01 hours)
+Average time per iteration: 1.8408 seconds
+Average reward (all iterations): 100.03
+Final reward (last 100 iterations): 10.00
+Time per step (avg): 0.0184 seconds
+================================================================================
+
+Results saved to simple_walker2d_gcl_seed123_results.txt
+================================================================================
+==========================================
+Completed at: Thu Nov 27 13:30:38 EST 2025
+==========================================
