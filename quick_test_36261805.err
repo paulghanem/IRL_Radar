@@ -1,0 +1,12 @@
+2025-11-27 15:36:57.340172: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764275817.458515   99389 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764275817.500735   99389 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_simple_walker_quick.py", line 233, in <module>
+    main()
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_simple_walker_quick.py", line 158, in main
+    states_warm, probs_warm, actions_warm, rewards_warm = mppi.generate_session_lax(
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/src/control/mppi_class.py", line 662, in generate_session_lax
+    dt=args.dt
+AttributeError: 'Namespace' object has no attribute 'dt'

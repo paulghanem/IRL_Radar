@@ -1,0 +1,43 @@
+
+==========================================
+ALL JOBS COMPLETED: Thu Nov 27 16:35:57 EST 2025
+==========================================
+==========================================
+FULL TRAINING RESULTS SUMMARY
+==========================================
+Generated at: Thu Nov 27 16:35:57 EST 2025
+
+Configuration:
+  - Iterations: 1000
+  - N_steps: 1000
+  - Horizon: 50
+  - Num trajectories: 2000
+  - Lambda: 0.01
+  - Learning rate: 1e-4
+  - Hidden dim: 64
+  - Sigma: 0.0
+  - Expert reward: 210.76
+
+==========================================
+
+=== SEED 123 ===
+
+  Last 3 iterations:
+
+=== SEED 124 ===
+
+  Last 3 iterations:
+
+=== SEED 125 ===
+
+  Last 3 iterations:
+
+=== SEED 126 ===
+
+  Last 3 iterations:
+
+==========================================
+Cross-seed statistics (when all complete):
+==========================================
+
+==========================================

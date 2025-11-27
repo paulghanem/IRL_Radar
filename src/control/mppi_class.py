@@ -548,7 +548,7 @@ class MPPI:
         return pdf
     def reward_fn(self,gym_env, state, action,next_state, mjx_data,dt,frame_skip):
         forward_reward=(next_state[0]-state[0])/(dt*frame_skip)
-       
+
         if gym_env == "CartPole-v1":
             x=next_state[0]
             x_threshold=2.4
@@ -619,19 +619,19 @@ class MPPI:
             
         if gym_env == "Walker2d":
             alive_bonus = 1.0
-        
+
             # JAX boolean: True when robot falls
             fall_cond = (
                 (jnp.abs(next_state[2]) > 1.0) |
                 (next_state[1] < 0.8) |
                 (next_state[1] > 2.0)
             )
-        
+
             # If fall_cond is True → alive_bonus = 0
             alive_bonus = jnp.where(fall_cond, 0.0, alive_bonus)
-        
+
             ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
-        
+
             r = forward_reward - ctrl_cost + alive_bonus
 
             
@@ -647,11 +647,10 @@ class MPPI:
             ctrl_cost = 0.1 * jnp.sum(jnp.square(action))
             r = 1.25*forward_reward - ctrl_cost  + alive_bonus
                
-        if gym_env == "Swimmer":   
+        if gym_env == "Swimmer":
             ctrl_cost = 1e-4 * jnp.sum(jnp.square(action))
             r = forward_reward - ctrl_cost
-            
-            
+
         return r
     
 
@@ -668,13 +667,13 @@ class MPPI:
     
         # Take the *current* previous_action_seq once, outside trace:
         prev_action_seq0 = self._previous_action_seq  # OK to read outside
-        env=args.gym_env     
+        env=args.gym_env
         if env=="CartPole-v1" or env=="Pendulum-v1" or env=="MountainCarContinuous-v0":
             self.env, self.env_params = gymnax.make(env)
             _, rng_reset = jax.random.split(key)
             env_state = self.env.reset(rng_reset, self.env_params)
         elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
-            
+
             self.mjx_data = self.reset_mjx_state(self.mjx_model,key=key)
         else:
             #env = gym.make(env)
