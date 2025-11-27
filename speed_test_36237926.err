@@ -1,0 +1,20 @@
+2025-11-26 23:53:05.481724: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764219185.621347   66292 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764219185.678231   66292 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_speed_optimization.py", line 173, in <module>
+    main()
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_speed_optimization.py", line 61, in main
+    mj_model = mj.MjModel.from_xml_path(xml_path)
+ValueError: ParseXML: Error opening file '/ocean/projects/cis250114p/pghanem/IRL_Radar_big/mujoco_menagerie/walker2d/walker2d.xml': No such file or directory
+2025-11-26 23:53:13.413752: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764219193.432710   66327 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764219193.438589   66327 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Traceback (most recent call last):
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_speed_optimization.py", line 173, in <module>
+    main()
+  File "/ocean/projects/cis250114p/pghanem/IRL_Radar_big/test_speed_optimization.py", line 61, in main
+    mj_model = mj.MjModel.from_xml_path(xml_path)
+ValueError: ParseXML: Error opening file '/ocean/projects/cis250114p/pghanem/IRL_Radar_big/mujoco_menagerie/walker2d/walker2d.xml': No such file or directory

@@ -1,0 +1,18 @@
+=== Walker2d RGCL Experiment on V100-32 GPU (horizon=5) ===
+Method: RGCL
+Seed: 124
+Horizon: 5
+Node: v021
+CUDA_VISIBLE_DEVICES: 0
+
+✓ CUDA 12.4.0 module loaded
+✓ Conda environment activated
+
+Configuring CUDA library paths...
+Found nvidia in site-packages: /jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/nvidia
+✓ Added nvidia library paths to LD_LIBRARY_PATH
+✓ JAX configured for GPU
+
+Starting experiment...
+==========================================
+
