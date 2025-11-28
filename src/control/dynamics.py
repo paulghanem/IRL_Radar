@@ -348,3 +348,105 @@ def kinematics_simplified_walker(mjx_model, mjx_data, init_state, actions, gym_e
 
 
 # This is the FAST batched version (adapted from the first code block)
+
+@partial(jax.jit, static_argnames=("gym_env", "frame_skip"))
+def kinematics_mujoco_original(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
+    """
+    Functional MJX rollout with lax.scan.
+
+    Args:
+        mjx_model: mjx.Model
+        mjx_data:  mjx.Data  (initial data, e.g. from reset_mjx_state)
+        init_state: (s_dim,) or (batch, s_dim) array of [qpos, qvel]
+        actions: (T, a_dim) or (T, batch, a_dim) array
+        gym_env: env name (static, unused except for API consistency)
+        frame_skip: int, number of mjx.step calls per RL step (static)
+
+    Returns:
+        states: (T, s_dim) or (T, batch, s_dim) array of [qpos, qvel]
+    """
+
+    # Ensure init_state is used only once: set qpos/qvel at t=0
+    def _init_from_state(mjx_data, state):
+        return mjx_data.replace(
+            qpos=state[..., : mjx_model.nq],
+            qvel=state[..., mjx_model.nq : mjx_model.nq + mjx_model.nv],
+        )
+
+    mjx_data = _init_from_state(mjx_data, init_state)
+
+    def one_step(carry_data, action_t):
+        """
+        carry_data: mjx.Data at time t
+        action_t: action at time t
+        """
+
+        def substep(d, _):
+            # Set control, step physics once
+            d = d.replace(ctrl=action_t)
+            d = mjx.step(mjx_model, d)
+            return d, None
+
+        # Perform frame_skip internal physics steps
+        carry_data, _ = lax.scan(substep, carry_data, xs=None, length=frame_skip)
+
+        # Observation = [qpos, qvel]
+        obs_t = jnp.concatenate([carry_data.qpos, carry_data.qvel], axis=-1)
+        return carry_data, obs_t
+
+    # Scan over time dimension
+    _, states = lax.scan(one_step, mjx_data, actions)
+    return states
+
+
+def kinematics_simplified_walker(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
+    """
+    Simplified Walker2d dynamics rollout with lax.scan interface matching kinematics_mujoco.
+
+    Args:
+        mjx_model: Unused (for interface compatibility)
+        mjx_data: Unused (for interface compatibility)
+        init_state: (s_dim,) or (batch, s_dim) array - initial state
+        actions: (T, a_dim) or (T, batch, a_dim) array - action sequence
+        gym_env: env name (static, for interface compatibility)
+        frame_skip: int, number of physics steps per action (default 4)
+
+    Returns:
+        states: (T, s_dim) or (T, batch, s_dim) array of next states
+    """
+    from src.control.simplified_walker import SimplifiedWalker
+
+    # Create SimplifiedWalker instance
+    walker = SimplifiedWalker(dt=0.002, frame_skip=frame_skip)
+
+    # Handle both single and batched actions
+    def one_step(state, action):
+        """
+        state: current state (s_dim,)
+        action: action at time t (a_dim,)
+        """
+        next_state = walker.step(state, action)
+        return next_state, next_state
+
+    # Scan over time dimension
+    # actions shape: (T, a_dim) or (T, batch, a_dim)
+    # init_state shape: (s_dim,) or (batch, s_dim)
+
+    if actions.ndim == 3:
+        # Batched: (T, batch, a_dim)
+        # Need to vmap over batch dimension
+        def batched_step(state_batch, action_batch):
+            # state_batch: (batch, s_dim)
+            # action_batch: (batch, a_dim)
+            next_states = jax.vmap(walker.step)(state_batch, action_batch)
+            return next_states, next_states
+
+        _, states = lax.scan(batched_step, init_state, actions)
+    else:
+        # Single: (T, a_dim)
+        _, states = lax.scan(one_step, init_state, actions)
+
+    return states
+
+
+# This is the FAST batched version (adapted from the first code block)

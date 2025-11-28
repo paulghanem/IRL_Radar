@@ -3,7 +3,17 @@
     "allow": [
       "Bash(python main.py:*)",
       "Bash(C:/Users/siliconsynapse/anaconda3/envs/rirl/python.exe:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(dir /b \"C:\\Users\\siliconsynapse\\Desktop\\IRL_Radar\\gail-airl-ppo.pytorch\\gail_airl_ppo\")",
+      "Bash(dir /b \"C:\\Users\\siliconsynapse\\Desktop\\IRL_Radar\\gail-airl-ppo.pytorch\\gail_airl_ppo\\algo\")",
+      "Bash(dir /b \"C:\\Users\\siliconsynapse\\Desktop\\IRL_Radar\\gail-airl-ppo.pytorch\\gail_airl_ppo\\network\")",
+      "Bash(dir /b \"C:\\Users\\siliconsynapse\\Desktop\\IRL_Radar\\gail-airl-ppo.pytorch\")",
+      "Bash(tree:*)",
+      "Bash(python:*)",
+      "Bash(timeout 60 \"C:/Users/siliconsynapse/anaconda3/envs/rirl/python.exe\" test_ppo_simple.py)",
+      "Bash(timeout 300 \"C:/Users/siliconsynapse/anaconda3/envs/rirl/python.exe\":*)",
+      "Bash(dir:*)",
+      "Bash(where:*)"
     ],
     "deny": [],
     "ask": []

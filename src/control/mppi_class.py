@@ -8,7 +8,7 @@ import jax.lax as lax
 from jax.random import multivariate_normal
 import functools
 
-from src.control.dynamics import kinematics,kinematics_mujoco
+from src.control.dynamics import kinematics,kinematics_mujoco,kinematics_mujoco_original
 from src.objective_fns.cost_to_go_fns import get_cost
 from cost_jax import get_gradients,get_hessian,get_hessian_diag,get_precond,fisher_diag
 
@@ -692,7 +692,7 @@ class MPPI:
             # ---- Dynamics update ----
             forward_reward = 0.0
             if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
-                  next_state = kinematics_mujoco(
+                  next_state = kinematics_mujoco_original(
                     self.mjx_model, self.mjx_data, state.flatten(),
                     action_seq[0, :].reshape((1, -1)), self.gym_env,frame_skip=frame_skip
                 ).flatten()

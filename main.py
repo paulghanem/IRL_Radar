@@ -62,11 +62,15 @@ from src.objective_fns.cost_to_go_fns import get_cost
 from src.control.dynamics import get_state
 from src.control.mppi_class import MPPI
 from src.control.PPO import PPOPolicy,policy_model
+from src.control.PPO_unified import UnifiedPPO
 from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 
 from utils.helpers import GenerateDemo
 
 import gymnax
+from src.control.dynamics import kinematics_simplified_walker
+import src.control.mppi_class as mppi_module
+mppi_module.kinematics_mujoco = kinematics_simplified_walker
 #from brax import envs
 # Redirect NumPy 2.x paths to NumPy 1.x
 #sys.modules["numpy._core"] = np.core
@@ -100,10 +104,10 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
 parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=9,type=int,help="The number of epoch updates")
-parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
-parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
+parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
+parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
+parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
+parser.add_argument("--lambda_",default=0.1,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=10,type=int,help="The number of runs")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
@@ -123,7 +127,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -370,24 +374,49 @@ for runs in range (args.runs):
             # params['Dense_0']['kernel']=jnp.identity(params['Dense_0']['kernel'].shape[0])
             tx = optax.adam(learning_rate=args.lr)
             state_train = train_state.TrainState.create(apply_fn=cost_f.apply, params=params, tx=tx)
-            policy = MPPI(
-                state_train=state_train,
-                horizon=args.horizon,
-                num_samples=args.num_traj,
-                # subiterations=args.MPPI_iterations,
-                dim_state=args.s_dim,
-                dim_control=args.a_dim,
-                dynamics=get_step_model(args.gym_env,env),
-                cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
-                u_min=u_min,
-                u_max=u_max,
-                sigmas=cov_scaler,
-                lambda_=args.lambda_,
-                env=env,
-                mjx_model=mjx_model,
-                gym_env=args.gym_env,
-                use_mujoco=True
-            )
+
+            # Create policy based on args.PPO flag
+            if args.PPO:
+                # Use PPO instead of MPPI
+                print("Using UnifiedPPO policy for IRL...")
+                dynamics = get_step_model(args.gym_env, env)
+                policy = UnifiedPPO(
+                    state_dim=args.s_dim,
+                    action_dim=args.a_dim,
+                    args=args,
+                    state_train=state_train,  # Cost function for IRL (passed but not used for rewards)
+                    dynamics=dynamics,
+                    mjx_model=mjx_model,
+                    gym_env=args.gym_env,
+                    hidden_dim=256,
+                    lr_actor=3e-4,
+                    lr_critic=1e-3,
+                    rollout_length=args.N_steps,
+                    buffer_mix=20,
+                    use_learned_cost=False  # Always use true environment rewards for PPO training
+                )
+            else:
+                # Use MPPI (default)
+                print("Using MPPI policy for IRL...")
+                policy = MPPI(
+                    state_train=state_train,
+                    horizon=args.horizon,
+                    num_samples=args.num_traj,
+                    # subiterations=args.MPPI_iterations,
+                    dim_state=args.s_dim,
+                    dim_control=args.a_dim,
+                   # dynamics=get_step_model(args.gym_env,env),
+                    dynamics=None,
+                    cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
+                    u_min=u_min,
+                    u_max=u_max,
+                    sigmas=cov_scaler,
+                    lambda_=args.lambda_,
+                    env=env,
+                    mjx_model=mjx_model,
+                    gym_env=args.gym_env,
+                    use_mujoco=True
+                )
                
             D_demo=np.array([])
         
@@ -424,38 +453,21 @@ for runs in range (args.runs):
             state_train=trajs[0][-1]
             total_cost=rewards
         else:
-            
-            if args.PPO:
-                trajs = [policy.generate_session(args,D_demo)]
-                rewards=trajs[0][-2]
-                total_cost=rewards
-                sample_trajs = [trajs[0][:-2]] #+ sample_trajs
-                log_probs_old=trajs[0][-1]
-                #sample_trajs = demo_trajs + sample_trajs
-                D_samp=np.array([])
-                D_samp = preprocess_traj(trajs, D_samp)
-                
-            else:
-                start = time.time()
-                #trajs = [policy.generate_session(args,state_train,initial_state,D_demo,thetas)]
-                #trajs=[policy.generate_session_lax(args,state_train,D_demo)]
-                trajs=[policy.generate_session_loop(args,state_train,D_demo)]
-                end = time.time()
-                
+            # Both PPO and MPPI use generate_session_lax with same interface
+            start = time.time()
+            trajs=[policy.generate_session_lax(args,state_train,D_demo)]
+            end = time.time()
 
-               
-                
-                
-                rewards=trajs[0][-1]
-               
-                print(f"Execution time: {end - start:.4f} seconds,Total True Reward = {rewards:.4f}")
-                
-                total_cost=rewards
-                sample_trajs = [trajs[0][:-1]] #+ sample_trajs
-                #sample_trajs = demo_trajs + sample_trajs
-                D_samp=np.array([])
-                D_samp = preprocess_traj(trajs, D_samp)
-               # print(steps,f"rewards: {rewards:.4f} ")
+            rewards=trajs[0][-1]
+
+            print(f"Execution time: {end - start:.4f} seconds,Total True Reward = {rewards:.4f}")
+
+            total_cost=rewards
+            sample_trajs = [trajs[0][:-1]] #+ sample_trajs
+            #sample_trajs = demo_trajs + sample_trajs
+            D_samp=np.array([])
+            D_samp = preprocess_traj(trajs, D_samp)
+           # print(steps,f"rewards: {rewards:.4f} ")
         
         #D_samp = D_demo
         
@@ -499,18 +511,34 @@ for runs in range (args.runs):
     
     
                 loss_rew.append(loss_IOC)
-                next_states = jnp.vstack([states[1:], states[-1:]]) 
-                if args.PPO:
-                    policy.update_ppo(
-                    states=states,
-                    actions=actions,
-                    rewards=rewards,
-                    dones=dones,
-                    log_probs_old=log_probs_old,
-                    next_states=next_states,
-                    batch_size=args.N_steps,
-                    value_fn=None  # or your critic if available
-                    )
+
+                # Update PPO policy if using PPO
+                if args.PPO and policy.buffer.p % policy.buffer.buffer_size == 0:
+                    # Buffer is aligned, extract data for PPO update
+                    try:
+                        buffer_states, buffer_actions, buffer_rewards, buffer_dones, buffer_log_probs, buffer_next_states = policy.buffer.get()
+
+                        # Update PPO with collected experience
+                        policy.update_ppo(
+                            states=buffer_states,
+                            actions=buffer_actions,
+                            rewards=buffer_rewards.flatten(),
+                            dones=buffer_dones.flatten(),
+                            log_probs_old=buffer_log_probs.flatten(),
+                            next_states=buffer_next_states,
+                            gamma=0.99,
+                            lam=0.97,
+                            clip_eps=0.2,
+                            vf_coef=0.5,
+                            ent_coef=0.01,
+                            num_epochs=10,
+                            batch_size=min(64, args.N_steps),
+                            max_grad_norm=0.5
+                        )
+                        print(f"PPO policy updated at iteration {i}")
+                    except AssertionError:
+                        # Buffer not aligned yet, skip update
+                        pass
             
             
             # mean_costs.append(np.mean(sum_of_cost_list))

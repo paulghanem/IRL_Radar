@@ -219,10 +219,18 @@ class PPOPolicy():
             
         if gym_env == "Walker2d":
             #forward_reward = self.mjx_data.qvel[0]  # usually qvel[0]
-            alive_bonus=1
-            if np.abs(state[2])>1 or state[1] <0.8 or state[1]>2:
-                alive_bonus=0
-            
+            alive_bonus = 1.0
+
+            # JAX-friendly boolean condition
+            fall_cond = (
+                (jnp.abs(state[2]) > 1.0) |
+                (state[1] < 0.8) |
+                (state[1] > 2.0)
+            )
+
+            # Use jnp.where instead of if-else
+            alive_bonus = jnp.where(fall_cond, 0.0, alive_bonus)
+
             ctrl_cost = 0.001 * jnp.sum(jnp.square(action))
             r = forward_reward - ctrl_cost + alive_bonus
             r=r.reshape((1,1))
@@ -270,7 +278,7 @@ class PPOPolicy():
             #state=kinematics_mujoco(self.mjx_model,self.mjx_data,state,action,self._dynamics,self.gym_env)
             state=jnp.array(state)
             action=jnp.array(action)
-            next_state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action.reshape((1,-1)),self._dynamics,self.gym_env,frame_skip=frame_skip).flatten()
+            next_state=kinematics_mujoco(self.mjx_model,self.mjx_data,state.flatten(),action.reshape((1,-1)),self.gym_env,frame_skip=frame_skip).flatten()
           
            
             # ---- Dynamics update ----
