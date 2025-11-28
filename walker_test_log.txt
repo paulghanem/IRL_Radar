@@ -1,0 +1,22 @@
+JAX devices: [CpuDevice(id=0)]
+
+============================================================
+Testing Simplified Walker2d with GCL + MPPI
+============================================================
+
+Initializing Simplified Walker2d environment...
+  State dim: 17
+  Action dim: 6
+  Time step: 0.008
+
+Generating expert demonstrations...
+  Using simple forward-walking policy...
+  Collecting 100 steps...
+Traceback (most recent call last):
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\test_simplified_walker.py", line 97, in <module>
+    expert_states = jnp.array(expert_states)
+  File "C:\Users\siliconsynapse\anaconda3\envs\rirl\lib\site-packages\jax\_src\numpy\lax_numpy.py", line 5644, in array
+    out = stack([asarray(elt, dtype=dtype) for elt in object])
+  File "C:\Users\siliconsynapse\anaconda3\envs\rirl\lib\site-packages\jax\_src\numpy\lax_numpy.py", line 4614, in stack
+    raise ValueError("All input arrays must have the same shape.")
+ValueError: All input arrays must have the same shape.

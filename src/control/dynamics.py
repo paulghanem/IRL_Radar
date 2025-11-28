@@ -296,4 +296,55 @@ def kinematics_mujoco(mjx_model, mjx_data, init_state, actions, gym_env, frame_s
     _, states = lax.scan(one_step, mjx_data, actions)
     return states
 
+
+def kinematics_simplified_walker(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
+    """
+    Simplified Walker2d dynamics rollout with lax.scan interface matching kinematics_mujoco.
+
+    Args:
+        mjx_model: Unused (for interface compatibility)
+        mjx_data: Unused (for interface compatibility)
+        init_state: (s_dim,) or (batch, s_dim) array - initial state
+        actions: (T, a_dim) or (T, batch, a_dim) array - action sequence
+        gym_env: env name (static, for interface compatibility)
+        frame_skip: int, number of physics steps per action (default 4)
+
+    Returns:
+        states: (T, s_dim) or (T, batch, s_dim) array of next states
+    """
+    from src.control.simplified_walker import SimplifiedWalker
+
+    # Create SimplifiedWalker instance
+    walker = SimplifiedWalker(dt=0.002, frame_skip=frame_skip)
+
+    # Handle both single and batched actions
+    def one_step(state, action):
+        """
+        state: current state (s_dim,)
+        action: action at time t (a_dim,)
+        """
+        next_state = walker.step(state, action)
+        return next_state, next_state
+
+    # Scan over time dimension
+    # actions shape: (T, a_dim) or (T, batch, a_dim)
+    # init_state shape: (s_dim,) or (batch, s_dim)
+
+    if actions.ndim == 3:
+        # Batched: (T, batch, a_dim)
+        # Need to vmap over batch dimension
+        def batched_step(state_batch, action_batch):
+            # state_batch: (batch, s_dim)
+            # action_batch: (batch, a_dim)
+            next_states = jax.vmap(walker.step)(state_batch, action_batch)
+            return next_states, next_states
+
+        _, states = lax.scan(batched_step, init_state, actions)
+    else:
+        # Single: (T, a_dim)
+        _, states = lax.scan(one_step, init_state, actions)
+
+    return states
+
+
 # This is the FAST batched version (adapted from the first code block)

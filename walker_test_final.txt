@@ -1,0 +1,47 @@
+JAX devices: [CpuDevice(id=0)]
+
+============================================================
+Testing Simplified Walker2d with GCL + MPPI
+============================================================
+
+Initializing Simplified Walker2d environment...
+  State dim: 17
+  Action dim: 6
+  Time step: 0.008
+
+Generating expert demonstrations...
+  Using simple forward-walking policy...
+  Collecting 100 steps...
+  Expert total reward: 100.14
+  Expert avg reward: 1.001
+
+Initializing cost function...
+  Cost network initialized
+
+Initializing MPPI policy...
+  MPPI initialized: 200 samples, horizon 20
+
+============================================================
+Starting GCL + MPPI Training
+============================================================
+
+Iteration 1/30
+  Generating trajectory with MPPI...
+jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\test_simplified_walker.py", line 188, in <module>
+    action_seq, _, policy.key, policy._previous_action_seq = policy.forward_pure(
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\src\control\mppi_class.py", line 422, in forward_pure
+    state_seq_batch = jax.vmap(kinematics, in_axes=(0, 0, None))(
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\src\control\dynamics.py", line 237, in kinematics
+    _, scan_out = jax.lax.scan(
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\src\control\dynamics.py", line 231, in policy_step
+    next_state = step_fn(state_input,action)
+  File "C:\Users\siliconsynapse\Desktop\IRL_Radar\src\control\simplified_walker.py", line 197, in simplified_walker_step
+    return jax.vmap(walker.step)(state, action)
+ValueError: vmap got inconsistent sizes for array axes to be mapped:
+  * one axis had size 1: axis 0 of argument state of type float32[1,17];
+  * one axis had size 6: axis 0 of argument action of type float32[6]

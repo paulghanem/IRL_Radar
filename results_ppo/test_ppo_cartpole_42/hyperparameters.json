@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "N_steps": 200,
+  "N_steps_expert": 200,
+  "rirl_iterations": 20,
+  "reward_fn_updates": 5,
+  "hidden_dim": 64,
+  "runs": 1,
+  "results_savepath": "results_ppo\\test_ppo_cartpole_42",
+  "experiment_name": "test_ppo_cartpole",
+  "lr": 0.001,
+  "ppo_lr": 0.0003,
+  "airl": false,
+  "gail": false,
+  "sqil": false,
+  "UB": false,
+  "gym_env": "CartPole-v1",
+  "rollout_length": 200,
+  "ppo_epochs": 10,
+  "ppo_batch_size": 64,
+  "gamma": 0.99,
+  "clip_eps": 0.2
+}
