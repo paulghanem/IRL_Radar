@@ -105,7 +105,7 @@ parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstar
 parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
-parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
+parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=10,type=int,help="The number of runs")
@@ -118,7 +118,7 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-2,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
-parser.add_argument('--sigma', default=0.0,type=float, help='noise level')
+parser.add_argument('--sigma', default=1.0,type=float, help='noise level')
 
 parser.add_argument("--UB",action=argparse.BooleanOptionalAction,default=False,type=bool,help="Upper bound loss  ")
 parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
@@ -339,7 +339,7 @@ for runs in range (args.runs):
     
             # INITILIZING POLICY AND REWARD FUNCTION
             u_min, u_max = get_action_space(args.gym_env,env)
-            cov_scaler = get_action_cov(args.gym_env,env)
+            cov_scaler = get_action_cov(args.gym_env,env,args.sigma)
     
     
     

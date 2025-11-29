@@ -189,13 +189,13 @@ def get_action_space(env_name,env):
     else:      
           return jnp.array(env.action_space.low),jnp.array(env.action_space.high)
 
-def get_action_cov(env_name,env):
+def get_action_cov(env_name,env,sigma):
     if env_name == "CartPole-v1":
         return jnp.array([5.0])
     if env_name == "Pendulum-v1":
         return jnp.array([2.0])
     else:
-        return jnp.array([1.0])*jnp.ones((env.action_space.shape))
+        return jnp.array([sigma*1.0])*jnp.ones((env.action_space.shape))
 
 def get_state(state,action=None,time=None,env_name="CartPole-v1"):
     if env_name == "CartPole-v1":
