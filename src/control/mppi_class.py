@@ -901,6 +901,8 @@ class MPPI:
         for t in range(args.N_steps):
             #brax_state = brax_state0   # true Brax State
             #state = brax_state.obs  
+            start = time.time()
+            
     
             # ---------------------------------------------------
             # FORWARD MPPI STEP (SAME AS BEFORE)
@@ -983,7 +985,9 @@ class MPPI:
             # MOVE TO NEXT STATE
             # ---------------------------------------------------
             state = next_state
-    
+            end = time.time()
+            print(f"Execution time: {end - start:.4f} seconds")
+
         # -----------------------------------
         # UPDATE WARM START AFTER ROLLOUT
         # -----------------------------------

@@ -16,6 +16,8 @@ import jax.numpy as jnp
 import jax
 import math
 import pdb
+import jax
+# MUST be enabled for unit testing against CPU
 
 
 
@@ -59,6 +61,13 @@ if gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4","Swim
 
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
+    model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+    model.opt.iterations = 4 
+    model.opt.ls_iterations = 4
+    model.opt.timestep = dt*frame_skip
+    frame_skip=1
+    dt=dt*frame_skip
+    
     if gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)

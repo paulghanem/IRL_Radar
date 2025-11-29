@@ -68,9 +68,9 @@ from src.control.dynamics import get_action_cov,get_action_space,get_step_model
 from utils.helpers import GenerateDemo
 
 import gymnax
-from src.control.dynamics import kinematics_simplified_walker
-import src.control.mppi_class as mppi_module
-mppi_module.kinematics_mujoco = kinematics_simplified_walker
+#from src.control.dynamics import kinematics_simplified_walker
+#import src.control.mppi_class as mppi_module
+#mppi_module.kinematics_mujoco = kinematics_simplified_walker
 #from brax import envs
 # Redirect NumPy 2.x paths to NumPy 1.x
 #sys.modules["numpy._core"] = np.core
@@ -107,7 +107,7 @@ parser.add_argument("--N_steps",default=200,type=int,help="The number of steps i
 parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=10,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
-parser.add_argument("--lambda_",default=0.1,type=float,help="Temperature in MPPI (lower makers sharper)")
+parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=10,type=int,help="The number of runs")
 
 parser.add_argument('--results_savepath', default="results",type=str, help='Folder to save bigger results folder')
@@ -135,8 +135,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=500,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -241,12 +241,26 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
         args.frame_skip=4
         args.dt=0.01
         #env_brax = envs.get_environment('Swimmer')
-
+    #pdb.set_trace()
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
+    model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+    model.opt.iterations = 4 
+    model.opt.ls_iterations = 4
+    model.opt.timestep = args.dt*args.frame_skip
+    args.frame_skip=1
+    args.dt=args.dt*args.frame_skip
     if args.gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)
+    
+    # model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+    # model.opt.iterations = 1 
+
+    # # 4. Set Line Search Iterations (Crucial for CG/Newton)
+    # # If using CG (Solver 1) or Newton (Solver 2), this controls 
+    # # how hard the solver tries to improve the solution per step.
+    # model.opt.ls_iterations = 1
     
 
 
@@ -454,8 +468,10 @@ for runs in range (args.runs):
             total_cost=rewards
         else:
             # Both PPO and MPPI use generate_session_lax with same interface
+            
             start = time.time()
-            trajs=[policy.generate_session_lax(args,state_train,D_demo)]
+            trajs=[policy.generate_session_loop(args,state_train,D_demo)]
+            #trajs=[policy.generate_session_lax(args,state_train,D_demo)]
             end = time.time()
 
             rewards=trajs[0][-1]
