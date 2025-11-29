@@ -986,7 +986,7 @@ class MPPI:
             # ---------------------------------------------------
             state = next_state
             end = time.time()
-            print(f"Execution time: {end - start:.4f} seconds")
+            #print(f"Execution time: {end - start:.4f} seconds")
 
         # -----------------------------------
         # UPDATE WARM START AFTER ROLLOUT

@@ -245,8 +245,8 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
     model.opt.solver = mujoco.mjtSolver.mjSOL_CG
-    model.opt.iterations = 4 
-    model.opt.ls_iterations = 4
+    model.opt.iterations = 1 
+    model.opt.ls_iterations = 1
     model.opt.timestep = args.dt*args.frame_skip
     args.frame_skip=1
     args.dt=args.dt*args.frame_skip
