@@ -1,0 +1,90 @@
+======================================================================
+EXPERT BENCHMARK SUMMARY - 1000 STEPS, 10 SEEDS
+======================================================================
+
+
+Walker2d:
+  State dim: 17, Action dim: 6
+  Mean:       4734.37
+  Std:          61.58
+  Min:        4657.55
+  Max:        4822.63
+  Median:     4714.78
+  Success:   10/10
+
+  Individual runs:
+    Seed 0:  4676.53
+    Seed 1:  4822.63
+    Seed 2:  4753.68
+    Seed 3:  4818.20
+    Seed 4:  4681.57
+    Seed 5:  4708.08
+    Seed 6:  4819.86
+    Seed 7:  4721.48
+    Seed 8:  4684.13
+    Seed 9:  4657.55
+
+Hopper:
+  State dim: 11, Action dim: 3
+  Mean:       3535.78
+  Std:          12.16
+  Min:        3514.23
+  Max:        3552.78
+  Median:     3538.90
+  Success:   10/10
+
+  Individual runs:
+    Seed 0:  3537.70
+    Seed 1:  3541.13
+    Seed 2:  3522.25
+    Seed 3:  3540.10
+    Seed 4:  3529.64
+    Seed 5:  3546.73
+    Seed 6:  3523.72
+    Seed 7:  3549.51
+    Seed 8:  3514.23
+    Seed 9:  3552.78
+
+HalfCheetah-v4:
+  State dim: 17, Action dim: 6
+  Mean:       9577.67
+  Std:         190.77
+  Min:        9253.43
+  Max:        9842.25
+  Median:     9644.21
+  Success:   10/10
+
+  Individual runs:
+    Seed 0:  9403.67
+    Seed 1:  9680.01
+    Seed 2:  9693.22
+    Seed 3:  9292.25
+    Seed 4:  9664.76
+    Seed 5:  9623.66
+    Seed 6:  9842.25
+    Seed 7:  9253.43
+    Seed 8:  9783.01
+    Seed 9:  9540.47
+
+Swimmer:
+  State dim: 8, Action dim: 2
+  Mean:        355.73
+  Std:           1.79
+  Min:         351.55
+  Max:         358.26
+  Median:      356.01
+  Success:   10/10
+
+  Individual runs:
+    Seed 0:   357.23
+    Seed 1:   356.31
+    Seed 2:   356.13
+    Seed 3:   357.16
+    Seed 4:   354.85
+    Seed 5:   351.55
+    Seed 6:   355.76
+    Seed 7:   358.26
+    Seed 8:   354.17
+    Seed 9:   355.89
+
+Total benchmark time: 60.5s (1.0 min)

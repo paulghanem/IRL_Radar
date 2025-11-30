@@ -293,7 +293,7 @@ class MPPI:
         )
     
         # rollout samples in parallel
-        if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+        if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4","Swimmer"]:
             st = state
             if self.gym_env in ["Ant"]:
                 st = jnp.concatenate((jnp.reshape(self.mjx_data.qpos[0:2], (2,)), st))
@@ -672,7 +672,7 @@ class MPPI:
             self.env, self.env_params = gymnax.make(env)
             _, rng_reset = jax.random.split(key)
             env_state = self.env.reset(rng_reset, self.env_params)
-        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+        elif env in["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4","Swimmer"]:
 
             self.mjx_data = self.reset_mjx_state(self.mjx_model,key=key)
         else:
@@ -691,7 +691,7 @@ class MPPI:
     
             # ---- Dynamics update ----
             forward_reward = 0.0
-            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+            if self.gym_env in ["HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4","Swimmer"]:
                   next_state = kinematics_mujoco_original(
                     self.mjx_model, self.mjx_data, state.flatten(),
                     action_seq[0, :].reshape((1, -1)), self.gym_env,frame_skip=frame_skip
@@ -801,7 +801,7 @@ class MPPI:
                 action = action_seq[0]
     
                 # 3. Environment transition
-                if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+                if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4","Swimmer"]:
                     next_state = kinematics_mujoco(
                         self.mjx_model, self.mjx_data, state, action.reshape(1, -1),
                         self.gym_env, frame_skip=frame_skip
@@ -998,7 +998,7 @@ class MPPI:
             _, rng_reset = jax.random.split(key)
             env_state = self.env.reset(rng_reset, self.env_params)
     
-        elif env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+        elif env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4","Swimmer"]:
             self.mjx_data = self.reset_mjx_state(self.mjx_model, key=key)
     
         else:
@@ -1077,7 +1077,7 @@ class MPPI:
             # ---------------------------------------------------
             # DYNAMICS UPDATE (MuJoCo or simple env)
             # ---------------------------------------------------
-            if env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+            if env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4","Swimmer"]:
                 next_state = kinematics_mujoco(
                     self.mjx_model,
                     self.mjx_data,

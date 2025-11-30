@@ -94,7 +94,7 @@ import os.path as osp
 
 from utils.models import load_neural_network
 import gymnax
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, TD3, SAC
 from stable_baselines3 import DDPG
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 import numpy as np
@@ -158,11 +158,37 @@ class GenerateDemo(object):
         self.base = osp.join("expert_agents", env_name)
         self.max_frames = max_frames
 
+        # Map environments to their expert models in the experts/ directory
+        self.expert_models = {
+            'HalfCheetah-v4': ('experts/td3-HalfCheetah-v3.zip', TD3),
+            'Hopper-v4': ('experts/td3-Hopper-v3.zip', TD3),
+            'Walker2d-v4': ('experts/td3-Walker2d-v3.zip', TD3),
+            'Walker2d': ('experts/td3-Walker2d-v3.zip', TD3),
+            'Swimmer-v4': ('experts/td3-Swimmer-v4.zip', TD3),
+            'Swimmer': ('experts/td3-Swimmer-v4.zip', TD3),
+            'Hopper': ('experts/td3-Hopper-v3.zip', TD3),
+        }
+
 
     def generate_demo(self,seed=123):
-        if self.env_name in ["MountainCarContinuous-v0","HalfCheetah-v4","Ant","Hopper","Walker2d","Humanoid-v4"]:
+        # Map of all MuJoCo and Gymnasium environments that use Stable-Baselines3
+        gymnasium_envs = [
+            "MountainCarContinuous-v0",
+            "HalfCheetah-v4",
+            "Ant",
+            "Ant-v4",
+            "Hopper",
+            "Hopper-v4",
+            "Walker2d",
+            "Walker2d-v4",
+            "Humanoid-v4",
+            "Swimmer",
+            "Swimmer-v4"
+        ]
+
+        if self.env_name in gymnasium_envs:
             states,actions,rewards,env = self.generate_gymnasium_demo(self.env_name,max_frames=self.max_frames,seed=seed)
-            
+
         else:
             states,actions,rewards,env = self.generate_gymnax_demo(self.env_name, max_frames=self.max_frames, seed=seed)
 
@@ -175,21 +201,55 @@ class GenerateDemo(object):
         torch.manual_seed(seed)
         random.seed(seed)
 
-        
+
 
         if self.env_name in ["MountainCarContinuous-v0"]:
             env = CustomTerminationWrapper(gym.make(env_name, render_mode='rgb_array'),max_steps=max_frames)
-           
+
             model = DDPG("MlpPolicy", env)
             base = osp.join(self.base,f"{env_name}.zip")
         else:
-            if self.env_name =="Ant":
-                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
+            # Check if we have a downloaded expert model
+            if self.env_name in self.expert_models:
+                expert_path, algo_class = self.expert_models[self.env_name]
+                print(f"Loading expert from: {expert_path} using {algo_class.__name__}")
+
+                # Determine correct environment version
+                if env_name.endswith('-v4'):
+                    actual_env_name = env_name
+                else:
+                    actual_env_name = f"{env_name}-v4"
+
+                # Create environment
+                # Note: v3 experts were trained WITH exclude_current_positions_from_observation=True (default)
+                # We need to match the observation space the model was trained on
+                if actual_env_name.endswith('-v3'):
+                    # v3 excludes x-position by default
+                    env = CustomTerminationWrapper(
+                        gym.make(actual_env_name),
+                        max_steps=max_frames
+                    )
+                else:
+                    # v4 includes x-position by default, but experts are from v3
+                    # So we need to match v3 behavior
+                    env = CustomTerminationWrapper(
+                        gym.make(actual_env_name, exclude_current_positions_from_observation=True),
+                        max_steps=max_frames
+                    )
+
+                # Load the appropriate algorithm
+                model = algo_class("MlpPolicy", env, verbose=1)
+                base = expert_path
             else:
-                env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
-           
-            model=PPO("MlpPolicy", env,verbose=1)
-            base = osp.join(self.base,"PPO.zip")
+                # Fallback to old behavior for environments without downloaded experts
+                if self.env_name == "Ant":
+                    env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
+                else:
+                    env = CustomTerminationWrapper(gym.make(env_name,exclude_current_positions_from_observation=False),max_steps=max_frames)
+
+                model = PPO("MlpPolicy", env,verbose=1)
+                base = osp.join(self.base,"PPO.zip")
+
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = model.load(base, env,device)
        
@@ -199,21 +259,39 @@ class GenerateDemo(object):
         vec_env._seeds = [seed]
         obs = vec_env.reset()
 
+        # Access underlying gym environment to get full MuJoCo state
+        base_env = vec_env.envs[0].unwrapped
 
-        state_seq = []
+        state_seq = []  # Observations for policy
+        full_state_seq = []  # Full state (qpos + qvel) for dynamics/rewards
         action_seq = []
         reward_seq = []
         t_counter = 0
-        while True:
 
+        # Initial full state
+        if hasattr(base_env, 'data'):  # MuJoCo environment
+            qpos = base_env.data.qpos.copy()
+            qvel = base_env.data.qvel.copy()
+            full_state = np.concatenate([qpos, qvel])
+            full_state_seq.append(full_state)
+
+        while True:
+            # Save observation (for compatibility/debugging)
             state_seq.append(obs.ravel())
+
+            # Predict action using observation
             #action = fast_predict(model, obs)
             with torch.no_grad():
-   
-
                 action, _states = model.predict(obs, deterministic=True)
+
             obs, reward, done, info = vec_env.step(action)
 
+            # Extract full state AFTER stepping
+            if hasattr(base_env, 'data'):  # MuJoCo environment
+                qpos = base_env.data.qpos.copy()
+                qvel = base_env.data.qvel.copy()
+                full_state = np.concatenate([qpos, qvel])
+                full_state_seq.append(full_state)
 
             action_seq.append(action.ravel())
             reward_seq.append(reward)
@@ -229,10 +307,20 @@ class GenerateDemo(object):
 
         print(f"{env_name} - Steps: {t_counter}, Return: {np.sum(reward_seq)}, State: {obs}")
 
-        if len(action.shape) == 0:
-            return np.stack(state_seq, axis=0), np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq),vec_env
+        # Return full_state_seq instead of obs-based state_seq for MuJoCo environments
+        # This ensures state includes x-position for reward calculation
+        if hasattr(base_env, 'data'):
+            # Use full state (includes x-position) - shape will be (T+1, full_state_dim)
+            # Trim to match action length
+            full_states = np.stack(full_state_seq[:-1], axis=0)  # Use states, not next_states
         else:
-            return np.stack(state_seq,axis=0), np.stack(action_seq,axis=0), np.cumsum(reward_seq),vec_env
+            # Non-MuJoCo environments use observations
+            full_states = np.stack(state_seq, axis=0)
+
+        if len(action.shape) == 0:
+            return full_states, np.stack(action_seq, axis=0).reshape(-1,1), np.cumsum(reward_seq), vec_env
+        else:
+            return full_states, np.stack(action_seq,axis=0), np.cumsum(reward_seq), vec_env
 
 
 

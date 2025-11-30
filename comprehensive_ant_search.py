@@ -1,0 +1,180 @@
+"""
+Comprehensive search for compatible Ant models across multiple sources.
+"""
+import urllib.request
+import os
+import json
+
+def try_download(url, output_path):
+    """Try to download a file and return success status."""
+    try:
+        urllib.request.urlretrieve(url, output_path)
+        file_size = os.path.getsize(output_path) / (1024 * 1024)
+        return True, file_size
+    except Exception as e:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        return False, str(e)
+
+os.makedirs('experts', exist_ok=True)
+
+print("="*70)
+print("COMPREHENSIVE ANT MODEL SEARCH")
+print("="*70)
+
+# Extensive list of potential sources
+model_sources = [
+    # Hugging Face - stable-baselines3 organization
+    ('HF sb3 - Ant-v2 PPO', 'https://huggingface.co/sb3/ppo-Ant-v2/resolve/main/ppo-Ant-v2.zip'),
+    ('HF sb3 - Ant-v2 SAC', 'https://huggingface.co/sb3/sac-Ant-v2/resolve/main/sac-Ant-v2.zip'),
+    ('HF sb3 - Ant-v2 TD3', 'https://huggingface.co/sb3/td3-Ant-v2/resolve/main/td3-Ant-v2.zip'),
+
+    # Try with different capitalization
+    ('HF sb3 - ant-v4 ppo', 'https://huggingface.co/sb3/ppo-ant-v4/resolve/main/ppo-ant-v4.zip'),
+    ('HF sb3 - ant-v4 sac', 'https://huggingface.co/sb3/sac-ant-v4/resolve/main/sac-ant-v4.zip'),
+
+    # CleanRL models
+    ('CleanRL - Ant-v4 PPO', 'https://huggingface.co/cleanrl/Ant-v4-ppo/resolve/main/ppo.zip'),
+    ('CleanRL - ppo_continuous_action', 'https://huggingface.co/cleanrl/Ant-v4-ppo_continuous_action/resolve/main/ppo_continuous_action.zip'),
+
+    # Try gymnasium naming
+    ('HF - gymnasium-Ant-v4', 'https://huggingface.co/sb3/ppo-gymnasium-Ant-v4/resolve/main/model.zip'),
+
+    # Community models - various users
+    ('HF araffin - Ant', 'https://huggingface.co/araffin/ppo-Ant-v4/resolve/main/ppo-Ant-v4.zip'),
+    ('HF sb3-contrib - Ant', 'https://huggingface.co/sb3-contrib/ppo-Ant-v4/resolve/main/model.zip'),
+
+    # Try RLlib models
+    ('RLlib - Ant-v4', 'https://huggingface.co/rllib/PPO-Ant-v4/resolve/main/model.zip'),
+
+    # Tianshou models
+    ('Tianshou - Ant', 'https://huggingface.co/tianshou/ppo-Ant-v4/resolve/main/policy.pth'),
+
+    # Try different file structures
+    ('HF sb3 - Ant v4 alt', 'https://huggingface.co/sb3/Ant-v4/resolve/main/ppo.zip'),
+    ('HF sb3 - Ant v4 alt2', 'https://huggingface.co/sb3/Ant-v4/resolve/main/model.zip'),
+
+    # Try models trained on MuJoCo 2.0+
+    ('HF - mujoco-Ant', 'https://huggingface.co/sb3/ppo-mujoco-Ant/resolve/main/model.zip'),
+
+    # Try RL Zoo models with different paths
+    ('RL Zoo - v4 PPO', 'https://huggingface.co/rl-baselines3-zoo/ppo-Ant-v4/resolve/main/Ant-v4.zip'),
+    ('RL Zoo - v4 SAC', 'https://huggingface.co/rl-baselines3-zoo/sac-Ant-v4/resolve/main/Ant-v4.zip'),
+    ('RL Zoo - v4 TD3', 'https://huggingface.co/rl-baselines3-zoo/td3-Ant-v4/resolve/main/Ant-v4.zip'),
+
+    # Try without version suffix
+    ('HF sb3 - Ant PPO', 'https://huggingface.co/sb3/ppo-Ant/resolve/main/ppo-Ant.zip'),
+    ('HF sb3 - Ant SAC', 'https://huggingface.co/sb3/sac-Ant/resolve/main/sac-Ant.zip'),
+
+    # Try AntMaze variants (might be compatible)
+    ('HF - AntMaze', 'https://huggingface.co/sb3/ppo-AntMaze/resolve/main/model.zip'),
+
+    # Try newer repository structures
+    ('HF models - Ant v4', 'https://huggingface.co/models/sb3/ppo-Ant-v4/resolve/main/model.zip'),
+]
+
+print(f"\nSearching {len(model_sources)} potential sources...\n")
+
+successful_downloads = []
+failed_downloads = []
+
+for idx, (name, url) in enumerate(model_sources, 1):
+    # Create output filename
+    filename = f"experts/ant_search_{idx}.zip"
+
+    print(f"[{idx}/{len(model_sources)}] {name}")
+    print(f"    URL: {url}")
+
+    success, result = try_download(url, filename)
+
+    if success:
+        print(f"    [OK] SUCCESS! Downloaded {result:.2f} MB")
+        successful_downloads.append((name, filename, url))
+    else:
+        print(f"    [FAIL] Failed: {result}")
+        failed_downloads.append(name)
+    print()
+
+print("="*70)
+print("SEARCH RESULTS")
+print("="*70)
+print(f"\nSuccessfully downloaded: {len(successful_downloads)} models")
+
+if successful_downloads:
+    print("\nDownloaded models:")
+    for name, filename, url in successful_downloads:
+        print(f"  + {name}")
+        print(f"    File: {filename}")
+        print(f"    URL: {url}")
+        print()
+
+    # Now test compatibility
+    print("\n" + "="*70)
+    print("TESTING COMPATIBILITY")
+    print("="*70)
+
+    import gymnasium as gym
+    from stable_baselines3 import PPO, SAC, TD3
+
+    compatible_models = []
+
+    for name, filename, url in successful_downloads:
+        print(f"\nTesting: {name}")
+        print(f"File: {filename}")
+
+        # Try each algorithm
+        for algo_name, algo_class in [('PPO', PPO), ('SAC', SAC), ('TD3', TD3)]:
+            try:
+                model = algo_class.load(filename)
+                model_obs_shape = model.observation_space.shape
+                print(f"  Loaded as {algo_name}, expects obs shape: {model_obs_shape}")
+
+                # Test with v4 and v5
+                for env_version in ['v4', 'v5']:
+                    try:
+                        env = gym.make(f'Ant-{env_version}')
+                        env_obs_shape = env.observation_space.shape
+
+                        if env_obs_shape == model_obs_shape:
+                            print(f"    >>> COMPATIBLE WITH Ant-{env_version}! <<<")
+                            compatible_models.append({
+                                'name': name,
+                                'file': filename,
+                                'url': url,
+                                'algorithm': algo_name,
+                                'env_version': env_version
+                            })
+                        else:
+                            print(f"    Ant-{env_version}: {env_obs_shape} (mismatch)")
+
+                        env.close()
+                    except Exception as e:
+                        print(f"    Error with Ant-{env_version}: {e}")
+
+                break  # If loaded successfully, don't try other algorithms
+
+            except Exception:
+                continue  # Try next algorithm
+
+        print()
+
+    if compatible_models:
+        print("\n" + "="*70)
+        print("COMPATIBLE MODELS FOUND!")
+        print("="*70)
+        for model_info in compatible_models:
+            print(f"\n✓ {model_info['name']}")
+            print(f"  Algorithm: {model_info['algorithm']}")
+            print(f"  Environment: Ant-{model_info['env_version']}")
+            print(f"  File: {model_info['file']}")
+            print(f"  URL: {model_info['url']}")
+    else:
+        print("\n[WARNING] No compatible models found in downloaded files")
+
+else:
+    print("[WARNING] No models were successfully downloaded")
+    print(f"\nFailed attempts: {len(failed_downloads)}")
+
+print("\n" + "="*70)
+print("Search complete")
+print("="*70)
