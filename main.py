@@ -102,8 +102,8 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps_expert",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
@@ -117,8 +117,8 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-2,type=float, help='rgcl initial covariance')
-parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
-parser.add_argument('--sigma', default=10.0,type=float, help='noise level')
+parser.add_argument('--Q', default=1e-5,type=float, help='rgcl learning rate')
+parser.add_argument('--sigma', default=1.0,type=float, help='noise level')
 
 parser.add_argument("--UB",action=argparse.BooleanOptionalAction,default=False,type=bool,help="Upper bound loss  ")
 parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
@@ -245,11 +245,11 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
     model.opt.solver = mujoco.mjtSolver.mjSOL_CG
-    model.opt.iterations = 1 
-    model.opt.ls_iterations = 1
-    # model.opt.timestep = args.dt*args.frame_skip
-    # args.dt=args.dt*args.frame_skip
-    # args.frame_skip=1
+    model.opt.iterations = 4 
+    model.opt.ls_iterations = 4
+    model.opt.timestep = args.dt*args.frame_skip
+    args.dt=args.dt*args.frame_skip
+    args.frame_skip=1
     if args.gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)
@@ -451,7 +451,7 @@ for runs in range (args.runs):
         if args.rgcl:
             start = time.time()
             #trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo[steps:steps+args.N_steps,:],P_theta,thetas)]
-            trajs = [policy.RGCL_lax(args,params,state_train,initial_state,D_demo,P_theta,thetas)]
+            trajs = [policy.RGCL(args,params,state_train,initial_state,D_demo,P_theta,thetas)]
             end = time.time()
             rewards=trajs[0][-3]
             #P_theta=trajs[0][-2]

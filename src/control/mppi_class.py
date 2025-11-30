@@ -735,6 +735,134 @@ class MPPI:
 
         return states, traj_probs, actions, rewards
     
+    def RGCL(self, args, params, state_train, initial_state, D_demo, P_theta_in, thetas=None):
+            """
+            Python loop version of RGCL (Logic identical to RGCL_lax).
+            Performs full Hessian updates explicitly in a standard for-loop.
+            """
+            import jax.numpy as jnp
+            import jax
+            
+            # ---- Flatten parameters into theta ----
+            flat_params, treedef = jax.tree_util.tree_flatten(params)
+            theta = jnp.concatenate([p.reshape(-1) for p in flat_params])
+            n_theta = theta.size
+            key = jax.random.PRNGKey(args.seed)
+    
+            # ---- Initialize P_theta and Q_theta ----
+            if args.diagonal:
+                raise ValueError("Diagonal version not implemented here. Full version only.")
+            else:
+                P = args.P * jnp.eye(n_theta)
+                Q = args.Q * jnp.eye(n_theta)
+    
+            # ---- Expert data ----
+            expert_states = D_demo[:, :args.s_dim]
+            # expert_actions = D_demo[:, args.s_dim:args.s_dim + args.a_dim] # Unused in the update logic shown
+    
+            # ---- Loop Initialization ----
+            state = initial_state
+            dt = args.dt
+            frame_skip = args.frame_skip
+            prev_action_seq = self._previous_action_seq
+            
+            # Storage lists
+            states_hist = []
+            traj_probs_hist = []
+            actions_hist = []
+            rewards_hist = []
+            P_theta_hist = [] # Optional: usually only final P is needed, but keeping for consistency
+    
+            # ----------- MAIN LOOP -----------
+            for t in range(args.N_steps):
+                
+                # 1. Unflatten theta -> params (Reconstruct params for current step)
+                p_list = []
+                idx = 0
+                for p in flat_params:
+                    size = p.size
+                    p_list.append(theta[idx:idx+size].reshape(p.shape))
+                    idx += size
+                local_params = jax.tree_util.tree_unflatten(treedef, p_list)
+                
+                # Update state_train with current parameters
+                state_train_local = state_train.replace(params=local_params)
+    
+                # 2. MPPI policy (Forward Pure)
+                # using the updated state_train_local (new weights)
+                action_seq, _, key, prev_action_seq = self.forward_pure(
+                    state=state,
+                    state_train=state_train_local,
+                    gail=args.gail,
+                    key=key,
+                    prev_action_seq=prev_action_seq,
+                    frame_skip=frame_skip
+                )
+                action = action_seq[0]
+    
+                # 3. Environment transition
+                if self.gym_env in ["HalfCheetah-v4", "Ant", "Hopper", "Walker2d", "Humanoid-v4"]:
+                    next_state = kinematics_mujoco(
+                        self.mjx_model, self.mjx_data, state, action.reshape(1, -1),
+                        self.gym_env, frame_skip=frame_skip
+                    ).reshape(-1)
+                else:
+                    next_state = self._dynamics(state, action).reshape(-1)
+    
+                # 4. Reward Calculation
+                reward = self.reward_fn(self.gym_env, state, action, next_state, self.mjx_data, dt, frame_skip)
+    
+                # 5. Compute Gradients
+                g_s = get_gradients(state_train_local, local_params, next_state, args.N_steps)
+                g_d = get_gradients(state_train_local, local_params, expert_states[t], args.N_steps)
+    
+                # 6. Compute Full Hessians
+                H_s = get_hessian(state_train_local, local_params, next_state, args.N_steps)
+                H_d = get_hessian(state_train_local, local_params, expert_states[t], args.N_steps)
+    
+                # 7. Kalman-style Update
+                # P_new = inv(inv(P + Q) + H_d - H_s)
+                P = jnp.linalg.inv(jnp.linalg.inv(P + Q) + (H_d - H_s))
+    
+                # theta_new = theta - P_new @ (g_d - g_s)
+                theta = theta - P @ (g_d - g_s)
+                theta = theta.astype(jnp.float32)
+    
+                # 8. Store History
+                # Store 'state' (current) before updating to 'next_state' for the next loop
+                states_hist.append(state)
+                actions_hist.append(action)
+                rewards_hist.append(reward)
+                traj_probs_hist.append(1.0) # Matched from RGCL_lax logic
+                P_theta_hist.append(P)
+    
+                # Update state for next iteration
+                state = next_state
+    
+            # ----------- Finalization -----------
+            
+            # Unflatten final theta back into params to return updated model
+            idx = 0
+            new_param_list = []
+            for p in flat_params:
+                size = p.size
+                new_param_list.append(theta[idx:idx+size].reshape(p.shape))
+                idx += size
+            new_params = jax.tree_util.tree_unflatten(treedef, new_param_list)
+            
+            # Calculate total reward
+            total_reward = sum(rewards_hist) # or jnp.sum(jnp.array(rewards_hist))
+    
+            # Convert lists to desired return format (standard lists as per your original request)
+            # Note: In the scan version you returned .tolist(). Doing the same here.
+            states_out = [s.tolist() if hasattr(s, 'tolist') else s for s in states_hist]
+            traj_probs_out = traj_probs_hist
+            actions_out = [a.tolist() if hasattr(a, 'tolist') else a for a in actions_hist]
+            rewards_out = [r.tolist() if hasattr(r, 'tolist') else r for r in rewards_hist]
+    
+            # Return format matches RGCL_lax
+            return states_out, traj_probs_out, actions_out, total_reward, P, new_params
+    
     def RGCL_lax(self, args, params, state_train, initial_state, D_demo, P_theta_in, thetas=None):
         """
         LAX-scan version of RGCL (NO JIT - user requested).
