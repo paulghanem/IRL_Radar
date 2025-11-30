@@ -106,7 +106,7 @@ parser.add_argument("--N_steps_expert",default=200,type=int,help="The number of 
 parser.add_argument("--N_steps",default=200,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=100,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
-parser.add_argument("--hidden_dim",default=64,type=int,help="The number of hidden neurons")
+parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
 parser.add_argument("--runs",default=10,type=int,help="The number of runs")
 
@@ -118,7 +118,7 @@ parser.add_argument('--save_images', action=argparse.BooleanOptionalAction,defau
 parser.add_argument('--lr', default=1e-4,type=float, help='learning rate')
 parser.add_argument('--P', default=1e-2,type=float, help='rgcl initial covariance')
 parser.add_argument('--Q', default=1e-4,type=float, help='rgcl learning rate')
-parser.add_argument('--sigma', default=1.0,type=float, help='noise level')
+parser.add_argument('--sigma', default=10.0,type=float, help='noise level')
 
 parser.add_argument("--UB",action=argparse.BooleanOptionalAction,default=False,type=bool,help="Upper bound loss  ")
 parser.add_argument('--sqil', action=argparse.BooleanOptionalAction,default=False,type=bool, help='sqil method flag (automatically turns sqil flag on)')
@@ -126,8 +126,8 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 # %%
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
-parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Walker2d",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=True,type=bool, help='rgcl method flag')
+parser.add_argument('--gym_env', default="CartPole-v1",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -135,8 +135,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=500,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=50,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=2000,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
@@ -247,9 +247,9 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
     model.opt.solver = mujoco.mjtSolver.mjSOL_CG
     model.opt.iterations = 1 
     model.opt.ls_iterations = 1
-    model.opt.timestep = args.dt*args.frame_skip
-    args.frame_skip=1
-    args.dt=args.dt*args.frame_skip
+    # model.opt.timestep = args.dt*args.frame_skip
+    # args.dt=args.dt*args.frame_skip
+    # args.frame_skip=1
     if args.gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)
@@ -353,7 +353,7 @@ for runs in range (args.runs):
     
     
             u_min, u_max = get_action_space(args.gym_env,env)
-            cov_scaler = get_action_cov(args.gym_env,env)
+            cov_scaler = get_action_cov(args.gym_env,env,args.sigma)
             
             init_rng = jax.random.key(0)
     
@@ -419,8 +419,8 @@ for runs in range (args.runs):
                     # subiterations=args.MPPI_iterations,
                     dim_state=args.s_dim,
                     dim_control=args.a_dim,
-                   # dynamics=get_step_model(args.gym_env,env),
-                    dynamics=None,
+                    dynamics=get_step_model(args.gym_env,env),
+                   
                     cost_func=jax.jit(vmap(cost_function,in_axes=(0,None))),
                     u_min=u_min,
                     u_max=u_max,

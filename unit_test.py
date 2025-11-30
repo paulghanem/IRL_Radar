@@ -22,7 +22,7 @@ import jax
 
 
 
-gym_env="Walker2d"
+gym_env="Swimmer"
 max_frames=1
 
 mjx_model=None
@@ -62,11 +62,12 @@ if gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4","Swim
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
     model.opt.solver = mujoco.mjtSolver.mjSOL_CG
-    model.opt.iterations = 4 
-    model.opt.ls_iterations = 4
-    model.opt.timestep = dt*frame_skip
-    frame_skip=1
-    dt=dt*frame_skip
+    model.opt.iterations = 1
+    model.opt.ls_iterations = 1
+    # model.opt.timestep = dt*frame_skip
+    
+    # dt=dt*frame_skip
+    # frame_skip=1
     
     if gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
@@ -91,7 +92,8 @@ def step_mjx(state,action,mjx_model,mjx_data,_dynamics,gym_env,frame_skip):
     return next_state
 
 def reward_fn(gym_env, state, action,next_state, mjx_data,dt,frame_skip):
-    forward_reward=(next_state[0]-state[0])/(dt*frame_skip)
+    #pdb.set_trace()
+    forward_reward=(next_state[0]-state[0])/(dt)
    
     if gym_env == "CartPole-v1":
         x=next_state[0]
@@ -197,7 +199,7 @@ def reward_fn(gym_env, state, action,next_state, mjx_data,dt,frame_skip):
 #state=jnp.ones((18,1))
 
 
-for i in [0.1,0.2,0.3,0.4,0.5,0.6,.7,.8]:
+for i in [ -0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-.7,-.8,0.1,0.2,0.3,0.4,0.5,0.6,.7,.8]:
     action=i*jnp.ones((a_dim,1))
     obs, info = env.reset(seed=42)
     #obs=obs[:mjx_data.qpos.shape[0]+mjx_data.qvel.shape[0]]

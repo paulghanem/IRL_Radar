@@ -8,7 +8,7 @@ import jax.lax as lax
 from jax.random import multivariate_normal
 import functools
 
-from src.control.dynamics import kinematics,kinematics_mujoco,kinematics_mujoco_original
+from src.control.dynamics import kinematics,kinematics_mujoco
 from src.objective_fns.cost_to_go_fns import get_cost
 from cost_jax import get_gradients,get_hessian,get_hessian_diag,get_precond,fisher_diag
 

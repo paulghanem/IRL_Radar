@@ -99,31 +99,34 @@ def mountaincar_step(
 
     return jnp.concatenate([position, velocity],axis=-1)
 
+import jax.numpy as jnp
+import numpy as np  # Required for signature-compliant noise generation
 
-def cartpole_step(
-        state,
-        action):
-
+def cartpole_step(state, action):
+    # --- Config ---
     gravity = 9.8
     masscart = 1.0
-    masspole= 0.1
-    total_mass = masscart + masspole  # (masscart + masspole)
+    masspole = 0.1
+    total_mass = masscart + masspole
     length = 0.5
-    polemass_length = masspole * length  # (masspole * length)
+    polemass_length = masspole * length
     force_mag = 10.0
     tau = 0.02
+    noise_scale = 0.01  # Adjust the magnitude of the corruption here
 
-    x, x_dot, theta, theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1),state[...,3].reshape(-1, 1)
+    # --- Unpack State ---
+    # state shape is expected to be (..., 4)
+    x, x_dot, theta, theta_dot = state[...,0:1], state[...,1:2], state[...,2:3], state[...,3:4]
 
-    force = action[...,0]
+    force = action[...,0:1] # Ensure dimensions match for broadcasting
 
     """Performs step transitions in the environment."""
-    force = jnp.clip(force,-force_mag,force_mag) #force_mag * action - force_mag * (1 - action) turn to continuous :)
+    force = jnp.clip(force, -force_mag, force_mag)
     costheta = jnp.cos(theta)
     sintheta = jnp.sin(theta)
 
     temp = (
-                   force + polemass_length * theta_dot ** 2 * sintheta
+            force + polemass_length * theta_dot ** 2 * sintheta
            ) / total_mass
     thetaacc = (gravity * sintheta - costheta * temp) / (
             length
@@ -131,13 +134,60 @@ def cartpole_step(
     )
     xacc = temp - polemass_length * thetaacc * costheta / total_mass
 
-    # Only default Euler integration option available here!
-    x = x + tau * x_dot
-    x_dot = x_dot + tau * xacc
-    theta = theta + tau * theta_dot
-    theta_dot = theta_dot + tau * thetaacc
+    # --- NOISE INJECTION (Using Numpy to preserve signature) ---
+    # We generate noise matching the shape of the state components
+    # Note: If you JIT this function, this noise becomes constant!
+    noise_x = jnp.array(np.random.normal(0, noise_scale, x.shape))
+    noise_x_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
+    noise_theta = jnp.array(np.random.normal(0, noise_scale, x.shape))
+    noise_theta_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
 
-    return jnp.concatenate([x, x_dot,theta,theta_dot], axis=-1)
+    # --- Euler Integration with Process Noise ---
+    x = x + tau * x_dot + noise_x
+    x_dot = x_dot + tau * xacc + noise_x_dot
+    theta = theta + tau * theta_dot + noise_theta
+    theta_dot = theta_dot + tau * thetaacc + noise_theta_dot
+
+    return jnp.concatenate([x, x_dot, theta, theta_dot], axis=-1)
+
+# def cartpole_step(
+#         state,
+#         action):
+
+#     gravity = 9.8
+#     masscart = 1.0
+#     masspole= 0.1
+#     total_mass = masscart + masspole  # (masscart + masspole)
+#     length = 0.5
+#     polemass_length = masspole * length  # (masspole * length)
+#     force_mag = 10.0
+#     tau = 0.02
+
+#     x, x_dot, theta, theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1),state[...,3].reshape(-1, 1)
+
+#     force = action[...,0]
+
+#     """Performs step transitions in the environment."""
+#     force = jnp.clip(force,-force_mag,force_mag) #force_mag * action - force_mag * (1 - action) turn to continuous :)
+#     costheta = jnp.cos(theta)
+#     sintheta = jnp.sin(theta)
+
+#     temp = (
+#                    force + polemass_length * theta_dot ** 2 * sintheta
+#            ) / total_mass
+#     thetaacc = (gravity * sintheta - costheta * temp) / (
+#             length
+#             * (4.0 / 3.0 - masspole * costheta ** 2 / total_mass)
+#     )
+#     xacc = temp - polemass_length * thetaacc * costheta / total_mass
+
+#     # Only default Euler integration option available here!
+#     x = x + tau * x_dot
+#     x_dot = x_dot + tau * xacc
+#     theta = theta + tau * theta_dot
+#     theta_dot = theta_dot + tau * thetaacc
+
+#     return jnp.concatenate([x, x_dot,theta,theta_dot], axis=-1)
 
 def pendulum_step(
     state,action
@@ -191,9 +241,9 @@ def get_action_space(env_name,env):
 
 def get_action_cov(env_name,env,sigma):
     if env_name == "CartPole-v1":
-        return jnp.array([5.0])
+        return jnp.array([sigma*1.0])
     if env_name == "Pendulum-v1":
-        return jnp.array([2.0])
+        return jnp.array([sigma*1.0])
     else:
         return jnp.array([sigma*1.0])*jnp.ones((env.action_space.shape))
 
@@ -296,157 +346,3 @@ def kinematics_mujoco(mjx_model, mjx_data, init_state, actions, gym_env, frame_s
     _, states = lax.scan(one_step, mjx_data, actions)
     return states
 
-
-def kinematics_simplified_walker(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
-    """
-    Simplified Walker2d dynamics rollout with lax.scan interface matching kinematics_mujoco.
-
-    Args:
-        mjx_model: Unused (for interface compatibility)
-        mjx_data: Unused (for interface compatibility)
-        init_state: (s_dim,) or (batch, s_dim) array - initial state
-        actions: (T, a_dim) or (T, batch, a_dim) array - action sequence
-        gym_env: env name (static, for interface compatibility)
-        frame_skip: int, number of physics steps per action (default 4)
-
-    Returns:
-        states: (T, s_dim) or (T, batch, s_dim) array of next states
-    """
-    from src.control.simplified_walker import SimplifiedWalker
-
-    # Create SimplifiedWalker instance
-    walker = SimplifiedWalker(dt=0.002, frame_skip=frame_skip)
-
-    # Handle both single and batched actions
-    def one_step(state, action):
-        """
-        state: current state (s_dim,)
-        action: action at time t (a_dim,)
-        """
-        next_state = walker.step(state, action)
-        return next_state, next_state
-
-    # Scan over time dimension
-    # actions shape: (T, a_dim) or (T, batch, a_dim)
-    # init_state shape: (s_dim,) or (batch, s_dim)
-
-    if actions.ndim == 3:
-        # Batched: (T, batch, a_dim)
-        # Need to vmap over batch dimension
-        def batched_step(state_batch, action_batch):
-            # state_batch: (batch, s_dim)
-            # action_batch: (batch, a_dim)
-            next_states = jax.vmap(walker.step)(state_batch, action_batch)
-            return next_states, next_states
-
-        _, states = lax.scan(batched_step, init_state, actions)
-    else:
-        # Single: (T, a_dim)
-        _, states = lax.scan(one_step, init_state, actions)
-
-    return states
-
-
-# This is the FAST batched version (adapted from the first code block)
-
-@partial(jax.jit, static_argnames=("gym_env", "frame_skip"))
-def kinematics_mujoco_original(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
-    """
-    Functional MJX rollout with lax.scan.
-
-    Args:
-        mjx_model: mjx.Model
-        mjx_data:  mjx.Data  (initial data, e.g. from reset_mjx_state)
-        init_state: (s_dim,) or (batch, s_dim) array of [qpos, qvel]
-        actions: (T, a_dim) or (T, batch, a_dim) array
-        gym_env: env name (static, unused except for API consistency)
-        frame_skip: int, number of mjx.step calls per RL step (static)
-
-    Returns:
-        states: (T, s_dim) or (T, batch, s_dim) array of [qpos, qvel]
-    """
-
-    # Ensure init_state is used only once: set qpos/qvel at t=0
-    def _init_from_state(mjx_data, state):
-        return mjx_data.replace(
-            qpos=state[..., : mjx_model.nq],
-            qvel=state[..., mjx_model.nq : mjx_model.nq + mjx_model.nv],
-        )
-
-    mjx_data = _init_from_state(mjx_data, init_state)
-
-    def one_step(carry_data, action_t):
-        """
-        carry_data: mjx.Data at time t
-        action_t: action at time t
-        """
-
-        def substep(d, _):
-            # Set control, step physics once
-            d = d.replace(ctrl=action_t)
-            d = mjx.step(mjx_model, d)
-            return d, None
-
-        # Perform frame_skip internal physics steps
-        carry_data, _ = lax.scan(substep, carry_data, xs=None, length=frame_skip)
-
-        # Observation = [qpos, qvel]
-        obs_t = jnp.concatenate([carry_data.qpos, carry_data.qvel], axis=-1)
-        return carry_data, obs_t
-
-    # Scan over time dimension
-    _, states = lax.scan(one_step, mjx_data, actions)
-    return states
-
-
-def kinematics_simplified_walker(mjx_model, mjx_data, init_state, actions, gym_env, frame_skip=1):
-    """
-    Simplified Walker2d dynamics rollout with lax.scan interface matching kinematics_mujoco.
-
-    Args:
-        mjx_model: Unused (for interface compatibility)
-        mjx_data: Unused (for interface compatibility)
-        init_state: (s_dim,) or (batch, s_dim) array - initial state
-        actions: (T, a_dim) or (T, batch, a_dim) array - action sequence
-        gym_env: env name (static, for interface compatibility)
-        frame_skip: int, number of physics steps per action (default 4)
-
-    Returns:
-        states: (T, s_dim) or (T, batch, s_dim) array of next states
-    """
-    from src.control.simplified_walker import SimplifiedWalker
-
-    # Create SimplifiedWalker instance
-    walker = SimplifiedWalker(dt=0.002, frame_skip=frame_skip)
-
-    # Handle both single and batched actions
-    def one_step(state, action):
-        """
-        state: current state (s_dim,)
-        action: action at time t (a_dim,)
-        """
-        next_state = walker.step(state, action)
-        return next_state, next_state
-
-    # Scan over time dimension
-    # actions shape: (T, a_dim) or (T, batch, a_dim)
-    # init_state shape: (s_dim,) or (batch, s_dim)
-
-    if actions.ndim == 3:
-        # Batched: (T, batch, a_dim)
-        # Need to vmap over batch dimension
-        def batched_step(state_batch, action_batch):
-            # state_batch: (batch, s_dim)
-            # action_batch: (batch, a_dim)
-            next_states = jax.vmap(walker.step)(state_batch, action_batch)
-            return next_states, next_states
-
-        _, states = lax.scan(batched_step, init_state, actions)
-    else:
-        # Single: (T, a_dim)
-        _, states = lax.scan(one_step, init_state, actions)
-
-    return states
-
-
-# This is the FAST batched version (adapted from the first code block)
