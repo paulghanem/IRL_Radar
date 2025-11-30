@@ -102,78 +102,31 @@ def mountaincar_step(
 import jax.numpy as jnp
 import numpy as np  # Required for signature-compliant noise generation
 
-def cartpole_step(state, action):
-    # --- Config ---
-    gravity = 9.8
-    masscart = 1.0
-    masspole = 0.1
-    total_mass = masscart + masspole
-    length = 0.5
-    polemass_length = masspole * length
-    force_mag = 10.0
-    tau = 0.02
-    noise_scale = 0.01  # Adjust the magnitude of the corruption here
-
-    # --- Unpack State ---
-    # state shape is expected to be (..., 4)
-    x, x_dot, theta, theta_dot = state[...,0:1], state[...,1:2], state[...,2:3], state[...,3:4]
-
-    force = action[...,0:1] # Ensure dimensions match for broadcasting
-
-    """Performs step transitions in the environment."""
-    force = jnp.clip(force, -force_mag, force_mag)
-    costheta = jnp.cos(theta)
-    sintheta = jnp.sin(theta)
-
-    temp = (
-            force + polemass_length * theta_dot ** 2 * sintheta
-           ) / total_mass
-    thetaacc = (gravity * sintheta - costheta * temp) / (
-            length
-            * (4.0 / 3.0 - masspole * costheta ** 2 / total_mass)
-    )
-    xacc = temp - polemass_length * thetaacc * costheta / total_mass
-
-    # --- NOISE INJECTION (Using Numpy to preserve signature) ---
-    # We generate noise matching the shape of the state components
-    # Note: If you JIT this function, this noise becomes constant!
-    noise_x = jnp.array(np.random.normal(0, noise_scale, x.shape))
-    noise_x_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
-    noise_theta = jnp.array(np.random.normal(0, noise_scale, x.shape))
-    noise_theta_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
-
-    # --- Euler Integration with Process Noise ---
-    x = x + tau * x_dot + noise_x
-    x_dot = x_dot + tau * xacc + noise_x_dot
-    theta = theta + tau * theta_dot + noise_theta
-    theta_dot = theta_dot + tau * thetaacc + noise_theta_dot
-
-    return jnp.concatenate([x, x_dot, theta, theta_dot], axis=-1)
-
-# def cartpole_step(
-#         state,
-#         action):
-
+# def cartpole_step(state, action):
+#     # --- Config ---
 #     gravity = 9.8
 #     masscart = 1.0
-#     masspole= 0.1
-#     total_mass = masscart + masspole  # (masscart + masspole)
+#     masspole = 0.1
+#     total_mass = masscart + masspole
 #     length = 0.5
-#     polemass_length = masspole * length  # (masspole * length)
+#     polemass_length = masspole * length
 #     force_mag = 10.0
 #     tau = 0.02
+#     noise_scale = 0.01  # Adjust the magnitude of the corruption here
 
-#     x, x_dot, theta, theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1),state[...,3].reshape(-1, 1)
+#     # --- Unpack State ---
+#     # state shape is expected to be (..., 4)
+#     x, x_dot, theta, theta_dot = state[...,0:1], state[...,1:2], state[...,2:3], state[...,3:4]
 
-#     force = action[...,0]
+#     force = action[...,0:1] # Ensure dimensions match for broadcasting
 
 #     """Performs step transitions in the environment."""
-#     force = jnp.clip(force,-force_mag,force_mag) #force_mag * action - force_mag * (1 - action) turn to continuous :)
+#     force = jnp.clip(force, -force_mag, force_mag)
 #     costheta = jnp.cos(theta)
 #     sintheta = jnp.sin(theta)
 
 #     temp = (
-#                    force + polemass_length * theta_dot ** 2 * sintheta
+#             force + polemass_length * theta_dot ** 2 * sintheta
 #            ) / total_mass
 #     thetaacc = (gravity * sintheta - costheta * temp) / (
 #             length
@@ -181,13 +134,60 @@ def cartpole_step(state, action):
 #     )
 #     xacc = temp - polemass_length * thetaacc * costheta / total_mass
 
-#     # Only default Euler integration option available here!
-#     x = x + tau * x_dot
-#     x_dot = x_dot + tau * xacc
-#     theta = theta + tau * theta_dot
-#     theta_dot = theta_dot + tau * thetaacc
+#     # --- NOISE INJECTION (Using Numpy to preserve signature) ---
+#     # We generate noise matching the shape of the state components
+#     # Note: If you JIT this function, this noise becomes constant!
+#     noise_x = jnp.array(np.random.normal(0, noise_scale, x.shape))
+#     noise_x_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
+#     noise_theta = jnp.array(np.random.normal(0, noise_scale, x.shape))
+#     noise_theta_dot = jnp.array(np.random.normal(0, noise_scale, x.shape))
 
-#     return jnp.concatenate([x, x_dot,theta,theta_dot], axis=-1)
+#     # --- Euler Integration with Process Noise ---
+#     x = x + tau * x_dot + noise_x
+#     x_dot = x_dot + tau * xacc + noise_x_dot
+#     theta = theta + tau * theta_dot + noise_theta
+#     theta_dot = theta_dot + tau * thetaacc + noise_theta_dot
+
+#     return jnp.concatenate([x, x_dot, theta, theta_dot], axis=-1)
+
+def cartpole_step(
+        state,
+        action):
+
+    gravity = 9.8
+    masscart = 1.0
+    masspole= 0.1
+    total_mass = masscart + masspole  # (masscart + masspole)
+    length = 0.5
+    polemass_length = masspole * length  # (masspole * length)
+    force_mag = 10.0
+    tau = 0.02
+
+    x, x_dot, theta, theta_dot = state[...,0].reshape(-1, 1),state[...,1].reshape(-1, 1),state[...,2].reshape(-1, 1),state[...,3].reshape(-1, 1)
+
+    force = action[...,0]
+
+    """Performs step transitions in the environment."""
+    force = jnp.clip(force,-force_mag,force_mag) #force_mag * action - force_mag * (1 - action) turn to continuous :)
+    costheta = jnp.cos(theta)
+    sintheta = jnp.sin(theta)
+
+    temp = (
+                    force + polemass_length * theta_dot ** 2 * sintheta
+            ) / total_mass
+    thetaacc = (gravity * sintheta - costheta * temp) / (
+            length
+            * (4.0 / 3.0 - masspole * costheta ** 2 / total_mass)
+    )
+    xacc = temp - polemass_length * thetaacc * costheta / total_mass
+
+    # Only default Euler integration option available here!
+    x = x + tau * x_dot
+    x_dot = x_dot + tau * xacc
+    theta = theta + tau * theta_dot
+    theta_dot = theta_dot + tau * thetaacc
+
+    return jnp.concatenate([x, x_dot,theta,theta_dot], axis=-1)
 
 def pendulum_step(
     state,action
