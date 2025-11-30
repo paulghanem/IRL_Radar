@@ -102,9 +102,9 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=10,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=10,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--rirl_iterations",default=10,type=int,help="The number of epoch updates")
+parser.add_argument("--N_steps_expert",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--rirl_iterations",default=1000,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
 parser.add_argument("--lambda_",default=0.01,type=float,help="Temperature in MPPI (lower makers sharper)")
@@ -135,8 +135,8 @@ parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=Fal
 parser.add_argument("--diagonal",action=argparse.BooleanOptionalAction,default=False,type=bool,help="diagonal version of hessians ")
 
 # ==================== MPPI CONFIGURATION ======================== #
-parser.add_argument('--horizon', default=5,type=int, help='Horizon for MPPI control')
-parser.add_argument('--num_traj', default=20,type=int, help='Number of MPPI control sequences samples to generate')
+parser.add_argument('--horizon', default=20,type=int, help='Horizon for MPPI control')
+parser.add_argument('--num_traj', default=500,type=int, help='Number of MPPI control sequences samples to generate')
 
 
 
