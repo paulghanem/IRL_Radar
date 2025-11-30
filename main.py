@@ -102,8 +102,8 @@ parser = argparse.ArgumentParser(description = 'Optimal Radar Placement', format
 
 # =========================== Experiment Choice ================== #
 parser.add_argument('--seed',default=123,type=int, help='Random seed to kickstart all randomness')
-parser.add_argument("--N_steps_expert",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
-parser.add_argument("--N_steps",default=1000,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps_expert",default=10,type=int,help="The number of steps in the experiment in GYM ENV")
+parser.add_argument("--N_steps",default=10,type=int,help="The number of steps in the experiment in GYM ENV")
 parser.add_argument("--rirl_iterations",default=1000,type=int,help="The number of epoch updates")
 parser.add_argument("--reward_fn_updates",default=15,type=int,help="The number of reward fn updates")
 parser.add_argument("--hidden_dim",default=16,type=int,help="The number of hidden neurons")
@@ -127,7 +127,7 @@ parser.add_argument('--gail', action=argparse.BooleanOptionalAction,default=Fals
 parser.add_argument('--airl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='airl method flag')
 
 parser.add_argument('--rgcl', action=argparse.BooleanOptionalAction,default=False,type=bool, help='rgcl method flag')
-parser.add_argument('--gym_env', default="Swimmer",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
+parser.add_argument('--gym_env', default="HalfCheetah-v4",type=str, help='gym environment to test (CartPole-v1 , Pendulum-v1)')
 parser.add_argument('--PPO', action=argparse.BooleanOptionalAction,default=False,type=bool, help='PPO policy flag')
 
 parser.add_argument("--online",action=argparse.BooleanOptionalAction,default=False,type=bool,help="online version of bechmarks ")
@@ -244,12 +244,17 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
     #pdb.set_trace()
     model_path=os.path.join(assets_dir,env_xml)
     model = mujoco.MjModel.from_xml_path(model_path)
-    model.opt.solver = mujoco.mjtSolver.mjSOL_CG
-    model.opt.iterations = 4 
-    model.opt.ls_iterations = 4
-    model.opt.timestep = args.dt*args.frame_skip
-    args.dt=args.dt*args.frame_skip
-    args.frame_skip=1
+    if args.gym_env=="HalfCheetah-v4":
+        model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+        model.opt.iterations = 4
+        model.opt.ls_iterations = 4
+    else:
+        model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+        model.opt.iterations = 4
+        model.opt.ls_iterations = 4
+        model.opt.timestep = args.dt*args.frame_skip
+        args.dt=args.dt*args.frame_skip
+        args.frame_skip=1
     if args.gym_env=="Humanoid-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
     mjx_model = mjx.put_model(model)
