@@ -257,29 +257,27 @@ def get_gradients(state_train,params,state,N_steps):
     gradients=jnp.concatenate([p.flatten() for p in flat_grads])
     return gradients
 
-@jax.jit 
-def get_hessian(state_train,params,state,N_steps):
-    d2c_d2_theta=jax.hessian(cost_fn,argnums=1)(state_train,params,state.reshape(1,-1),N_steps)
-    Dense_0_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['bias'])
-    Dense_0_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_0']['kernel'])
-    Dense_1_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['bias'])
-    Dense_1_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_1']['kernel'])
-    Dense_2_bias_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['bias'])
-    Dense_2_kernel_h=jax.tree.flatten(d2c_d2_theta['Dense_2']['kernel'])
-    
-    for j in range(len(Dense_0_bias_h[0])):
-        Dense_0_bias_h[0][j]=Dense_0_bias_h[0][j].reshape((Dense_0_bias_h[0][j].shape[0],-1))
-        Dense_1_bias_h[0][j]=Dense_1_bias_h[0][j].reshape((Dense_1_bias_h[0][j].shape[0],-1))
-        Dense_2_bias_h[0][j]=Dense_2_bias_h[0][j].reshape((Dense_2_bias_h[0][j].shape[0],-1))
-        Dense_0_kernel_h[0][j]=Dense_0_kernel_h[0][j].reshape((Dense_0_kernel_h[0][j].shape[0]*Dense_0_kernel_h[0][j].shape[1],-1))
-        Dense_1_kernel_h[0][j]=Dense_1_kernel_h[0][j].reshape((Dense_1_kernel_h[0][j].shape[0]*Dense_1_kernel_h[0][j].shape[1],-1))
-        Dense_2_kernel_h[0][j]=Dense_2_kernel_h[0][j].reshape((Dense_2_kernel_h[0][j].shape[0]*Dense_2_kernel_h[0][j].shape[1],-1))
-    
-    hessian=jnp.concatenate((jnp.concatenate(Dense_0_bias_h[0],axis=1),jnp.concatenate(Dense_0_kernel_h[0],axis=1),jnp.concatenate(Dense_1_bias_h[0],axis=1),jnp.concatenate(Dense_1_kernel_h[0],axis=1),jnp.concatenate(Dense_2_bias_h[0],axis=1),jnp.concatenate(Dense_2_kernel_h[0],axis=1)),axis=0)
-    #flat_hessian, tree_def = tree_flatten(d2c_d2_theta)
-   # hessian=jnp.concatenate([p.flatten() for p in flat_hessian])
+@jax.jit
+def get_hessian(state_train, params, state, N_steps):
+    """
+    Compute the full Hessian matrix using jax.hessian directly.
+    This is the exact Hessian, not a Fisher approximation.
 
-    return hessian
+    Returns: Hessian matrix of shape [num_params, num_params]
+    """
+    # Flatten the parameter PyTree into a single vector
+    flat_params, unravel_fn = ravel_pytree(params)
+
+    # Define scalar cost as function of flattened params
+    def scalar_cost(flat_params):
+        unflat_params = unravel_fn(flat_params)
+        return cost_fn(state_train, unflat_params, state.reshape(1, -1), N_steps)
+
+    # Compute full Hessian matrix using jax.hessian
+    # This computes the exact Hessian: H[i,j] = d²cost/dθ[i]dθ[j]
+    hessian = jax.hessian(scalar_cost)(flat_params)
+
+    return hessian  # Shape: [num_params, num_params]
 
 # @jax.jit 
 # def get_hessian_diag(state_train,params,state,N_steps):

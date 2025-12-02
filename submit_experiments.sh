@@ -36,7 +36,7 @@ for env in "${ENVS[@]}"; do
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gpus=v100-32:1
-#SBATCH --time=04:00:00
+#SBATCH --time=48:00:00
 #SBATCH --partition=GPU-shared
 #SBATCH --mail-user=ghanem.p@northeastern.edu
 #SBATCH --mail-type=END,FAIL
