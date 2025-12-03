@@ -13,7 +13,8 @@
       "Bash(timeout 60 \"C:/Users/siliconsynapse/anaconda3/envs/rirl/python.exe\" test_ppo_simple.py)",
       "Bash(timeout 300 \"C:/Users/siliconsynapse/anaconda3/envs/rirl/python.exe\":*)",
       "Bash(dir:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(squeue:*)"
     ],
     "deny": [],
     "ask": []

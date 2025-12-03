@@ -1,0 +1,10 @@
+Running Swimmer_rgcl_124 on v023.ib.bridges2.psc.edu with Q=1e-6
+GPU Allocated: 0
+[CudaDevice(id=0)]
+Using AIRL:  False
+Using GAIL:  False
+Using RGCL:  True
+Experiment State @  2025-12-01 09:54:49.281498-05:00
+Experiment Saved @  results/experiment_124
+Experiment Settings Saved @  results/experiment_124
+Job Swimmer_rgcl_124 complete

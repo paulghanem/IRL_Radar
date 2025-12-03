@@ -229,6 +229,12 @@ class GenerateDemo(object):
                         gym.make(actual_env_name),
                         max_steps=max_frames
                     )
+                elif "Swimmer" in actual_env_name:
+                    # Swimmer-v4 has XML compatibility issues, use v3 instead
+                    env = CustomTerminationWrapper(
+                        gym.make("Swimmer-v3"),
+                        max_steps=max_frames
+                    )
                 else:
                     # v4 includes x-position by default, but experts are from v3
                     # So we need to match v3 behavior

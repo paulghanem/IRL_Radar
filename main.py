@@ -237,7 +237,7 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
         args.dt=0.003
         #env_brax = envs.get_environment('Humanoid')
     elif args.gym_env=="Swimmer":
-        env_xml = "Swimmer.xml"
+        env_xml = "swimmer.xml"
         args.frame_skip=4
         args.dt=0.01
         #env_brax = envs.get_environment('Swimmer')
@@ -246,8 +246,6 @@ if args.gym_env in ["HalfCheetah-v4","Ant-v4","Hopper","Walker2d","Humanoid-v4",
     model = mujoco.MjModel.from_xml_path(model_path)
     if args.gym_env=="HalfCheetah-v4":
         model.opt.solver = mujoco.mjtSolver.mjSOL_CG
-        model.opt.iterations = 4
-        model.opt.ls_iterations = 4
     else:
         model.opt.solver = mujoco.mjtSolver.mjSOL_CG
         model.opt.iterations = 4

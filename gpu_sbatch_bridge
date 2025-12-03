@@ -55,16 +55,16 @@ echo ""
 python main.py \
     --gym_env=Walker2d \
     --num_traj=500 \
-    --horizon=50 \
-    --N_steps=100 \
-    --N_steps_expert=100 \
-    --rirl_iterations=1 \
+    --horizon=20 \
+    --N_steps=1000 \
+    --N_steps_expert=1000 \
+    --rirl_iterations=1000 \
     --reward_fn_updates=15 \
     --UB \
-    --seed=123 \
+    --seed=$SEED \
     --lr=1e-4 \
     --lambda_=0.01 \
-    --Q=1e-4 \
+    --Q=1e-5 \
     --P=1e-2 \
     --hidden_dim=16 \
     --no-save_images

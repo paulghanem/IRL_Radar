@@ -1,0 +1,13 @@
+2025-12-01 09:34:50.807118: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1764599690.825774   53558 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1764599690.831442   53558 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/save_util.py:167: UserWarning: Could not deserialize object learning_rate. Consider using `custom_objects` argument to replace this object.
+Exception: 'bytes' object cannot be interpreted as an integer
+  warnings.warn(
+/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/save_util.py:167: UserWarning: Could not deserialize object lr_schedule. Consider using `custom_objects` argument to replace this object.
+Exception: 'bytes' object cannot be interpreted as an integer
+  warnings.warn(
+/jet/home/pghanem/.conda/envs/rirl/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:95: UserWarning: You loaded a model that was trained using OpenAI Gym. We strongly recommend transitioning to Gymnasium by saving that model again.
+  warnings.warn(
+slurmstepd: error: *** JOB 36332131 ON v016 CANCELLED AT 2025-12-01T12:36:48 ***
